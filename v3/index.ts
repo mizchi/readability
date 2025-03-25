@@ -20,7 +20,7 @@ export {
 } from './parser.ts';
 
 export {
-  parse,
+  extract,
   extractContent
 } from './core.ts';
 

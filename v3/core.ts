@@ -370,10 +370,6 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
   
   const content = isTestEnvironment ? mainContent : 
                  (textLength >= charThreshold ? mainContent : null);
-  const textContent = content ? getInnerText(content) : '';
-  
-  // コンテンツをHTMLにシリアライズ
-  const contentHTML = content ? serializeToHTML(content) : '';
   
   return {
     title,
@@ -386,7 +382,7 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
 /**
  * HTMLから記事を抽出する
  */
-export function parse(html: string, options: ReadabilityOptions = {}): ReadabilityArticle {
+export function extract(html: string, options: ReadabilityOptions = {}): ReadabilityArticle {
   // HTMLをパースして仮想DOMを作成
   const doc = parseHTML(html);
   

@@ -15,7 +15,7 @@ export default defineConfig({
       entry: 'v3/index.ts',
       name: 'Readability',
       formats: ['es'],
-      fileName: () => 'dist.js',
+      fileName: () => 'index.js',
     },
     target: 'esnext',
     sourcemap: true,

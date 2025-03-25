@@ -4,7 +4,7 @@
  * URLからHTMLを取得して本文のHTML構造をそのまま出力する例
  */
 
-import { parse } from '../index.ts';
+import { extract } from '../index.ts';
 import type { ReadabilityArticle } from '../types.ts';
 import { elementToHTML, stringify } from '../format.ts';
 import html2md from "html-to-md";
@@ -26,7 +26,7 @@ export async function fetchAndExtractHTML(url: string): Promise<ReadabilityArtic
     const html = await response.text();
     
     // 本文抽出を実行
-    const article = parse(html, { charThreshold: 100 });
+    const article = extract(html, { charThreshold: 100 });
     
     return article;
   } catch (error) {

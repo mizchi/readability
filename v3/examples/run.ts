@@ -4,7 +4,7 @@
  * URLからHTMLを取得して本文抽出を実行する例
  */
 
-import { parse } from '../index.ts';
+import { extract } from '../index.ts';
 import type { ReadabilityArticle } from '../types.ts';
 import { extractTextContent, elementToHTML } from '../format.ts';
 
@@ -26,7 +26,7 @@ export async function fetchAndExtract(url: string): Promise<ReadabilityArticle> 
     const html = await response.text();
     
     // 本文抽出を実行
-    const article = parse(html, { charThreshold: 100 });
+    const article = extract(html, { charThreshold: 100 });
     
     return article;
   } catch (error) {

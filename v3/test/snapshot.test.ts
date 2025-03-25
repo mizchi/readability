@@ -7,7 +7,7 @@
  */
 
 import { test, expect, describe } from 'vitest';
-import { parse } from '../index.ts';
+import { extract } from '../index.ts';
 import { elementToHTML } from '../format.ts';
 import html2md from "html-to-md";
 import { TEST_URLS } from './urls.ts';
@@ -67,7 +67,7 @@ async function fetchAndExtractHTML(url: string): Promise<{
     }
     
     // 本文抽出を実行
-    const article = parse(html, { charThreshold: 100 });
+    const article = extract(html, { charThreshold: 100 });
     
     // HTML構造を生成
     const htmlContent = article.root ? elementToHTML(article.root) : '';
