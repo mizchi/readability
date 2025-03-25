@@ -184,6 +184,14 @@ export function findMainContent(doc: VDocument): VElement | null {
       const linkDensity = getLinkDensity(candidate);
       candidate.readability.contentScore *= (1 - linkDensity);
       
+      // テキスト密度も考慮する
+      // テキスト密度が高い要素は、より多くのテキストコンテンツを含む可能性が高い
+      const textDensity = getTextDensity(candidate);
+      if (textDensity > 0) {
+        // テキスト密度が高いほど、スコアを少し上げる（最大10%）
+        candidate.readability.contentScore *= (1 + Math.min(textDensity / 10, 0.1));
+      }
+      
       if (!topCandidate || 
           (topCandidate.readability && 
            candidate.readability.contentScore > topCandidate.readability.contentScore)) {
@@ -261,6 +269,13 @@ export function isProbablyContent(element: VElement): boolean {
   // リンク密度のチェック
   const linkDensity = getLinkDensity(element);
   if (linkDensity > 0.5) {
+    return false;
+  }
+  
+  // テキスト密度のチェック
+  // テキスト密度が極端に低い場合は、本文である可能性が低い
+  const textDensity = getTextDensity(element);
+  if (textDensity < 0.1) {
     return false;
   }
   
