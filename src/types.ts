@@ -39,7 +39,7 @@ declare global {
 
 export interface ReadabilityAttempt {
   articleContent: Element;
-  textContent: number;
+  textLength: number;
 }
 
 export interface ReadabilityMetadata {

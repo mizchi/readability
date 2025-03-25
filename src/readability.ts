@@ -127,31 +127,21 @@ export class Readability {
         if (node.nodeType == TEXT_NODE) {
           return `${node.nodeName} ("${node.textContent}")`;
         }
-        let attrPairs = Array.from(node.attributes || [], function (attr) {
+        let attrPairs = Array.from((node as HTMLElement).attributes || [], function (attr) {
           return `${attr.name}="${attr.value}"`;
         }).join(" ");
         return `<${(node as Element).localName} ${attrPairs}>`;
       };
       this.log = function (...args: any[]) {
-        if (typeof console !== "undefined") {
-          let processedArgs = Array.from(args, arg => {
-            if (arg && arg.nodeType == ELEMENT_NODE) {
-              return logNode(arg);
-            }
-            return arg;
-          });
-          processedArgs.unshift("Reader: (Readability)");
-          // eslint-disable-next-line no-console
-          console.log(...processedArgs);
-        } else if (typeof dump !== "undefined") {
-          /* global dump */
-          var msg = Array.prototype.map
-            .call(args, function (x: any) {
-              return x && x.nodeName ? logNode(x) : x;
-            })
-            .join(" ");
-          (dump as any)("Reader: (Readability) " + msg + "\n");
-        }
+        let processedArgs = Array.from(args, arg => {
+          if (arg && arg.nodeType == ELEMENT_NODE) {
+            return logNode(arg);
+          }
+          return arg;
+        });
+        processedArgs.unshift("Reader: (Readability)");
+        // eslint-disable-next-line no-console
+        console.log(...processedArgs);
       };
     } else {
       this.log = function () {};
@@ -162,10 +152,10 @@ export class Readability {
   /**
    * Run any post-process modifications to article content as necessary.
    *
-   * @param Element
+   * @param articleContent The article element to process
    * @return void
    **/
-  _postProcessContent(articleContent) {
+  _postProcessContent(articleContent: Element): void {
     // Readability cannot open relative uris so we convert them to absolute uris.
     this._fixRelativeUris(articleContent);
 
@@ -175,7 +165,7 @@ export class Readability {
       // Remove classes.
       this._cleanClasses(articleContent);
     }
-  },
+  }
 
   /**
    * Iterates over a NodeList, calls `filterFn` for each node and removes node
@@ -183,13 +173,13 @@ export class Readability {
    *
    * If function is not passed, removes all the nodes in node list.
    *
-   * @param NodeList nodeList The nodes to operate on
-   * @param Function filterFn the function to use as a filter
+   * @param nodeList The nodes to operate on
+   * @param filterFn the function to use as a filter
    * @return void
    */
-  _removeNodes(nodeList, filterFn) {
+  _removeNodes(nodeList: NodeListOf<Element> | Element[], filterFn?: (node: Element, index: number, nodeList: NodeListOf<Element> | Element[]) => boolean): void {
     // Avoid ever operating on live node lists.
-    if (this._docJSDOMParser && nodeList._isLiveNodeList) {
+    if (this._docJSDOMParser && (nodeList as any)._isLiveNodeList) {
       throw new Error("Do not pass live node lists to _removeNodes");
     }
     for (var i = nodeList.length - 1; i >= 0; i--) {
@@ -201,24 +191,24 @@ export class Readability {
         }
       }
     }
-  },
+  }
 
   /**
    * Iterates over a NodeList, and calls _setNodeTag for each node.
    *
-   * @param NodeList nodeList The nodes to operate on
-   * @param String newTagName the new tag name to use
+   * @param nodeList The nodes to operate on
+   * @param newTagName the new tag name to use
    * @return void
    */
-  _replaceNodeTags(nodeList, newTagName) {
+  _replaceNodeTags(nodeList: NodeListOf<Element> | Element[], newTagName: string): void {
     // Avoid ever operating on live node lists.
-    if (this._docJSDOMParser && nodeList._isLiveNodeList) {
+    if (this._docJSDOMParser && (nodeList as any)._isLiveNodeList) {
       throw new Error("Do not pass live node lists to _replaceNodeTags");
     }
     for (const node of nodeList) {
       this._setNodeTag(node, newTagName);
     }
-  },
+  }
 
   /**
    * Iterate over a NodeList, which doesn't natively fully implement the Array
@@ -227,13 +217,13 @@ export class Readability {
    * For convenience, the current object context is applied to the provided
    * iterate function.
    *
-   * @param  NodeList nodeList The NodeList.
-   * @param  Function fn       The iterate function.
+   * @param nodeList The NodeList.
+   * @param fn The iterate function.
    * @return void
    */
-  _forEachNode(nodeList, fn) {
+  _forEachNode(nodeList: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[], fn: (node: Element | Node, index: number, list: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[]) => void): void {
     Array.prototype.forEach.call(nodeList, fn, this);
-  },
+  }
 
   /**
    * Iterate over a NodeList, and return the first node that passes
@@ -242,13 +232,13 @@ export class Readability {
    * For convenience, the current object context is applied to the provided
    * test function.
    *
-   * @param  NodeList nodeList The NodeList.
-   * @param  Function fn       The test function.
-   * @return void
+   * @param nodeList The NodeList.
+   * @param fn The test function.
+   * @return The found node or undefined
    */
-  _findNode(nodeList, fn) {
+  _findNode(nodeList: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[], fn: (node: Element | Node, index: number, list: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[]) => boolean): Element | Node | undefined {
     return Array.prototype.find.call(nodeList, fn, this);
-  },
+  }
 
   /**
    * Iterate over a NodeList, return true if any of the provided iterate
@@ -257,13 +247,13 @@ export class Readability {
    * For convenience, the current object context is applied to the
    * provided iterate function.
    *
-   * @param  NodeList nodeList The NodeList.
-   * @param  Function fn       The iterate function.
+   * @param nodeList The NodeList.
+   * @param fn The iterate function.
    * @return Boolean
    */
-  _someNode(nodeList, fn) {
+  _someNode(nodeList: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[], fn: (node: Element | Node, index: number, list: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[]) => boolean): boolean {
     return Array.prototype.some.call(nodeList, fn, this);
-  },
+  }
 
   /**
    * Iterate over a NodeList, return true if all of the provided iterate
@@ -272,15 +262,15 @@ export class Readability {
    * For convenience, the current object context is applied to the
    * provided iterate function.
    *
-   * @param  NodeList nodeList The NodeList.
-   * @param  Function fn       The iterate function.
+   * @param nodeList The NodeList.
+   * @param fn The iterate function.
    * @return Boolean
    */
-  _everyNode(nodeList, fn) {
+  _everyNode(nodeList: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[], fn: (node: Element | Node, index: number, list: NodeListOf<Element> | Element[] | NodeListOf<Node> | Node[]) => boolean): boolean {
     return Array.prototype.every.call(nodeList, fn, this);
-  },
+  }
 
-  _getAllNodesWithTag(node, tagNames) {
+  _getAllNodesWithTag(node: Element | Document, tagNames: string[]): NodeListOf<Element> | Element[] {
     if (node.querySelectorAll) {
       return node.querySelectorAll(tagNames.join(","));
     }
@@ -291,17 +281,17 @@ export class Readability {
         return Array.isArray(collection) ? collection : Array.from(collection);
       })
     );
-  },
+  }
 
   /**
    * Removes the class="" attribute from every element in the given
    * subtree, except those that match CLASSES_TO_PRESERVE and
    * the classesToPreserve array from the options object.
    *
-   * @param Element
+   * @param node The element to clean classes from
    * @return void
    */
-  _cleanClasses(node) {
+  _cleanClasses(node: Element): void {
     var classesToPreserve = this._classesToPreserve;
     var className = (node.getAttribute("class") || "")
       .split(/\s+/)
@@ -314,36 +304,36 @@ export class Readability {
       node.removeAttribute("class");
     }
 
-    for (node = node.firstElementChild; node; node = node.nextElementSibling) {
-      this._cleanClasses(node);
+    for (let child = node.firstElementChild; child; child = child.nextElementSibling) {
+      this._cleanClasses(child);
     }
-  },
+  }
 
   /**
    * Tests whether a string is a URL or not.
    *
-   * @param {string} str The string to test
-   * @return {boolean} true if str is a URL, false if not
+   * @param str The string to test
+   * @return true if str is a URL, false if not
    */
-  _isUrl(str) {
+  _isUrl(str: string): boolean {
     try {
       new URL(str);
       return true;
     } catch {
       return false;
     }
-  },
+  }
   /**
    * Converts each <a> and <img> uri in the given element to an absolute URI,
    * ignoring #ref URIs.
    *
-   * @param Element
+   * @param articleContent The element to process
    * @return void
    */
-  _fixRelativeUris(articleContent) {
+  _fixRelativeUris(articleContent: Element): void {
     var baseURI = this._doc.baseURI;
     var documentURI = this._doc.documentURI;
-    function toAbsoluteURI(uri) {
+    const toAbsoluteURI = (uri: string): string => {
       // Leave hash links alone if the base URI matches the document URI:
       if (baseURI == documentURI && uri.charAt(0) == "#") {
         return uri;
@@ -356,7 +346,7 @@ export class Readability {
         // Something went wrong, just return the original:
       }
       return uri;
-    }
+    };
 
     var links = this._getAllNodesWithTag(articleContent, ["a"]);
     this._forEachNode(links, function (link) {
@@ -368,17 +358,21 @@ export class Readability {
           // if the link only contains simple text content, it can be converted to a text node
           if (
             link.childNodes.length === 1 &&
-            link.childNodes[0].nodeType === this.TEXT_NODE
+            link.childNodes[0].nodeType === TEXT_NODE
           ) {
-            var text = this._doc.createTextNode(link.textContent);
-            link.parentNode.replaceChild(text, link);
+            var text = this._doc.createTextNode(link.textContent || "");
+            if (link.parentNode) {
+              link.parentNode.replaceChild(text, link);
+            }
           } else {
             // if the link has multiple children, they should all be preserved
             var container = this._doc.createElement("span");
             while (link.firstChild) {
               container.appendChild(link.firstChild);
             }
-            link.parentNode.replaceChild(container, link);
+            if (link.parentNode) {
+              link.parentNode.replaceChild(container, link);
+            }
           }
         } else {
           link.setAttribute("href", toAbsoluteURI(href));
@@ -410,7 +404,7 @@ export class Readability {
 
       if (srcset) {
         var newSrcset = srcset.replace(
-          this.REGEXPS.srcsetUrl,
+          REGEXPS.srcsetUrl,
           function (_, p1, p2, p3) {
             return toAbsoluteURI(p1) + (p2 || "") + p3;
           }
@@ -419,10 +413,10 @@ export class Readability {
         media.setAttribute("srcset", newSrcset);
       }
     });
-  },
+  }
 
-  _simplifyNestedElements(articleContent) {
-    var node = articleContent;
+  _simplifyNestedElements(articleContent: Element): void {
+    var node: Element | null = articleContent;
 
     while (node) {
       if (
@@ -439,24 +433,26 @@ export class Readability {
         ) {
           var child = node.children[0];
           for (var i = 0; i < node.attributes.length; i++) {
-            child.setAttributeNode(node.attributes[i].cloneNode());
+            child.setAttributeNode(node.attributes[i].cloneNode() as Attr);
           }
-          node.parentNode.replaceChild(child, node);
-          node = child;
-          continue;
+          if (node.parentNode) {
+            node.parentNode.replaceChild(child, node);
+            node = child;
+            continue;
+          }
         }
       }
 
       node = this._getNextNode(node);
     }
-  },
+  }
 
   /**
    * Get the article title as an H1.
    *
    * @return string
    **/
-  _getArticleTitle() {
+  _getArticleTitle(): string {
     var doc = this._doc;
     var curTitle = "";
     var origTitle = "";
@@ -466,16 +462,17 @@ export class Readability {
 
       // If they had an element with id "title" in their HTML
       if (typeof curTitle !== "string") {
-        curTitle = origTitle = this._getInnerText(
-          doc.getElementsByTagName("title")[0]
-        );
+        const titleEl = doc.getElementsByTagName("title")[0];
+        if (titleEl) {
+          curTitle = origTitle = this._getInnerText(titleEl);
+        }
       }
     } catch (e) {
       /* ignore exceptions setting the title. */
     }
 
     var titleHadHierarchicalSeparators = false;
-    function wordCount(str) {
+    function wordCount(str: string): number {
       return str.split(/\s+/).length;
     }
 
@@ -483,7 +480,12 @@ export class Readability {
     if (/ [\|\-\\\/>»] /.test(curTitle)) {
       titleHadHierarchicalSeparators = / [\\\/>»] /.test(curTitle);
       let allSeparators = Array.from(origTitle.matchAll(/ [\|\-\\\/>»] /gi));
-      curTitle = origTitle.substring(0, allSeparators.pop().index);
+      if (allSeparators.length > 0) {
+        const lastSeparator = allSeparators.pop();
+        if (lastSeparator && lastSeparator.index !== undefined) {
+          curTitle = origTitle.substring(0, lastSeparator.index);
+        }
+      }
 
       // If the resulting title is too short, remove the first part instead:
       if (wordCount(curTitle) < 3) {
@@ -495,7 +497,7 @@ export class Readability {
       var headings = this._getAllNodesWithTag(doc, ["h1", "h2"]);
       var trimmedTitle = curTitle.trim();
       var match = this._someNode(headings, function (heading) {
-        return heading.textContent.trim() === trimmedTitle;
+        return heading.textContent?.trim() === trimmedTitle;
       });
 
       // If we don't, let's extract the title out of the original title string.
@@ -519,7 +521,7 @@ export class Readability {
       }
     }
 
-    curTitle = curTitle.trim().replace(this.REGEXPS.normalize, " ");
+    curTitle = curTitle.trim().replace(REGEXPS.normalize, " ");
     // If we now have 4 words or fewer as our title, and either no
     // 'hierarchical' separators (\, /, > or ») were found in the original
     // title or we decreased the number of words by more than 1 word, use
@@ -535,7 +537,7 @@ export class Readability {
     }
 
     return curTitle;
-  },
+  }
 
   /**
    * Prepare the HTML document for readability to scrape it.
@@ -543,7 +545,7 @@ export class Readability {
    *
    * @return void
    **/
-  _prepDocument() {
+  _prepDocument(): void {
     var doc = this._doc;
 
     // Remove all style tags in head
@@ -554,24 +556,24 @@ export class Readability {
     }
 
     this._replaceNodeTags(this._getAllNodesWithTag(doc, ["font"]), "SPAN");
-  },
+  }
 
   /**
    * Finds the next node, starting from the given node, and ignoring
    * whitespace in between. If the given node is an element, the same node is
    * returned.
    */
-  _nextNode(node) {
+  _nextNode(node: Node): Node | null {
     var next = node;
     while (
       next &&
-      next.nodeType != this.ELEMENT_NODE &&
-      this.REGEXPS.whitespace.test(next.textContent)
+      next.nodeType != ELEMENT_NODE &&
+      REGEXPS.whitespace.test(next.textContent || "")
     ) {
       next = next.nextSibling;
     }
     return next;
-  },
+  }
 
   /**
    * Replaces 2 or more successive <br> elements with a single <p>.
@@ -580,7 +582,7 @@ export class Readability {
    * will become:
    *   <div>foo<br>bar<p>abc</p></div>
    */
-  _replaceBrs(elem) {
+  _replaceBrs(elem: Element): void {
     this._forEachNode(this._getAllNodesWithTag(elem, ["br"]), function (br) {
       var next = br.nextSibling;
 
@@ -591,7 +593,7 @@ export class Readability {
       // If we find a <br> chain, remove the <br>s until we hit another node
       // or non-whitespace. This leaves behind the first <br> in the chain
       // (which will be replaced with a <p> later).
-      while ((next = this._nextNode(next)) && next.tagName == "BR") {
+      while ((next = this._nextNode(next)) && (next as Element).tagName == "BR") {
         replaced = true;
         var brSibling = next.nextSibling;
         next.remove();
@@ -603,14 +605,16 @@ export class Readability {
       // chain.
       if (replaced) {
         var p = this._doc.createElement("p");
-        br.parentNode.replaceChild(p, br);
+        if (br.parentNode) {
+          br.parentNode.replaceChild(p, br);
+        }
 
         next = p.nextSibling;
         while (next) {
           // If we've hit another <br><br>, we're done adding children to this <p>.
-          if (next.tagName == "BR") {
+          if ((next as Element).tagName == "BR") {
             var nextElem = this._nextNode(next.nextSibling);
-            if (nextElem && nextElem.tagName == "BR") {
+            if (nextElem && (nextElem as Element).tagName == "BR") {
               break;
             }
           }
@@ -629,14 +633,14 @@ export class Readability {
           p.lastChild.remove();
         }
 
-        if (p.parentNode.tagName === "P") {
+        if (p.parentNode && p.parentNode.tagName === "P") {
           this._setNodeTag(p.parentNode, "DIV");
         }
       }
     });
-  },
+  }
 
-  _setNodeTag(node, tag) {
+  _setNodeTag(node: Element, tag: string): Element {
     this.log("_setNodeTag", node, tag);
     if (this._docJSDOMParser) {
       node.localName = tag.toLowerCase();
@@ -648,7 +652,9 @@ export class Readability {
     while (node.firstChild) {
       replacement.appendChild(node.firstChild);
     }
-    node.parentNode.replaceChild(replacement, node);
+    if (node.parentNode) {
+      node.parentNode.replaceChild(replacement, node);
+    }
     if (node.readability) {
       replacement.readability = node.readability;
     }
@@ -657,16 +663,16 @@ export class Readability {
       replacement.setAttributeNode(node.attributes[i].cloneNode());
     }
     return replacement;
-  },
+  }
 
   /**
    * Prepare the article node for display. Clean out any inline styles,
    * iframes, forms, strip extraneous <p> tags, etc.
    *
-   * @param Element
+   * @param articleContent The article element to prepare
    * @return void
    **/
-  _prepArticle(articleContent) {
+  _prepArticle(articleContent: Element): void {
     this._cleanStyles(articleContent);
 
     // Check for data tables before we continue, to avoid removing items in
@@ -688,13 +694,13 @@ export class Readability {
     // Clean out elements with little content that have "share" in their id/class combinations from final top candidates,
     // which means we don't remove the top candidates even they have "share".
 
-    var shareElementThreshold = this.DEFAULT_CHAR_THRESHOLD;
+    var shareElementThreshold = DEFAULT_CHAR_THRESHOLD;
 
     this._forEachNode(articleContent.children, function (topCandidate) {
       this._cleanMatchedNodes(topCandidate, function (node, matchString) {
         return (
-          this.REGEXPS.shareElements.test(matchString) &&
-          node.textContent.length < shareElementThreshold
+          REGEXPS.shareElements.test(matchString) &&
+          node.textContent!.length < shareElementThreshold
         );
       });
     });
@@ -740,7 +746,7 @@ export class Readability {
       this._getAllNodesWithTag(articleContent, ["br"]),
       function (br) {
         var next = this._nextNode(br.nextSibling);
-        if (next && next.tagName == "P") {
+        if (next && (next as Element).tagName == "P") {
           br.remove();
         }
       }
@@ -753,31 +759,35 @@ export class Readability {
         var tbody = this._hasSingleTagInsideElement(table, "TBODY")
           ? table.firstElementChild
           : table;
-        if (this._hasSingleTagInsideElement(tbody, "TR")) {
+        if (tbody && this._hasSingleTagInsideElement(tbody, "TR")) {
           var row = tbody.firstElementChild;
-          if (this._hasSingleTagInsideElement(row, "TD")) {
+          if (row && this._hasSingleTagInsideElement(row, "TD")) {
             var cell = row.firstElementChild;
-            cell = this._setNodeTag(
-              cell,
-              this._everyNode(cell.childNodes, this._isPhrasingContent)
-                ? "P"
-                : "DIV"
-            );
-            table.parentNode.replaceChild(cell, table);
+            if (cell) {
+              cell = this._setNodeTag(
+                cell,
+                this._everyNode(cell.childNodes, this._isPhrasingContent)
+                  ? "P"
+                  : "DIV"
+              );
+              if (table.parentNode) {
+                table.parentNode.replaceChild(cell, table);
+              }
+            }
           }
         }
       }
     );
-  },
+  }
 
   /**
    * Initialize a node with the readability object. Also checks the
    * className/id for special names to add to its score.
    *
-   * @param Element
+   * @param node The element to initialize
    * @return void
    **/
-  _initializeNode(node) {
+  _initializeNode(node: Element): void {
     node.readability = { contentScore: 0 };
 
     switch (node.tagName) {
@@ -814,13 +824,13 @@ export class Readability {
     }
 
     node.readability.contentScore += this._getClassWeight(node);
-  },
+  }
 
-  _removeAndGetNext(node) {
+  _removeAndGetNext(node: Element): Element | null {
     var nextNode = this._getNextNode(node, true);
     node.remove();
     return nextNode;
-  },
+  }
 
   /**
    * Traverse the DOM from node to node, starting at the node passed in.
@@ -829,11 +839,11 @@ export class Readability {
    *
    * Calling this in a loop will traverse the DOM depth-first.
    *
-   * @param {Element} node
-   * @param {boolean} ignoreSelfAndKids
-   * @return {Element}
+   * @param node The element to start traversal from
+   * @param ignoreSelfAndKids Whether to ignore this node and its children
+   * @return The next node in the traversal
    */
-  _getNextNode(node, ignoreSelfAndKids) {
+  _getNextNode(node: Element, ignoreSelfAndKids?: boolean): Element | null {
     // First check for kids if those aren't being ignored
     if (!ignoreSelfAndKids && node.firstElementChild) {
       return node.firstElementChild;
@@ -846,23 +856,29 @@ export class Readability {
     // (because this is depth-first traversal, we will have already
     // seen the parent nodes themselves).
     do {
-      node = node.parentNode;
+      node = node.parentNode as Element;
     } while (node && !node.nextElementSibling);
     return node && node.nextElementSibling;
-  },
+  }
 
-  // compares second text to first one
-  // 1 = same text, 0 = completely different text
-  // works the way that it splits both texts into words and then finds words that are unique in second text
-  // the result is given by the lower length of unique parts
-  _textSimilarity(textA, textB) {
+  /**
+   * Compares second text to first one
+   * 1 = same text, 0 = completely different text
+   * Works by splitting both texts into words and then finding words that are unique in second text
+   * The result is given by the lower length of unique parts
+   * 
+   * @param textA First text to compare
+   * @param textB Second text to compare
+   * @return Similarity score between 0 and 1
+   */
+  _textSimilarity(textA: string, textB: string): number {
     var tokensA = textA
       .toLowerCase()
-      .split(this.REGEXPS.tokenize)
+      .split(REGEXPS.tokenize)
       .filter(Boolean);
     var tokensB = textB
       .toLowerCase()
-      .split(this.REGEXPS.tokenize)
+      .split(REGEXPS.tokenize)
       .filter(Boolean);
     if (!tokensA.length || !tokensB.length) {
       return 0;
@@ -870,33 +886,40 @@ export class Readability {
     var uniqTokensB = tokensB.filter(token => !tokensA.includes(token));
     var distanceB = uniqTokensB.join(" ").length / tokensB.join(" ").length;
     return 1 - distanceB;
-  },
+  }
 
   /**
    * Checks whether an element node contains a valid byline
    *
-   * @param node {Element}
-   * @param matchString {string}
-   * @return boolean
+   * @param node The element to check
+   * @param matchString String containing class and id information
+   * @return boolean indicating if this is a valid byline
    */
-  _isValidByline(node, matchString) {
+  _isValidByline(node: Element, matchString: string): boolean {
     var rel = node.getAttribute("rel");
     var itemprop = node.getAttribute("itemprop");
-    var bylineLength = node.textContent.trim().length;
+    var bylineLength = node.textContent ? node.textContent.trim().length : 0;
 
     return (
       (rel === "author" ||
         (itemprop && itemprop.includes("author")) ||
-        this.REGEXPS.byline.test(matchString)) &&
+        REGEXPS.byline.test(matchString)) &&
       !!bylineLength &&
       bylineLength < 100
     );
-  },
+  }
 
-  _getNodeAncestors(node, maxDepth) {
+  /**
+   * Gets the ancestors of a node up to a specified depth
+   * 
+   * @param node The node to get ancestors for
+   * @param maxDepth Maximum depth of ancestors to return (0 means no limit)
+   * @return Array of ancestor nodes
+   */
+  _getNodeAncestors(node: Node, maxDepth?: number): Node[] {
     maxDepth = maxDepth || 0;
     var i = 0,
-      ancestors = [];
+      ancestors: Node[] = [];
     while (node.parentNode) {
       ancestors.push(node.parentNode);
       if (maxDepth && ++i === maxDepth) {
@@ -905,7 +928,7 @@ export class Readability {
       node = node.parentNode;
     }
     return ancestors;
-  },
+  }
 
   /***
    * grabArticle - Using a variety of metrics (content score, classname, element types), find the content that is
@@ -932,7 +955,7 @@ export class Readability {
     while (true) {
       this.log("Starting grabArticle loop");
       var stripUnlikelyCandidates = this._flagIsActive(
-        this.FLAG_STRIP_UNLIKELYS
+        FLAG_STRIP_UNLIKELYS
       );
 
       // First, node prepping. Trash nodes that look cruddy (like ones with the
@@ -1003,8 +1026,8 @@ export class Readability {
         // Remove unlikely candidates
         if (stripUnlikelyCandidates) {
           if (
-            this.REGEXPS.unlikelyCandidates.test(matchString) &&
-            !this.REGEXPS.okMaybeItsACandidate.test(matchString) &&
+            REGEXPS.unlikelyCandidates.test(matchString) &&
+            !REGEXPS.okMaybeItsACandidate.test(matchString) &&
             !this._hasAncestorTag(node, "table") &&
             !this._hasAncestorTag(node, "code") &&
             node.tagName !== "BODY" &&
@@ -1015,7 +1038,7 @@ export class Readability {
             continue;
           }
 
-          if (this.UNLIKELY_ROLES.includes(node.getAttribute("role"))) {
+          if (UNLIKELY_ROLES.includes(node.getAttribute("role"))) {
             this.log(
               "Removing content with role " +
                 node.getAttribute("role") +
@@ -1044,7 +1067,7 @@ export class Readability {
           continue;
         }
 
-        if (this.DEFAULT_TAGS_TO_SCORE.includes(node.tagName)) {
+        if (DEFAULT_TAGS_TO_SCORE.includes(node.tagName)) {
           elementsToScore.push(node);
         }
 
@@ -1125,7 +1148,7 @@ export class Readability {
         contentScore += 1;
 
         // Add points for any commas within this paragraph.
-        contentScore += innerText.split(this.REGEXPS.commas).length;
+        contentScore += innerText.split(REGEXPS.commas).length;
 
         // For every 100 characters in this paragraph, add another point. Up to 3 points.
         contentScore += Math.min(Math.floor(innerText.length / 100), 3);
@@ -1371,7 +1394,7 @@ export class Readability {
         if (append) {
           this.log("Appending node:", sibling);
 
-          if (!this.ALTER_TO_DIV_EXCEPTIONS.includes(sibling.nodeName)) {
+          if (!ALTER_TO_DIV_EXCEPTIONS.includes(sibling.nodeName)) {
             // We have a node that isn't a common block level element, like a form or td tag.
             // Turn it into a div so it doesn't get filtered out later by accident.
             this.log("Altering sibling:", sibling, "to div.");
@@ -1440,10 +1463,10 @@ export class Readability {
           textLength,
         });
 
-        if (this._flagIsActive(this.FLAG_STRIP_UNLIKELYS)) {
-          this._removeFlag(this.FLAG_STRIP_UNLIKELYS);
-        } else if (this._flagIsActive(this.FLAG_WEIGHT_CLASSES)) {
-          this._removeFlag(this.FLAG_WEIGHT_CLASSES);
+        if (this._flagIsActive(FLAG_STRIP_UNLIKELYS)) {
+          this._removeFlag(FLAG_STRIP_UNLIKELYS);
+        } else if (this._flagIsActive(FLAG_WEIGHT_CLASSES)) {
+          this._removeFlag(FLAG_WEIGHT_CLASSES);
         } else if (this._flagIsActive(this.FLAG_CLEAN_CONDITIONALLY)) {
           this._removeFlag(this.FLAG_CLEAN_CONDITIONALLY);
         } else {
@@ -1481,23 +1504,22 @@ export class Readability {
         return articleContent;
       }
     }
-  },
+  }
 
   /**
    * Converts some of the common HTML entities in string to their corresponding characters.
    *
-   * @param str {string} - a string to unescape.
-   * @return string without HTML entity.
+   * @param str A string to unescape
+   * @return String without HTML entities
    */
-  _unescapeHtmlEntities(str) {
+  _unescapeHtmlEntities(str: string): string {
     if (!str) {
       return str;
     }
 
-    var htmlEscapeMap = this.HTML_ESCAPE_MAP;
     return str
       .replace(/&(quot|amp|apos|lt|gt);/g, function (_, tag) {
-        return htmlEscapeMap[tag];
+        return HTML_ESCAPE_MAP[tag];
       })
       .replace(/&#(?:x([0-9a-f]+)|([0-9]+));/gi, function (_, hex, numStr) {
         var num = parseInt(hex || numStr, hex ? 16 : 10);
@@ -1509,17 +1531,19 @@ export class Readability {
 
         return String.fromCodePoint(num);
       });
-  },
+  }
 
   /**
    * Try to extract metadata from JSON-LD object.
    * For now, only Schema.org objects of type Article or its subtypes are supported.
+   * 
+   * @param doc The document to extract metadata from
    * @return Object with any metadata that could be extracted (possibly none)
    */
-  _getJSONLD(doc) {
+  _getJSONLD(doc: Document): ReadabilityMetadata {
     var scripts = this._getAllNodesWithTag(doc, ["script"]);
 
-    var metadata;
+    var metadata: ReadabilityMetadata | undefined;
 
     this._forEachNode(scripts, function (jsonLdElement) {
       if (
@@ -1528,7 +1552,7 @@ export class Readability {
       ) {
         try {
           // Strip CDATA markers if present
-          var content = jsonLdElement.textContent.replace(
+          var content = (jsonLdElement.textContent || "").replace(
             /^\s*<!\[CDATA\[|\]\]>\s*$/g,
             ""
           );
@@ -1538,7 +1562,7 @@ export class Readability {
             parsed = parsed.find(it => {
               return (
                 it["@type"] &&
-                it["@type"].match(this.REGEXPS.jsonLdArticleTypes)
+                it["@type"].match(REGEXPS.jsonLdArticleTypes)
               );
             });
             if (!parsed) {
@@ -1560,14 +1584,14 @@ export class Readability {
 
           if (!parsed["@type"] && Array.isArray(parsed["@graph"])) {
             parsed = parsed["@graph"].find(it => {
-              return (it["@type"] || "").match(this.REGEXPS.jsonLdArticleTypes);
+              return (it["@type"] || "").match(REGEXPS.jsonLdArticleTypes);
             });
           }
 
           if (
             !parsed ||
             !parsed["@type"] ||
-            !parsed["@type"].match(this.REGEXPS.jsonLdArticleTypes)
+            !parsed["@type"].match(REGEXPS.jsonLdArticleTypes)
           ) {
             return;
           }
@@ -1626,25 +1650,23 @@ export class Readability {
             metadata.datePublished = parsed.datePublished.trim();
           }
         } catch (err) {
-          this.log(err.message);
+          this.log(err instanceof Error ? err.message : String(err));
         }
       }
     });
-    return metadata ? metadata : {};
-  },
+    return metadata || {};
+  }
 
   /**
    * Attempts to get excerpt and byline metadata for the article.
    *
-   * @param {Object} jsonld — object containing any metadata that
-   * could be extracted from JSON-LD object.
-   *
-   * @return Object with optional "excerpt" and "byline" properties
+   * @param jsonld Object containing any metadata that could be extracted from JSON-LD object
+   * @return Object with optional metadata properties
    */
-  _getArticleMetadata(jsonld) {
-    var metadata = {};
-    var values = {};
-    var metaElements = this._doc.getElementsByTagName("meta");
+  _getArticleMetadata(jsonld: ReadabilityMetadata): ReadabilityMetadata {
+    var metadata: ReadabilityMetadata = {};
+    var values: Record<string, string> = {};
+    var metaElements = this._doc.getElementsByTagName("meta") as HTMLMetaElement[];
 
     // property is a space-separated list of values
     var propertyPattern =
@@ -1655,7 +1677,7 @@ export class Readability {
       /^\s*(?:(dc|dcterm|og|twitter|parsely|weibo:(article|webpage))\s*[-\.:]\s*)?(author|creator|pub-date|description|title|site_name)\s*$/i;
 
     // Find description tags.
-    this._forEachNode(metaElements, function (element) {
+    this._forEachNode(metaElements, function (element: HTMLElement) {
       var elementName = element.getAttribute("name");
       var elementProperty = element.getAttribute("property");
       var content = element.getAttribute("content");
@@ -1740,14 +1762,14 @@ export class Readability {
 
     // in many sites the meta value is escaped with HTML entities,
     // so here we need to unescape it
-    metadata.title = this._unescapeHtmlEntities(metadata.title);
-    metadata.byline = this._unescapeHtmlEntities(metadata.byline);
-    metadata.excerpt = this._unescapeHtmlEntities(metadata.excerpt);
-    metadata.siteName = this._unescapeHtmlEntities(metadata.siteName);
-    metadata.publishedTime = this._unescapeHtmlEntities(metadata.publishedTime);
+    if (metadata.title) metadata.title = this._unescapeHtmlEntities(metadata.title);
+    if (metadata.byline) metadata.byline = this._unescapeHtmlEntities(metadata.byline);
+    if (metadata.excerpt) metadata.excerpt = this._unescapeHtmlEntities(metadata.excerpt);
+    if (metadata.siteName) metadata.siteName = this._unescapeHtmlEntities(metadata.siteName);
+    if (metadata.publishedTime) metadata.publishedTime = this._unescapeHtmlEntities(metadata.publishedTime);
 
     return metadata;
-  },
+  }
 
   /**
    * Check if node is image, or if node contains exactly only one image
@@ -1766,7 +1788,7 @@ export class Readability {
       node = node.children[0];
     }
     return false;
-  },
+  }
 
   /**
    * Find all <noscript> that are located after <img> nodes, and which contain only one
@@ -1776,7 +1798,7 @@ export class Readability {
    *
    * @param Element
    **/
-  _unwrapNoscriptImages(doc) {
+  _unwrapNoscriptImages(doc: Element) {
     // Find img without source or attributes that might contains image, and remove it.
     // This is done to prevent a placeholder img is replaced by img from noscript in next step.
     var imgs = Array.from(doc.getElementsByTagName("img"));
@@ -1806,7 +1828,7 @@ export class Readability {
       if (!this._isSingleImage(noscript)) {
         return;
       }
-      var tmp = doc.createElement("div");
+      var tmp = document.createElement("div");
       // We're running in the document context, and using unmodified
       // document contents, so doing this should be safe.
       // (Also we heavily discourage people from allowing script to
@@ -1844,7 +1866,6 @@ export class Readability {
             if (newImg.hasAttribute(attrName)) {
               attrName = "data-old-" + attrName;
             }
-
             newImg.setAttribute(attrName, attr.value);
           }
         }
@@ -1852,16 +1873,16 @@ export class Readability {
         noscript.parentNode.replaceChild(tmp.firstElementChild, prevElement);
       }
     });
-  },
+  }
 
   /**
    * Removes script tags from the document.
    *
    * @param Element
    **/
-  _removeScripts(doc) {
+  _removeScripts(doc: Element) {
     this._removeNodes(this._getAllNodesWithTag(doc, ["script", "noscript"]));
-  },
+  }
 
   /**
    * Check if this node has only whitespace and a single element with given tag
@@ -1880,22 +1901,22 @@ export class Readability {
     // And there should be no text nodes with real content
     return !this._someNode(element.childNodes, function (node) {
       return (
-        node.nodeType === this.TEXT_NODE &&
-        this.REGEXPS.hasContent.test(node.textContent)
+        node.nodeType === TEXT_NODE &&
+        REGEXPS.hasContent.test(node.textContent)
       );
     });
-  },
+  }
 
   _isElementWithoutContent(node) {
     return (
-      node.nodeType === this.ELEMENT_NODE &&
+      node.nodeType === ELEMENT_NODE &&
       !node.textContent.trim().length &&
       (!node.children.length ||
         node.children.length ==
           node.getElementsByTagName("br").length +
             node.getElementsByTagName("hr").length)
     );
-  },
+  }
 
   /**
    * Determine whether element has any children block level elements.
@@ -1905,34 +1926,34 @@ export class Readability {
   _hasChildBlockElement(element) {
     return this._someNode(element.childNodes, function (node) {
       return (
-        this.DIV_TO_P_ELEMS.has(node.tagName) ||
+        DIV_TO_P_ELEMS.has(node.tagName) ||
         this._hasChildBlockElement(node)
       );
     });
-  },
+  }
 
   /***
    * Determine if a node qualifies as phrasing content.
    * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
    **/
-  _isPhrasingContent(node) {
+  _isPhrasingContent(node: Element) {
     return (
-      node.nodeType === this.TEXT_NODE ||
-      this.PHRASING_ELEMS.includes(node.tagName) ||
+      node.nodeType === TEXT_NODE ||
+      PHRASING_ELEMS.includes(node.tagName) ||
       ((node.tagName === "A" ||
         node.tagName === "DEL" ||
         node.tagName === "INS") &&
         this._everyNode(node.childNodes, this._isPhrasingContent))
     );
-  },
+  }
 
   _isWhitespace(node) {
     return (
-      (node.nodeType === this.TEXT_NODE &&
+      (node.nodeType === ELEMENT_NODE &&
         node.textContent.trim().length === 0) ||
-      (node.nodeType === this.ELEMENT_NODE && node.tagName === "BR")
+      (node.nodeType === ELEMENT_NODE && node.tagName === "BR")
     );
-  },
+  }
 
   /**
    * Get the inner text of a node - cross browser compatibly.
@@ -1948,10 +1969,10 @@ export class Readability {
     var textContent = e.textContent.trim();
 
     if (normalizeSpaces) {
-      return textContent.replace(this.REGEXPS.normalize, " ");
+      return textContent.replace(REGEXPS.normalize, " ");
     }
     return textContent;
-  },
+  }
 
   /**
    * Get the number of times a string s appears in the node e.
@@ -1960,10 +1981,10 @@ export class Readability {
    * @param string - what to split on. Default is ","
    * @return number (integer)
    **/
-  _getCharCount(e, s) {
+  _getCharCount(e: Element, s: string = ",") {
     s = s || ",";
     return this._getInnerText(e).split(s).length - 1;
-  },
+  }
 
   /**
    * Remove the style attribute on every e and under.
@@ -1972,17 +1993,17 @@ export class Readability {
    * @param Element
    * @return void
    **/
-  _cleanStyles(e) {
+  _cleanStyles(e: Element) {
     if (!e || e.tagName.toLowerCase() === "svg") {
       return;
     }
 
     // Remove `style` and deprecated presentational attributes
-    for (var i = 0; i < this.PRESENTATIONAL_ATTRIBUTES.length; i++) {
-      e.removeAttribute(this.PRESENTATIONAL_ATTRIBUTES[i]);
+    for (var i = 0; i < PRESENTATIONAL_ATTRIBUTES.length; i++) {
+      e.removeAttribute(PRESENTATIONAL_ATTRIBUTES[i]);
     }
 
-    if (this.DEPRECATED_SIZE_ATTRIBUTE_ELEMS.includes(e.tagName)) {
+    if (DEPRECATED_SIZE_ATTRIBUTE_ELEMS.includes(e.tagName)) {
       e.removeAttribute("width");
       e.removeAttribute("height");
     }
@@ -1992,7 +2013,7 @@ export class Readability {
       this._cleanStyles(cur);
       cur = cur.nextElementSibling;
     }
-  },
+  }
 
   /**
    * Get the density of links as a percentage of the content
@@ -2012,12 +2033,12 @@ export class Readability {
     // XXX implement _reduceNodeList?
     this._forEachNode(element.getElementsByTagName("a"), function (linkNode) {
       var href = linkNode.getAttribute("href");
-      var coefficient = href && this.REGEXPS.hashUrl.test(href) ? 0.3 : 1;
+      var coefficient = href && REGEXPS.hashUrl.test(href) ? 0.3 : 1;
       linkLength += this._getInnerText(linkNode).length * coefficient;
     });
 
     return linkLength / textLength;
-  },
+  }
 
   /**
    * Get an elements class/id weight. Uses regular expressions to tell if this
@@ -2027,7 +2048,7 @@ export class Readability {
    * @return number (Integer)
    **/
   _getClassWeight(e) {
-    if (!this._flagIsActive(this.FLAG_WEIGHT_CLASSES)) {
+    if (!this._flagIsActive(FLAG_WEIGHT_CLASSES)) {
       return 0;
     }
 
@@ -2035,28 +2056,28 @@ export class Readability {
 
     // Look for a special classname
     if (typeof e.className === "string" && e.className !== "") {
-      if (this.REGEXPS.negative.test(e.className)) {
+      if (REGEXPS.negative.test(e.className)) {
         weight -= 25;
       }
 
-      if (this.REGEXPS.positive.test(e.className)) {
+      if (REGEXPS.positive.test(e.className)) {
         weight += 25;
       }
     }
 
     // Look for a special ID
     if (typeof e.id === "string" && e.id !== "") {
-      if (this.REGEXPS.negative.test(e.id)) {
+      if (REGEXPS.negative.test(e.id)) {
         weight -= 25;
       }
 
-      if (this.REGEXPS.positive.test(e.id)) {
+      if (REGEXPS.positive.test(e.id)) {
         weight += 25;
       }
     }
 
     return weight;
-  },
+  }
 
   /**
    * Clean a node of all elements of type "tag".
@@ -2090,7 +2111,7 @@ export class Readability {
 
       return true;
     });
-  },
+  }
 
   /**
    * Check if a given node has one of its ancestor tag name matching the
@@ -2119,7 +2140,7 @@ export class Readability {
       depth++;
     }
     return false;
-  },
+  }
 
   /**
    * Return an object indicating how many rows and columns this table has.
@@ -2148,7 +2169,7 @@ export class Readability {
       columns = Math.max(columns, columnsInThisRow);
     }
     return { rows, columns };
-  },
+  }
 
   /**
    * Look for 'data' (as opposed to 'layout') tables, for which we use
@@ -2213,7 +2234,7 @@ export class Readability {
       // Now just go by size entirely:
       table._readabilityDataTable = sizeInfo.rows * sizeInfo.columns > 10;
     }
-  },
+  }
 
   /* convert images and figures that have properties like data-src into images that can be loaded without JS */
   _fixLazyImages(root) {
@@ -2222,9 +2243,9 @@ export class Readability {
       function (elem) {
         // In some sites (e.g. Kotaku), they put 1px square image as base64 data uri in the src attribute.
         // So, here we check if the data uri is too short, just might as well remove it.
-        if (elem.src && this.REGEXPS.b64DataUrl.test(elem.src)) {
+        if (elem.src && REGEXPS.b64DataUrl.test(elem.src)) {
           // Make sure it's not SVG, because SVG can have a meaningful image in under 133 bytes.
-          var parts = this.REGEXPS.b64DataUrl.exec(elem.src);
+          var parts = REGEXPS.b64DataUrl.exec(elem.src);
           if (parts[1] === "image/svg+xml") {
             return;
           }
@@ -2272,7 +2293,7 @@ export class Readability {
           ) {
             continue;
           }
-          var copyTo = null;
+          let copyTo: string | null = null;
           if (/\.(jpg|jpeg|png|webp)\s+\d/.test(attr.value)) {
             copyTo = "srcset";
           } else if (/^\s*\S+\.(jpg|jpeg|png|webp)\S*\s*$/.test(attr.value)) {
@@ -2296,7 +2317,7 @@ export class Readability {
         }
       }
     );
-  },
+  }
 
   _getTextDensity(e, tags) {
     var textLength = this._getInnerText(e, true).length;
@@ -2310,7 +2331,7 @@ export class Readability {
       child => (childrenLength += this._getInnerText(child, true).length)
     );
     return childrenLength / textLength;
-  },
+  }
 
   /**
    * Clean an element of all tags of type "tag" if they look fishy.
@@ -2424,8 +2445,8 @@ export class Readability {
 
         // toss any node whose inner text contains nothing but suspicious words
         if (
-          this.REGEXPS.adWords.test(innerText) ||
-          this.REGEXPS.loadingWords.test(innerText)
+          REGEXPS.adWords.test(innerText) ||
+          REGEXPS.loadingWords.test(innerText)
         ) {
           return true;
         }
@@ -2442,13 +2463,13 @@ export class Readability {
         const shouldRemoveNode = () => {
           const errs = [];
           if (!isFigureChild && img > 1 && p / img < 0.5) {
-            errs.push(`Bad p to img ratio (img=${img}, p=${p})`);
+            errs.push(`Bad p to img ratio (img=${img} p=${p})`);
           }
           if (!isList && li > p) {
             errs.push(`Too many li's outside of a list. (li=${li} > p=${p})`);
           }
           if (input > Math.floor(p / 3)) {
-            errs.push(`Too many inputs per p. (input=${input}, p=${p})`);
+            errs.push(`Too many inputs per p. (input=${input} p=${p})`);
           }
           if (
             !isList &&
@@ -2459,7 +2480,7 @@ export class Readability {
             linkDensity > 0
           ) {
             errs.push(
-              `Suspiciously short. (headingDensity=${headingDensity}, img=${img}, linkDensity=${linkDensity})`
+              `Suspiciously short. (headingDensity=${headingDensity} img=${img} linkDensity=${linkDensity})`
             );
           }
           if (
@@ -2478,12 +2499,12 @@ export class Readability {
           }
           if ((embedCount === 1 && contentLength < 75) || embedCount > 1) {
             errs.push(
-              `Suspicious embed. (embedCount=${embedCount}, contentLength=${contentLength})`
+              `Suspicious embed. (embedCount=${embedCount} contentLength=${contentLength})`
             );
           }
           if (img === 0 && textDensity === 0) {
             errs.push(
-              `No useful content. (img=${img}, textDensity=${textDensity})`
+              `No useful content. (img=${img} textDensity=${textDensity})`
             );
           }
 
@@ -2516,7 +2537,7 @@ export class Readability {
       }
       return false;
     });
-  },
+  }
 
   /**
    * Clean out elements that match the specified conditions
@@ -2535,7 +2556,7 @@ export class Readability {
         next = this._getNextNode(next);
       }
     }
-  },
+  }
 
   /**
    * Clean out spurious headers from an Element.
@@ -2552,7 +2573,7 @@ export class Readability {
       }
       return shouldRemove;
     });
-  },
+  }
 
   /**
    * Check if this node is an H1 or H2 element whose content is mostly
@@ -2568,17 +2589,17 @@ export class Readability {
     var heading = this._getInnerText(node, false);
     this.log("Evaluating similarity of header:", heading, this._articleTitle);
     return this._textSimilarity(this._articleTitle, heading) > 0.75;
-  },
+  }
 
   _flagIsActive(flag) {
     return (this._flags & flag) > 0;
-  },
+  }
 
   _removeFlag(flag) {
     this._flags = this._flags & ~flag;
-  },
+  }
 
-  _isProbablyVisible(node) {
+  _isProbablyVisible(node: HTMLElement) {
     // Have to null-check node.style and node.className.includes to deal with SVG and MathML nodes.
     return (
       (!node.style || node.style.display != "none") &&
@@ -2591,7 +2612,7 @@ export class Readability {
           node.className.includes &&
           node.className.includes("fallback-image")))
     );
-  },
+  }
 
   /**
    * Runs readability.
@@ -2663,11 +2684,5 @@ export class Readability {
       siteName: metadata.siteName || this._articleSiteName,
       publishedTime: metadata.publishedTime,
     };
-  },
+  }
 };
-
-if (typeof module === "object") {
-  /* eslint-disable-next-line no-redeclare */
-  /* global module */
-  module.exports = Readability;
-}
