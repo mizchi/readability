@@ -30,6 +30,9 @@ importers:
       eslint-plugin-no-unsanitized:
         specifier: ^4.0.2
         version: 4.1.2(eslint@8.57.0)
+      html-to-md:
+        specifier: ^0.8.6
+        version: 0.8.6
       htmltidy2:
         specifier: 1.0.0
         version: 1.0.0
@@ -1430,6 +1433,9 @@ packages:
   html-encoding-sniffer@3.0.0:
     resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}
     engines: {node: '>=12'}
+
+  html-to-md@0.8.6:
+    resolution: {integrity: sha512-KaRoYxML9AIETfgz5tgI1ioCsT8+skHTIILzrDV66XwCxuWUVjwCcpbnfeUwT9r8VBrfDAa8B5p5b5Pcs9LtRg==}
 
   htmlparser2@10.0.0:
     resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
@@ -4405,6 +4411,8 @@ snapshots:
   html-encoding-sniffer@3.0.0:
     dependencies:
       whatwg-encoding: 2.0.0
+
+  html-to-md@0.8.6: {}
 
   htmlparser2@10.0.0:
     dependencies:

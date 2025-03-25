@@ -48,6 +48,7 @@ export interface ReadabilityArticle {
   byline: string | null;
   content: VElement | null;
   textContent: string;
+  contentHTML: string; // HTML構造をそのまま出力するためのプロパティ
   length: number;
   excerpt: string | null;
   siteName: string | null;

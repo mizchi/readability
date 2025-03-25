@@ -370,11 +370,15 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
                  (textLength >= charThreshold ? mainContent : null);
   const textContent = content ? getInnerText(content) : '';
   
+  // コンテンツをHTMLにシリアライズ
+  const contentHTML = content ? serializeToHTML(content) : '';
+  
   return {
     title,
     byline,
     content,
     textContent,
+    contentHTML,
     length: textContent.length,
     excerpt,
     siteName
@@ -397,6 +401,7 @@ export function parse(html: string, options: ReadabilityOptions = {}): Readabili
   return {
     ...article,
     content: article.content,
-    textContent: article.textContent || contentHTML.replace(/<[^>]+>/g, '')
+    textContent: article.textContent || contentHTML.replace(/<[^>]+>/g, ''),
+    contentHTML: contentHTML // HTML構造をそのまま出力
   };
 }
