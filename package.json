@@ -36,6 +36,11 @@
     "prettier": "^3.3.2",
     "release-it": "17.0.1",
     "sinon": "14.0.2",
+    "vite": "^6.2.3",
+    "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
+  },
+  "dependencies": {
+    "htmlparser2": "^10.0.0"
   }
 }

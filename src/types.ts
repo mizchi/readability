@@ -1,3 +1,5 @@
+import { VElement } from "./vdom";
+
 export interface ReadabilityOptions {
   debug?: boolean;
   maxElemsToParse?: number;
@@ -5,7 +7,7 @@ export interface ReadabilityOptions {
   charThreshold?: number;
   classesToPreserve?: string[];
   keepClasses?: boolean;
-  serializer?: (element: Element) => string;
+  serializer?: (element: VElement) => string;
   disableJSONLD?: boolean;
   allowedVideoRegex?: RegExp;
   linkDensityModifier?: number;
@@ -38,7 +40,7 @@ declare global {
 }
 
 export interface ReadabilityAttempt {
-  articleContent: Element;
+  articleContent: VElement;
   textLength: number;
 }
 
@@ -49,4 +51,5 @@ export interface ReadabilityMetadata {
   siteName?: string;
   datePublished?: string;
   publishedTime?: string;
+  author?: string;
 }
