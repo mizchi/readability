@@ -7,7 +7,7 @@ import {
   createVElement,
   createVTextNode
 } from './vdom.ts';
-import type { VDocument, VElement, VTextNode } from './types';
+import type { VDocument, VElement, VTextNode } from './types.ts';
 
 /**
  * Parse HTML string into a virtual DOM structure

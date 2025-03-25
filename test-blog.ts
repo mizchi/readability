@@ -1,6 +1,6 @@
-import { parseHTML, serializeToHTML } from './src/html_parser.ts';
-import { Readability } from './src/readability/index.ts';
-import type { VElement } from './src/types.ts';
+import { parseHTML, serializeToHTML } from './v2/html_parser.ts';
+import { Readability } from './v2/readability/index.ts';
+import type { VElement } from './v2/types.ts';
 
 // ブログのようなHTMLテキストを作成
 const person = 'テスト著者';
@@ -183,7 +183,17 @@ function testBlogParsing() {
     // 自己終了タグのリスト
     const selfClosingTags = ['meta', 'link', 'img', 'br', 'hr', 'input', 'source'];
     
-    // コードブロック内のコンテンツをエスケープするかどうか
+    // HTMLエスケープ関数
+    const escapeHtml = (text: string): string => {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+    
+    // コードブロック内かどうかを判定
     const isCodeBlock = (el: VElement): boolean => {
       return el.tagName === 'PRE' || el.tagName === 'CODE';
     };
@@ -210,8 +220,8 @@ function testBlogParsing() {
       const childrenHtml = el.children
         .map((child: VElement | { nodeType: 'text', textContent: string }) => {
           if (child.nodeType === 'text') {
-            // コードブロック内のテキストは特殊文字をエスケープしない
-            return child.textContent;
+            // コードブロック内のテキストは特殊文字をエスケープする
+            return newInsideCode ? escapeHtml(child.textContent) : child.textContent;
           } else {
             return serializeElement(child as VElement, newInsideCode);
           }

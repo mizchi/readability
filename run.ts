@@ -3,9 +3,9 @@ import {
   createVTextNode,
   setAttribute,
   getAttribute
-} from './src/vdom.ts';
-import { postProcessContent } from './src/readability/postprocess.ts';
-import type { VElement, VTextNode } from './src/types.ts';
+} from './v2/vdom.ts';
+import { postProcessContent } from './v2/readability/postprocess.ts';
+import type { VElement, VTextNode } from './v2/types.ts';
 
 // テスト用のVDOM要素を作成
 function createTestElement(): VElement {
