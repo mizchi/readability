@@ -1,16 +1,16 @@
 {
-  "name": "@mozilla/readability",
-  "version": "0.6.0",
+  "name": "@mizchi/readability",
+  "version": "0.3.0",
   "description": "A standalone version of the readability library used for Firefox Reader View.",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "v3/dist/index.js",
+  "types": "v3/dist/index.d.ts",
   "scripts": {
+    "build": "vite build",
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
     "test": "mocha test/test-*.js",
-    "test:2": "vitest --run",
+    "test:v3": "vitest v3 --run",
     "generate-testcase": "node test/generate-testcase.js",
-    "release": "release-it",
-    "test:blog": "vite-node test-blog.ts"
+    "release": "echo wip # release-it"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "@release-it/keep-a-changelog": "5.0.0",
     "@types/node": "^22.13.13",
     "chai": "4.3.7",
+    "esbuild": "^0.25.1",
     "eslint": "8.57.0",
     "eslint-plugin-mozilla": "^3.7.4",
     "eslint-plugin-no-unsanitized": "^4.0.2",
@@ -43,10 +44,15 @@
     "typescript": "^5.8.2",
     "vite": "^6.2.3",
     "vite-node": "^3.0.9",
+    "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
   },
   "dependencies": {
     "htmlparser2": "^10.0.0"
-  }
+  },
+  "files": [
+    "v3",
+    "dist"
+  ]
 }
