@@ -18,7 +18,7 @@ import {
   PHRASING_ELEMS,
   CLASSES_TO_PRESERVE,
   HTML_ESCAPE_MAP
-} from './constants';
+} from '../constants';
 
 /**
  * Type guard to check if an Element is an HTMLElement

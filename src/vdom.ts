@@ -2,7 +2,16 @@
  * Virtual DOM structure for DOM-independent readability implementation
  */
 
-import type { VElement, VTextNode } from "./types.ts";
+import type { VElement, VNode, VTextNode } from "./types.ts";
+
+// 型ガード関数
+export function isVElement(node: VNode): node is VElement {
+  return node.nodeType === 'element';
+}
+
+export function isVTextNode(node: VNode): node is VTextNode {
+  return node.nodeType === 'text';
+}
 
 // ノードの作成ヘルパー関数
 export function createVElement(tagName: string): VElement {
@@ -210,7 +219,7 @@ export function hasChildBlockElement(element: VElement): boolean {
 }
 
 // フレージングコンテンツの確認
-export function isPhrasingContent(node: VElement | VTextNode): boolean {
+export function isPhrasingContent(node: VNode): boolean {
   const PHRASING_ELEMS = [
     "ABBR",
     "AUDIO",
@@ -253,20 +262,22 @@ export function isPhrasingContent(node: VElement | VTextNode): boolean {
     "WBR",
   ];
   
-  if (node.nodeType === 'text') {
+  if (isVTextNode(node)) {
     return true;
   }
   
-  if (PHRASING_ELEMS.includes(node.tagName)) {
-    return true;
-  }
-  
-  if (
-    node.tagName === "A" ||
-    node.tagName === "DEL" ||
-    node.tagName === "INS"
-  ) {
-    return everyNode(node.children, isPhrasingContent);
+  if (isVElement(node)) {
+    if (PHRASING_ELEMS.includes(node.tagName)) {
+      return true;
+    }
+    
+    if (
+      node.tagName === "A" ||
+      node.tagName === "DEL" ||
+      node.tagName === "INS"
+    ) {
+      return everyNode(node.children, isPhrasingContent);
+    }
   }
   
   return false;

@@ -1,6 +1,7 @@
-import { DIV_TO_P_ELEMS, REGEXPS } from "../constants";
-import { forEachNode, getAttribute, getElementsByTagName, getInnerText, getLinkDensity, someNode, VElement, VNode, VTextNode } from "../vdom";
-import { getAllNodesWithTag } from "./preprocess";
+import { DIV_TO_P_ELEMS, REGEXPS } from "../constants.ts";
+import type { VElement, VNode, VTextNode } from "../types.ts";
+import { forEachNode, getAttribute, getElementsByTagName, getInnerText, getLinkDensity, someNode} from "../vdom.ts";
+import { getAllNodesWithTag } from "./preprocess.ts";
 
 /**
  * Initialize a node with the readability object. Also checks the

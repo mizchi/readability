@@ -15,7 +15,7 @@ import {
   HTML_ESCAPE_MAP
 } from '../constants.ts';
 
-import { ReadabilityMetadata, VDocument } from '../types.ts';
+import type { ReadabilityMetadata, VDocument } from '../types.ts';
 
 /**
  * Get the article title as an H1.

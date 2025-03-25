@@ -39,7 +39,7 @@ import {
   getNodeAncestors,
   checkElementWithoutContent,
   checkSingleTagInsideElement
-} from './helpers';
+} from './helpers.ts';
 
 /**
  * The main grabArticle function

@@ -3,7 +3,7 @@
  */
 
 import { type VDocument, type VElement } from '../types.ts';
-import { ReadabilityOptions, ReadabilityArticle, ReadabilityAttempt, ReadabilityMetadata } from '../types';
+import type { ReadabilityOptions, ReadabilityArticle, ReadabilityAttempt, ReadabilityMetadata } from '../types.ts';
 import { 
   FLAG_STRIP_UNLIKELYS,
   FLAG_WEIGHT_CLASSES,
@@ -12,12 +12,12 @@ import {
   DEFAULT_N_TOP_CANDIDATES,
   DEFAULT_CHAR_THRESHOLD,
   CLASSES_TO_PRESERVE
-} from '../constants';
+} from '../constants.ts';
 
-import { prepDocument } from './preprocess';
-import { postProcessContent } from './postprocess';
-import { grabArticle } from './grabber';
-import { getArticleTitle, getJSONLD, getArticleMetadata } from './metadata';
+import { prepDocument } from './preprocess.ts';
+import { postProcessContent } from './postprocess.ts';
+import { grabArticle } from './grabber.ts';
+import { getArticleTitle, getJSONLD, getArticleMetadata } from './metadata.ts';
 
 /**
  * DOM-independent implementation of Readability

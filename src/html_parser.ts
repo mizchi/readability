@@ -4,12 +4,10 @@
 
 import { Parser } from 'htmlparser2';
 import {
-  VDocument,
-  VElement,
-  VTextNode,
   createVElement,
   createVTextNode
-} from './vdom';
+} from './vdom.ts';
+import type { VDocument, VElement, VTextNode } from './types';
 
 /**
  * Parse HTML string into a virtual DOM structure

@@ -13,7 +13,9 @@ import {
   someNode,
   isWhitespace,
   isPhrasingContent,
-  createVElement
+  createVElement,
+  isVElement,
+  isVTextNode
 } from '../vdom.ts';
 
 import type { VDocument, VElement, VNode, VTextNode } from '../types.ts';
@@ -45,10 +47,11 @@ export function nextNode(node: VNode): VNode | null {
   let next: VNode | null = node;
   while (
     next &&
-    next.nodeType !== 'element' &&
-    isWhitespace(next as VTextNode)
+    !isVElement(next) &&
+    isVTextNode(next) &&
+    isWhitespace(next)
   ) {
-    next = getNextNode(next as VElement);
+    next = getNextNode(next);
   }
   return next;
 }
@@ -73,15 +76,15 @@ export function replaceBrs(elem: VElement): void {
     // If we find a <br> chain, remove the <br>s until we hit another node
     // or non-whitespace. This leaves behind the first <br> in the chain
     // (which will be replaced with a <p> later).
-    while ((next = nextNode(next as VNode)) && (next as VElement).tagName == "BR") {
+    while ((next = nextNode(next as VNode)) && isVElement(next) && next.tagName == "BR") {
       replaced = true;
-      const brSibling = next.parent?.children.indexOf(next as VElement) !== undefined
-        ? next.parent?.children[next.parent?.children.indexOf(next as VElement) + 1]
+      const brSibling = next.parent?.children.indexOf(next) !== undefined
+        ? next.parent?.children[next.parent?.children.indexOf(next) + 1]
         : null;
       
       // Remove the br
       if (next.parent) {
-        const index = next.parent.children.indexOf(next as VElement);
+        const index = next.parent.children.indexOf(next);
         if (index !== -1) {
           next.parent.children.splice(index, 1);
         }
@@ -110,9 +113,9 @@ export function replaceBrs(elem: VElement): void {
         
       while (next) {
         // If we've hit another <br><br>, we're done adding children to this <p>.
-        if ((next as VElement).tagName == "BR") {
-          const nextElem = nextNode(getNextNode(next as VElement)!);
-          if (nextElem && (nextElem as VElement).tagName == "BR") {
+        if (isVElement(next) && next.tagName == "BR") {
+          const nextElem = nextNode(getNextNode(next)!);
+          if (nextElem && isVElement(nextElem) && nextElem.tagName == "BR") {
             break;
           }
         }
@@ -122,15 +125,18 @@ export function replaceBrs(elem: VElement): void {
         }
 
         // Otherwise, make this node a child of the new <p>.
-        const sibling = next.parent?.children.indexOf(next as VNode) !== undefined
-          ? next.parent?.children[next.parent?.children.indexOf(next as VNode) + 1]
+        const sibling = next.parent?.children.indexOf(next as VElement | VTextNode) !== undefined
+          ? next.parent?.children[next.parent?.children.indexOf(next as VElement | VTextNode) + 1]
           : null;
           
-        p.children.push(next as VElement | VTextNode);
+        // 型ガードを使用して適切な型のノードを追加
+        if (isVElement(next) || isVTextNode(next)) {
+          p.children.push(next);
+        }
         
         // Remove the node from its parent
         if (next.parent) {
-          const index = next.parent.children.indexOf(next as VNode);
+          const index = next.parent.children.indexOf(next as VElement | VTextNode);
           if (index !== -1) {
             next.parent.children.splice(index, 1);
           }
