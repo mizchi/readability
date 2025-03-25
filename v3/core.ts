@@ -21,6 +21,7 @@ import {
 } from './constants.ts';
 import { parseHTML, serializeToHTML } from './parser.ts';
 import { countNodes } from './format.ts';
+import { preprocessDocument } from './preprocess.ts';
 
 /**
  * 要素にスコアを初期化する
@@ -388,6 +389,9 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
 export function parse(html: string, options: ReadabilityOptions = {}): ReadabilityArticle {
   // HTMLをパースして仮想DOMを作成
   const doc = parseHTML(html);
+  
+  // プリプロセスを実行
+  preprocessDocument(doc);
   
   // 本文を抽出
   return extractContent(doc, options);

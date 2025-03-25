@@ -7,14 +7,31 @@
 // 公開する型定義のみエクスポート
 export type { 
   ReadabilityArticle,
-  ReadabilityOptions
+  ReadabilityOptions,
+  VDocument,
+  VElement,
+  VTextNode
 } from './types.ts';
 
 // 公開する関数のみエクスポート
 export {
-  parseHTML
+  parseHTML,
+  serializeToHTML
 } from './parser.ts';
 
 export {
-  parse
+  parse,
+  extractContent
 } from './core.ts';
+
+export {
+  preprocessDocument
+} from './preprocess.ts';
+
+export {
+  elementToHTML,
+  stringify,
+  formatDocument,
+  extractTextContent,
+  countNodes
+} from './format.ts';
