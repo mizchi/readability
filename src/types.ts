@@ -1,4 +1,3 @@
-import { VElement } from "./vdom";
 
 export interface ReadabilityOptions {
   debug?: boolean;
@@ -14,7 +13,7 @@ export interface ReadabilityOptions {
 }
 
 export interface ReadabilityArticle {
-  title: string;
+  title: string | null;
   byline: string | null;
   dir: string | null;
   lang: string | null;
@@ -52,4 +51,45 @@ export interface ReadabilityMetadata {
   datePublished?: string;
   publishedTime?: string;
   author?: string;
+}
+
+
+// ノードの基本型
+export type VNodeType = 'element' | 'text';
+
+
+// 基本ノードインターフェース
+export interface VNode {
+  nodeType: VNodeType;
+  parent?: VElement;
+  // readabilityアルゴリズムで使用される特性
+  readability?: {
+    contentScore: number;
+  };
+  _readabilityDataTable?: boolean;
+}
+
+// テキストノード
+export interface VTextNode extends VNode {
+  nodeType: 'text';
+  textContent: string;
+}
+
+// 要素ノード
+export interface VElement extends VNode {
+  nodeType: 'element';
+  tagName: string;
+  attributes: Record<string, string>;
+  children: Array<VElement | VTextNode>;
+  // 便利なアクセサ
+  id?: string;
+  className?: string;
+}
+
+// ドキュメント構造
+export interface VDocument {
+  documentElement: VElement;
+  body: VElement;
+  baseURI?: string;
+  documentURI?: string;
 }

@@ -2,44 +2,7 @@
  * Virtual DOM structure for DOM-independent readability implementation
  */
 
-// ノードの基本型
-export type VNodeType = 'element' | 'text';
-
-// 基本ノードインターフェース
-export interface VNode {
-  nodeType: VNodeType;
-  parent?: VElement;
-  // readabilityアルゴリズムで使用される特性
-  readability?: {
-    contentScore: number;
-  };
-  _readabilityDataTable?: boolean;
-}
-
-// テキストノード
-export interface VTextNode extends VNode {
-  nodeType: 'text';
-  textContent: string;
-}
-
-// 要素ノード
-export interface VElement extends VNode {
-  nodeType: 'element';
-  tagName: string;
-  attributes: Record<string, string>;
-  children: Array<VElement | VTextNode>;
-  // 便利なアクセサ
-  id?: string;
-  className?: string;
-}
-
-// ドキュメント構造
-export interface VDocument {
-  documentElement: VElement;
-  body: VElement;
-  baseURI?: string;
-  documentURI?: string;
-}
+import type { VElement, VTextNode } from "./types.ts";
 
 // ノードの作成ヘルパー関数
 export function createVElement(tagName: string): VElement {
@@ -101,12 +64,13 @@ export function removeAttribute(element: VElement, name: string): void {
 }
 
 // 要素の取得（タグ名で）
-export function getElementsByTagName(element: VElement, tagName: string): VElement[] {
-  const upperTagName = tagName.toUpperCase();
+export function getElementsByTagName(element: VElement, tagName: string | string[]): VElement[] {
+  const tagNames = Array.isArray(tagName) ? tagName : [tagName];
+  const upperTagNames = tagNames.map(tag => tag.toUpperCase());
   const result: VElement[] = [];
   
   // この要素が一致するか確認
-  if (upperTagName === '*' || element.tagName === upperTagName) {
+  if (upperTagNames.includes('*') || upperTagNames.includes(element.tagName)) {
     result.push(element);
   }
   

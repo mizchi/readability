@@ -3,18 +3,19 @@
  * This is the main algorithm that identifies and extracts the article content
  */
 
+import type { VDocument, VElement, VNode, VTextNode } from '../types.ts';
 import {
-  VDocument,
-  VElement,
-  VTextNode,
-  VNode,
+  // type VDocument,
+  // type VElement,
+  // VTextNode,
+  // VNode,
   getAttribute,
   createVElement,
   isPhrasingContent,
   isWhitespace,
   getLinkDensity,
   getInnerText
-} from '../vdom';
+} from '../vdom.ts';
 
 import {
   REGEXPS,
@@ -23,11 +24,11 @@ import {
   FLAG_CLEAN_CONDITIONALLY,
   UNLIKELY_ROLES,
   DEFAULT_TAGS_TO_SCORE
-} from '../constants';
+} from '../constants.ts';
 
-import { ReadabilityAttempt } from '../types';
-import { getAllNodesWithTag, setNodeTag } from './preprocess';
-import { getNextNode, removeAndGetNext } from './postprocess';
+import { type ReadabilityAttempt } from '../types.ts';
+import { getAllNodesWithTag, setNodeTag } from './preprocess.ts';
+import { getNextNode, removeAndGetNext } from './postprocess.ts';
 import {
   initializeNode,
   isProbablyVisible,

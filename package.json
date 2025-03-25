@@ -36,6 +36,7 @@
     "prettier": "^3.3.2",
     "release-it": "17.0.1",
     "sinon": "14.0.2",
+    "typescript": "^5.8.2",
     "vite": "^6.2.3",
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"

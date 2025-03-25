@@ -2,7 +2,7 @@
  * Main entry point for the DOM-independent readability implementation
  */
 
-import { VDocument, VElement, createVElement } from '../vdom';
+import { type VDocument, type VElement } from '../types.ts';
 import { ReadabilityOptions, ReadabilityArticle, ReadabilityAttempt, ReadabilityMetadata } from '../types';
 import { 
   FLAG_STRIP_UNLIKELYS,
@@ -107,7 +107,7 @@ export class Readability {
     // Get metadata
     const metadata = getArticleMetadata(this._doc, jsonLd);
     this._metadata = metadata;
-    this._articleTitle = metadata.title;
+    this._articleTitle = metadata.title ?? null;
 
     // Extract the content
     const articleContent = grabArticle(this._doc, {
@@ -156,9 +156,9 @@ export class Readability {
       content: this._serializer(articleContent),
       textContent,
       length: textContent.length,
-      excerpt: metadata.excerpt,
+      excerpt: metadata.excerpt ?? null,
       siteName: metadata.siteName || this._articleSiteName,
-      publishedTime: metadata.publishedTime,
+      publishedTime: metadata.publishedTime ?? null,
     };
   }
 
@@ -210,7 +210,7 @@ export class Readability {
 }
 
 // Export all the individual functions for direct use
-export * from './preprocess';
-export * from './postprocess';
-export * from './grabber';
-export * from './metadata';
+// export * from './preprocess.ts';
+// export * from './postprocess.ts';
+// export * from './grabber.ts';
+// export * from './metadata.ts';

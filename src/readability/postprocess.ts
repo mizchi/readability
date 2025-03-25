@@ -4,20 +4,21 @@
  */
 
 import {
-  VElement,
-  VTextNode,
   getAttribute,
   setAttribute,
   removeAttribute,
   getElementsByTagName,
   forEachNode,
-  someNode
-} from '../vdom';
+  someNode,
+  getNextNode as vdomGetNextNode,
+  removeAndGetNext as vdomRemoveAndGetNext
+} from '../vdom.ts';
 
 import {
   REGEXPS,
   CLASSES_TO_PRESERVE
-} from '../constants';
+} from '../constants.ts';
+import type { VElement, VTextNode } from '../types.ts';
 
 /**
  * Run any post-process modifications to article content as necessary.
@@ -58,7 +59,7 @@ export function postProcessContent(
 export function cleanClasses(node: VElement, classesToPreserve: string[]): void {
   const className = (getAttribute(node, "class") || "")
     .split(/\s+/)
-    .filter(cls => classesToPreserve.includes(cls))
+    .filter(cls => cls && classesToPreserve.includes(cls))
     .join(" ");
 
   if (className) {
@@ -67,12 +68,9 @@ export function cleanClasses(node: VElement, classesToPreserve: string[]): void 
     removeAttribute(node, "class");
   }
 
-  for (let i = 0; i < node.children.length; i++) {
-    const child = node.children[i];
-    if (child.nodeType === 'element') {
-      cleanClasses(child, classesToPreserve);
-    }
-  }
+  // 子要素のうち、element型のものだけを処理
+  const elementChildren = node.children.filter(child => child.nodeType === 'element') as VElement[];
+  elementChildren.forEach(child => cleanClasses(child, classesToPreserve));
 }
 
 /**
@@ -82,6 +80,8 @@ export function cleanClasses(node: VElement, classesToPreserve: string[]): void 
  * @return true if str is a URL, false if not
  */
 export function isUrl(str: string): boolean {
+  if (!str) return false;
+  
   try {
     new URL(str);
     return true;
@@ -116,7 +116,8 @@ export function fixRelativeUris(
     try {
       return new URL(uri, baseURI).href;
     } catch (ex) {
-      // Something went wrong, just return the original:
+      // Something went wrong, log the error and return the original
+      console.error(`Error resolving URL: ${uri} against base ${baseURI}`, ex);
     }
     return uri;
   };
@@ -262,104 +263,60 @@ export function simplifyNestedElements(articleContent: VElement): void {
  * Checks if an element has no content (no text and only BR or HR elements)
  */
 export function isElementWithoutContent(node: VElement): boolean {
-  // Check if node has no text content
-  let hasText = false;
-  for (const child of node.children) {
-    if (child.nodeType === 'text' && child.textContent.trim().length > 0) {
-      hasText = true;
-      break;
-    }
-  }
+  // 子要素がない場合は空と見なす
+  if (node.children.length === 0) return true;
   
-  if (hasText) return false;
+  // テキストノードがあるかチェック
+  const hasTextContent = someNode(node.children, child => 
+    child.nodeType === 'text' && child.textContent.trim().length > 0
+  );
   
-  // Count BR and HR elements
-  let brHrCount = 0;
-  for (const child of node.children) {
-    if (child.nodeType === 'element' && (child.tagName === 'BR' || child.tagName === 'HR')) {
-      brHrCount++;
-    }
-  }
+  if (hasTextContent) return false;
   
-  // Element has no content if it has no text and all children are BR or HR
-  return !hasText && (node.children.length === 0 || node.children.length === brHrCount);
+  // BR/HR以外の要素があるかチェック
+  const hasNonBrHrElement = someNode(node.children, child => 
+    child.nodeType === 'element' && child.tagName !== 'BR' && child.tagName !== 'HR'
+  );
+  
+  // テキストがなく、BR/HR以外の要素もない場合は空と見なす
+  return !hasNonBrHrElement;
 }
 
 /**
  * Check if this node has only one child element with the specified tag
+ * and no text content
  */
 export function hasSingleTagInsideElement(element: VElement, tag: string): boolean {
-  // There should be exactly 1 element child with given tag
-  if (element.children.length != 1) return false;
+  // 子要素が1つだけであることを確認
+  if (element.children.length !== 1) return false;
   
   const child = element.children[0];
+  
+  // 子要素が指定されたタグの要素であることを確認
   if (child.nodeType !== 'element' || child.tagName !== tag) return false;
   
-  // And there should be no text nodes with real content
-  return !someNode(element.children, function(node) {
-    return (
-      node.nodeType === 'text' &&
-      node.textContent.trim().length > 0
-    );
-  });
+  // テキストノードがないか、あっても空であることを確認
+  const textNodes = element.children.filter(node => 
+    node.nodeType === 'text' && node.textContent.trim().length > 0
+  );
+  
+  return textNodes.length === 0;
 }
 
 /**
  * Get the next node in a tree traversal
+ * This is a wrapper around the vdom getNextNode function to maintain API compatibility
  */
 export function getNextNode(node: VElement, ignoreSelfAndKids?: boolean): VElement | null {
-  // First check for kids if those aren't being ignored
-  if (!ignoreSelfAndKids && node.children.length > 0) {
-    const child = node.children[0];
-    if (child.nodeType === 'element') {
-      return child as VElement;
-    }
-  }
-  
-  // Then for siblings...
-  if (node.parent) {
-    const siblings = node.parent.children;
-    const index = siblings.indexOf(node);
-    
-    if (index < siblings.length - 1) {
-      const nextSibling = siblings[index + 1];
-      if (nextSibling.nodeType === 'element') {
-        return nextSibling as VElement;
-      }
-    }
-    
-    // And finally, move up the parent chain and find a sibling
-    let parent = node.parent;
-    while (parent) {
-      const parentSiblings = parent.parent?.children || [];
-      const parentIndex = parentSiblings.indexOf(parent);
-      
-      if (parentIndex < parentSiblings.length - 1) {
-        const parentNextSibling = parentSiblings[parentIndex + 1];
-        if (parentNextSibling.nodeType === 'element') {
-          return parentNextSibling as VElement;
-        }
-      }
-      
-      parent = parent.parent as VElement;
-    }
-  }
-  
-  return null;
+  const nextNode = vdomGetNextNode(node, ignoreSelfAndKids);
+  return nextNode && nextNode.nodeType === 'element' ? nextNode as VElement : null;
 }
 
 /**
  * Remove a node and get the next node in the traversal
+ * This is a wrapper around the vdom removeAndGetNext function to maintain API compatibility
  */
 export function removeAndGetNext(node: VElement): VElement | null {
-  const nextNode = getNextNode(node, true);
-  
-  if (node.parent) {
-    const index = node.parent.children.indexOf(node);
-    if (index !== -1) {
-      node.parent.children.splice(index, 1);
-    }
-  }
-  
-  return nextNode;
+  const nextNode = vdomRemoveAndGetNext(node);
+  return nextNode && nextNode.nodeType === 'element' ? nextNode as VElement : null;
 }

@@ -4,10 +4,6 @@
  */
 
 import {
-  VDocument,
-  VElement,
-  VTextNode,
-  VNode,
   getAttribute,
   setAttribute,
   removeAttribute,
@@ -18,11 +14,9 @@ import {
   isWhitespace,
   isPhrasingContent,
   createVElement
-} from '../vdom';
+} from '../vdom.ts';
 
-import {
-  REGEXPS
-} from '../constants';
+import type { VDocument, VElement, VNode, VTextNode } from '../types.ts';
 
 /**
  * Prepare the HTML document for readability to scrape it.
@@ -48,13 +42,13 @@ export function prepDocument(doc: VDocument): void {
  * returned.
  */
 export function nextNode(node: VNode): VNode | null {
-  let next = node;
+  let next: VNode | null = node;
   while (
     next &&
     next.nodeType !== 'element' &&
     isWhitespace(next as VTextNode)
   ) {
-    next = getNextNode(next);
+    next = getNextNode(next as VElement);
   }
   return next;
 }
@@ -68,7 +62,7 @@ export function nextNode(node: VNode): VNode | null {
  */
 export function replaceBrs(elem: VElement): void {
   forEachNode(getAllNodesWithTag(elem, ["br"]), function(br: VElement) {
-    let next = br.parent?.children.indexOf(br) !== undefined 
+    let next: VNode | null = br.parent?.children.indexOf(br) !== undefined 
       ? br.parent?.children[br.parent?.children.indexOf(br) + 1] 
       : null;
 
@@ -117,13 +111,13 @@ export function replaceBrs(elem: VElement): void {
       while (next) {
         // If we've hit another <br><br>, we're done adding children to this <p>.
         if ((next as VElement).tagName == "BR") {
-          const nextElem = nextNode(getNextNode(next as VNode));
+          const nextElem = nextNode(getNextNode(next as VElement)!);
           if (nextElem && (nextElem as VElement).tagName == "BR") {
             break;
           }
         }
 
-        if (!isPhrasingContent(next as VNode)) {
+        if (!isPhrasingContent(next)) {
           break;
         }
 

@@ -4,21 +4,18 @@
  */
 
 import {
-  VDocument,
-  VElement,
-  VTextNode,
   getAttribute,
   getElementsByTagName,
   forEachNode,
   getInnerText
-} from '../vdom';
+} from '../vdom.ts';
 
 import {
   REGEXPS,
   HTML_ESCAPE_MAP
-} from '../constants';
+} from '../constants.ts';
 
-import { ReadabilityMetadata } from '../types';
+import { ReadabilityMetadata, VDocument } from '../types.ts';
 
 /**
  * Get the article title as an H1.
@@ -74,7 +71,10 @@ export function getArticleTitle(doc: VDocument): string {
   } else if (curTitle.includes(": ")) {
     // Check if we have an heading containing this exact string, so we
     // could assume it's the full title.
-    const headings = getElementsByTagName(doc.documentElement, ["h1", "h2"]);
+    // getElementsByTagNameは単一のタグ名しか受け付けないため、複数のタグを処理するヘルパー関数を使用
+    const h1Elements = getElementsByTagName(doc.documentElement, "h1");
+    const h2Elements = getElementsByTagName(doc.documentElement, "h2");
+    const headings = [...h1Elements, ...h2Elements];
     const trimmedTitle = curTitle.trim();
     
     let match = false;
@@ -159,7 +159,7 @@ export function unescapeHtmlEntities(str: string): string {
  * @return Object with any metadata that could be extracted (possibly none)
  */
 export function getJSONLD(doc: VDocument): ReadabilityMetadata {
-  const scripts = getElementsByTagName(doc.documentElement, ["script"]);
+  const scripts = getElementsByTagName(doc.documentElement, "script");
   let metadata: ReadabilityMetadata = {};
 
   for (const jsonLdElement of scripts) {
@@ -245,10 +245,10 @@ export function getJSONLD(doc: VDocument): ReadabilityMetadata {
             typeof parsed.author[0].name === "string"
           ) {
             metadata.byline = parsed.author
-              .filter(function(author) {
+              .filter(function(author: any) {
                 return author && typeof author.name === "string";
               })
-              .map(function(author) {
+              .map(function(author: any) {
                 return author.name.trim();
               })
               .join(", ");
@@ -382,7 +382,7 @@ export function getArticleMetadata(doc: VDocument, jsonld: ReadabilityMetadata):
     jsonld.datePublished ||
     values["article:published_time"] ||
     values["parsely-pub-date"] ||
-    null;
+    undefined;
 
   // in many sites the meta value is escaped with HTML entities,
   // so here we need to unescape it
