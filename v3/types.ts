@@ -46,12 +46,8 @@ export interface VDocument {
 export interface ReadabilityArticle {
   title: string | null;
   byline: string | null;
-  content: VElement | null;
-  textContent: string;
-  contentHTML: string; // HTML構造をそのまま出力するためのプロパティ
-  length: number;
-  excerpt: string | null;
-  siteName: string | null;
+  root: VElement | null;
+  nodeCount: number;
 }
 
 // Readabilityのオプション

@@ -6,6 +6,7 @@
 
 import { parse } from '../index.ts';
 import type { ReadabilityArticle } from '../types.ts';
+import { elementToHTML, stringify } from '../format.ts';
 import html2md from "html-to-md";
 /**
  * URLからHTMLを取得して本文のHTML構造を抽出する
@@ -37,10 +38,10 @@ export async function fetchAndExtractHTML(url: string): Promise<ReadabilityArtic
 /**
  * 指定されたURLから記事を抽出してHTML構造を表示する
  */
-async function main() {
+async function main(url: string) {
   try {
     // Zenn記事のURLを指定
-    const url = 'https://zenn.dev/mizchi/articles/deno-cli-ai-sdk-tools-template';
+    // const url = ;
     
     console.log(`Fetching and extracting HTML content from: ${url}`);
     
@@ -51,15 +52,28 @@ async function main() {
     console.log('\n=== 抽出結果 ===\n');
     console.log(`タイトル: ${article.title}`);
     console.log(`著者: ${article.byline || '不明'}`);
-    console.log(`サイト名: ${article.siteName || '不明'}`);
-    console.log(`抜粋: ${article.excerpt || '抜粋なし'}`);
-    console.log(`本文長: ${article.length} 文字`);
+    console.log(`ノード数: ${article.nodeCount}`);
     
-    // HTML構造を表示
-    console.log('\n=== HTML構造 ===\n');
-    console.log(article.contentHTML);    
-    const md = html2md(article.contentHTML);
-    console.log(md);
+    if (article.root) {
+      // HTML構造を生成
+      const htmlContent = elementToHTML(article.root);
+      
+      // HTML構造を表示
+      // console.log('\n=== HTML構造 ===\n');
+      // console.log(htmlContent);
+    
+      // Markdownに変換
+      const md = html2md(htmlContent);
+      console.log('\n=== Markdown ===\n');
+      console.log(md);
+
+      // stringy
+      // const str = stringify(article.root);
+      // console.log('\n=== Stringify ===\n');
+      // console
+      // console.log(str);
+      // const outputPath = 'output.html';
+    }
     // fs.writeFileSync(outputPath, fullHTML);
     // console.log(`\nHTML content saved to: ${outputPath}`);
   } catch (error) {
@@ -67,4 +81,4 @@ async function main() {
   }
 }
 
-main();
+main(process.argv[2] ?? 'https://zenn.dev/mizchi/articles/deno-cli-ai-sdk-tools-template');

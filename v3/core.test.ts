@@ -197,14 +197,14 @@ describe('Core Readability Functions', () => {
     const result = extractContent(doc);
     
     // コンテンツが抽出されることを確認
-    expect(result.content).not.toBeNull();
+    expect(result.root).not.toBeNull();
     
-    // テキスト長が計算されることを確認
-    expect(result.length).toBeGreaterThan(0);
+    // ノード数が計算されることを確認
+    expect(result.nodeCount).toBeGreaterThan(0);
     
     // 抽出されたコンテンツにテスト記事のテキストが含まれることを確認
-    if (result.content) {
-      const contentText = result.content.children
+    if (result.root) {
+      const contentText = result.root.children
         .filter((child): child is VElement => child.nodeType === 'element' && child.tagName === 'P')
         .map((p: VElement) => p.children
           .filter((c): c is VTextNode => c.nodeType === 'text')
@@ -222,16 +222,16 @@ describe('Core Readability Functions', () => {
     const result = extractContent(doc);
     
     // コンテンツが抽出されることを確認
-    expect(result.content).not.toBeNull();
+    expect(result.root).not.toBeNull();
     
-    // テキスト長が計算されることを確認
-    expect(result.length).toBeGreaterThan(0);
+    // ノード数が計算されることを確認
+    expect(result.nodeCount).toBeGreaterThan(0);
     
     // 抽出されたコンテンツにarticleタグ内のテキストが含まれることを確認
-    if (result.content) {
+    if (result.root) {
       const isArticleOrContainsArticle = 
-        result.content.tagName === 'ARTICLE' ||
-        result.content.children.some((child): boolean => 
+        result.root.tagName === 'ARTICLE' ||
+        result.root.children.some((child): boolean => 
           child.nodeType === 'element' && child.tagName === 'ARTICLE'
         );
       
@@ -244,17 +244,17 @@ describe('Core Readability Functions', () => {
     const result = extractContent(doc);
     
     // コンテンツが抽出されることを確認
-    expect(result.content).not.toBeNull();
+    expect(result.root).not.toBeNull();
     
-    // テキスト長が計算されることを確認
-    expect(result.length).toBeGreaterThan(0);
+    // ノード数が計算されることを確認
+    expect(result.nodeCount).toBeGreaterThan(0);
     
     // 抽出されたコンテンツにメインコンテンツのテキストが含まれることを確認
-    if (result.content) {
+    if (result.root) {
       // contentクラスの要素またはその親要素が選択されていることを確認
       const contentOrParentOfContent = 
-        result.content.className === 'content' ||
-        result.content.children.some((child): boolean => 
+        result.root.className === 'content' ||
+        result.root.children.some((child): boolean => 
           child.nodeType === 'element' && child.className === 'content'
         );
       

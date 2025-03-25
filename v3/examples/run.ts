@@ -6,6 +6,7 @@
 
 import { parse } from '../index.ts';
 import type { ReadabilityArticle } from '../types.ts';
+import { extractTextContent, elementToHTML } from '../format.ts';
 
 /**
  * URLからHTMLを取得して本文抽出を実行する
@@ -51,18 +52,26 @@ async function main() {
     console.log('\n=== 抽出結果 ===\n');
     console.log(`タイトル: ${article.title}`);
     console.log(`著者: ${article.byline || '不明'}`);
-    console.log(`サイト名: ${article.siteName || '不明'}`);
-    console.log(`抜粋: ${article.excerpt || '抜粋なし'}`);
-    console.log(`本文長: ${article.length} 文字`);
+    console.log(`ノード数: ${article.nodeCount}`);
     
-    // 本文の一部を表示（最初の200文字）
-    if (article.textContent) {
-      const previewText = article.textContent.length > 200 
-        ? article.textContent.substring(0, 200) + '...' 
-        : article.textContent;
+    // 本文のテキストを抽出
+    if (article.root) {
+      const textContent = extractTextContent(article.root);
+      const htmlContent = elementToHTML(article.root);
+      
+      // テキストの長さを表示
+      console.log(`本文長: ${textContent.length} 文字`);
+      
+      // 本文の一部を表示（最初の200文字）
+      const previewText = textContent.length > 200 
+        ? textContent.substring(0, 200) + '...' 
+        : textContent;
       
       console.log('\n=== 本文プレビュー ===\n');
       console.log(previewText);
+      
+      console.log('\n=== HTML プレビュー ===\n');
+      console.log(htmlContent.substring(0, 200) + '...');
     }
     
   } catch (error) {

@@ -20,6 +20,7 @@ import {
   DEFAULT_CHAR_THRESHOLD
 } from './constants.ts';
 import { parseHTML, serializeToHTML } from './parser.ts';
+import { countNodes } from './format.ts';
 
 /**
  * 要素にスコアを初期化する
@@ -376,12 +377,8 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
   return {
     title,
     byline,
-    content,
-    textContent,
-    contentHTML,
-    length: textContent.length,
-    excerpt,
-    siteName
+    root: content,
+    nodeCount: content ? countNodes(content) : 0
   };
 }
 
@@ -393,15 +390,5 @@ export function parse(html: string, options: ReadabilityOptions = {}): Readabili
   const doc = parseHTML(html);
   
   // 本文を抽出
-  const article = extractContent(doc, options);
-  
-  // コンテンツをHTMLにシリアライズ
-  const contentHTML = article.content ? serializeToHTML(article.content) : '';
-  
-  return {
-    ...article,
-    content: article.content,
-    textContent: article.textContent || contentHTML.replace(/<[^>]+>/g, ''),
-    contentHTML: contentHTML // HTML構造をそのまま出力
-  };
+  return extractContent(doc, options);
 }
