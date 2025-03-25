@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
     "test": "mocha test/test-*.js",
+    "test:2": "vitest --run",
     "generate-testcase": "node test/generate-testcase.js",
     "release": "release-it",
     "test:blog": "vite-node test-blog.ts"
