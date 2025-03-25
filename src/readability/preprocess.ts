@@ -49,9 +49,9 @@ export function nextNode(node: VNode): VNode | null {
     next &&
     !isVElement(next) &&
     isVTextNode(next) &&
-    isWhitespace(next)
+    isWhitespace(next as VTextNode)
   ) {
-    next = getNextNode(next);
+    next = getNextNode(next as VTextNode);
   }
   return next;
 }

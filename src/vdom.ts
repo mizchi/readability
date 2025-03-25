@@ -4,15 +4,6 @@
 
 import type { VElement, VNode, VTextNode } from "./types.ts";
 
-// 型ガード関数
-export function isVElement(node: VNode): node is VElement {
-  return node.nodeType === 'element';
-}
-
-export function isVTextNode(node: VNode): node is VTextNode {
-  return node.nodeType === 'text';
-}
-
 // ノードの作成ヘルパー関数
 export function createVElement(tagName: string): VElement {
   return {
@@ -127,6 +118,15 @@ export function removeAndGetNext(node: VElement | VTextNode): VElement | VTextNo
   }
   
   return next;
+}
+
+// 型ガード関数
+export function isVElement(node: VNode): node is VElement {
+  return node.nodeType === 'element';
+}
+
+export function isVTextNode(node: VNode): node is VTextNode {
+  return node.nodeType === 'text';
 }
 
 // 可視性の確認

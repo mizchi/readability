@@ -1,9 +1,8 @@
-import { parseHTML, serializeToHTML } from './src/html_parser.ts';
-import { Readability } from './src/readability/index.ts';
-import type { VElement } from './src/types.ts';
+// オリジナルのReadabilityを使用したテスト
+const { JSDOM } = require('jsdom');
+const { Readability } = require('./index');
 
-// ブログのようなHTMLテキストを作成
-const person = 'テスト著者';
+// test-blog.tsからHTMLデータを取得
 const blogHTML = `
 <!DOCTYPE html>
 <html>
@@ -73,7 +72,7 @@ const isActive: boolean = true;
 
 // 関数の型アノテーション
 function greet(person: string): string {
-  return \`Hello, ${person}!\`;
+  return \`Hello, \${person}!\`;
 }
       </code></pre>
       
@@ -167,64 +166,20 @@ function processValue(value: string | number) {
 </html>
 `;
 
-// HTMLをパースしてVDocumentを作成
-function testBlogParsing() {
-  console.log('=== ブログHTMLのパースと本文抽出テスト ===\n');
+// HTMLをパースしてDOMを作成
+function testOriginalReadability() {
+  console.log('=== オリジナルReadabilityによるブログHTMLのパースと本文抽出テスト ===\n');
   
   // HTMLをパース
   console.log('1. HTMLをパースしています...');
-  const doc = parseHTML(blogHTML, 'https://example.com/blog/typescript-safety');
+  const dom = new JSDOM(blogHTML, {
+    url: 'https://example.com/blog/typescript-safety'
+  });
+  const doc = dom.window.document;
   
   // Readabilityを使用して本文を抽出
   console.log('2. Readabilityを使用して本文を抽出しています...');
-  
-  // 循環参照を処理するカスタムシリアライザー
-  const customSerializer = (element: VElement) => {
-    // 自己終了タグのリスト
-    const selfClosingTags = ['meta', 'link', 'img', 'br', 'hr', 'input', 'source'];
-    
-    // コードブロック内のコンテンツをエスケープするかどうか
-    const isCodeBlock = (el: VElement): boolean => {
-      return el.tagName === 'PRE' || el.tagName === 'CODE';
-    };
-    
-    // 簡易的なHTMLシリアライザー
-    const serializeElement = (el: VElement, insideCode = false): string => {
-      const tagName = el.tagName.toLowerCase();
-      const attrs = Object.entries(el.attributes)
-        .map(([key, value]) => ` ${key}="${value}"`)
-        .join('');
-      
-      // 子要素がない場合
-      if (el.children.length === 0) {
-        // 自己終了タグの場合
-        if (selfClosingTags.includes(tagName)) {
-          return `<${tagName}${attrs}>`;
-        }
-        return `<${tagName}${attrs}></${tagName}>`;
-      }
-      
-      // コードブロック内かどうかを判定
-      const newInsideCode = insideCode || isCodeBlock(el);
-      
-      const childrenHtml = el.children
-        .map((child: VElement | { nodeType: 'text', textContent: string }) => {
-          if (child.nodeType === 'text') {
-            // コードブロック内のテキストは特殊文字をエスケープしない
-            return child.textContent;
-          } else {
-            return serializeElement(child as VElement, newInsideCode);
-          }
-        })
-        .join('');
-      
-      return `<${tagName}${attrs}>${childrenHtml}</${tagName}>`;
-    };
-    
-    return serializeElement(element);
-  };
-  
-  const reader = new Readability(doc, { serializer: customSerializer });
+  const reader = new Readability(doc);
   const article = reader.parse();
   
   if (!article) {
@@ -249,4 +204,4 @@ function testBlogParsing() {
 }
 
 // テストを実行
-testBlogParsing();
+testOriginalReadability();

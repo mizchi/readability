@@ -26,6 +26,7 @@
   "homepage": "https://github.com/mozilla/readability",
   "devDependencies": {
     "@release-it/keep-a-changelog": "5.0.0",
+    "@types/node": "^22.13.13",
     "chai": "4.3.7",
     "eslint": "8.57.0",
     "eslint-plugin-mozilla": "^3.7.4",
