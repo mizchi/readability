@@ -9,7 +9,7 @@ WIP under `src/*`
 ## How to use
 
 ```ts
-import { elementToHTML, extract } from "./dist/index.js";
+import { elementToHTML, extract } from "@mizchi/readability";
 import html2md from "html-to-md";
 
 const html = await fetch(
