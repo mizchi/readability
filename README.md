@@ -1,6 +1,6 @@
 # Readability.js | TS Rewriting
 
-WIP in `v3/*`
+WIP
 
 - Goal: NO DOM API to work on cloudflare
 

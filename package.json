@@ -2,40 +2,35 @@
   "name": "@mizchi/readability",
   "version": "0.3.0",
   "description": "A standalone version of the readability library used for Firefox Reader View.",
-  "main": "v3/dist/index.js",
-  "types": "v3/dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "vite build",
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
     "test:original": "mocha test/test-*.js",
-    "test": "vitest v3 --run",
+    "test": "vitest src --run",
     "generate-testcase": "node test/generate-testcase.js",
     "release": "echo wip # release-it"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mozilla/readability"
+    "url": "https://github.com/mizchi/readability"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/mozilla/readability/issues"
+    "url": "https://github.com/mizchi/readability/issues"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=22.0.0"
   },
-  "homepage": "https://github.com/mozilla/readability",
+  "homepage": "https://github.com/mizchi/readability",
   "devDependencies": {
-    "@release-it/keep-a-changelog": "5.0.0",
     "@types/node": "^22.13.13",
     "chai": "4.3.7",
     "esbuild": "^0.25.1",
-    "eslint": "8.57.0",
-    "eslint-plugin-mozilla": "^3.7.4",
-    "eslint-plugin-no-unsanitized": "^4.0.2",
     "html-to-md": "^0.8.6",
     "htmltidy2": "1.0.0",
-    "js-beautify": "1.14.7",
     "jsdom": "20.0.2",
     "mocha": "10.8.2",
     "prettier": "^3.3.2",
@@ -43,7 +38,6 @@
     "sinon": "14.0.2",
     "typescript": "^5.8.2",
     "vite": "^6.2.3",
-    "vite-node": "^3.0.9",
     "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
@@ -52,7 +46,7 @@
     "htmlparser2": "^10.0.0"
   },
   "files": [
-    "v3",
+    "src",
     "dist"
   ]
 }

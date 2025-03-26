@@ -1,10 +1,10 @@
 /**
- * Readability v3 - Formatting Functions
+ * Readability - Formatting Functions
  *
  * Provides functions to generate HTML from VElement and stringify it.
  */
 
-import type { VElement, VTextNode, VNode } from './types';
+import type { VElement, VTextNode, VNode } from "./types";
 
 /**
  * Generate HTML string from VElement
@@ -13,21 +13,33 @@ import type { VElement, VTextNode, VNode } from './types';
  * @returns HTML string
  */
 export function elementToHTML(element: VElement | null): string {
-  if (!element) return '';
+  if (!element) return "";
 
   const { tagName, attributes, children } = element;
   const tagNameLower = tagName.toLowerCase();
 
   // List of self-closing tags
   const selfClosingTags = new Set([
-    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
-    'link', 'meta', 'param', 'source', 'track', 'wbr'
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
   ]);
 
   // Generate attribute string
   const attrs = Object.entries(attributes)
     .map(([key, value]) => `${key}="${escapeHTML(value)}"`)
-    .join(' ');
+    .join(" ");
 
   // For self-closing tags
   if (selfClosingTags.has(tagNameLower) && children.length === 0) {
@@ -39,14 +51,14 @@ export function elementToHTML(element: VElement | null): string {
 
   // Process child elements
   const childContent = children
-    .map(child => {
-      if (child.nodeType === 'text') {
+    .map((child) => {
+      if (child.nodeType === "text") {
         return escapeHTML((child as VTextNode).textContent);
       } else {
         return elementToHTML(child as VElement);
       }
     })
-    .join('');
+    .join("");
 
   // End tag
   const endTag = `</${tagNameLower}>`;
@@ -62,21 +74,50 @@ export function elementToHTML(element: VElement | null): string {
  */
 function escapeHTML(str: string): string {
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
     .replace(/"/g, '"')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, "&#039;");
 }
 
 /**
  * List of block elements
  */
 const BLOCK_ELEMENTS = new Set([
-  'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd',
-  'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form',
-  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'li',
-  'main', 'nav', 'ol', 'p', 'pre', 'section', 'table', 'ul'
+  "address",
+  "article",
+  "aside",
+  "blockquote",
+  "details",
+  "dialog",
+  "dd",
+  "div",
+  "dl",
+  "dt",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "footer",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "hgroup",
+  "hr",
+  "li",
+  "main",
+  "nav",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "table",
+  "ul",
 ]);
 
 /**
@@ -89,35 +130,35 @@ const BLOCK_ELEMENTS = new Set([
  * @returns Formatted string
  */
 export function stringify(element: VElement | null): string {
-  if (!element) return '';
+  if (!element) return "";
 
   const { tagName, children } = element;
   const tagNameLower = tagName.toLowerCase();
   const isBlock = BLOCK_ELEMENTS.has(tagNameLower);
 
   // Handle special tags
-  if (tagNameLower === 'br') {
-    return '\n';
+  if (tagNameLower === "br") {
+    return "\n";
   }
 
-  if (tagNameLower === 'hr') {
-    return '\n----------\n';
+  if (tagNameLower === "hr") {
+    return "\n----------\n";
   }
 
-  let result = '';
+  let result = "";
 
   // Insert line break before block elements
   if (isBlock) {
-    result += '\n';
+    result += "\n";
   }
 
   // Process child elements
   for (const child of children) {
-    if (child.nodeType === 'text') {
+    if (child.nodeType === "text") {
       // Append text node directly
       const text = (child as VTextNode).textContent.trim();
       if (text) {
-        result += text + ' ';
+        result += text + " ";
       }
     } else {
       // Recursively process element nodes
@@ -126,15 +167,15 @@ export function stringify(element: VElement | null): string {
   }
 
   // Remove trailing space
-  result = result.replace(/ $/, '');
+  result = result.replace(/ $/, "");
 
   // Insert line break after block elements
   if (isBlock) {
-    result += '\n';
+    result += "\n";
   }
 
   // Merge consecutive line breaks into one
-  return result.replace(/\n{2,}/g, '\n');
+  return result.replace(/\n{2,}/g, "\n");
 }
 
 /**
@@ -146,10 +187,10 @@ export function stringify(element: VElement | null): string {
  */
 export function formatDocument(text: string): string {
   return text
-    .replace(/\n{2,}/g, '\n')  // Merge consecutive line breaks
-    .replace(/^\n+/, '')       // Remove leading line breaks
-    .replace(/\n+$/, '')       // Remove trailing line breaks
-    .trim();                   // Remove leading/trailing whitespace
+    .replace(/\n{2,}/g, "\n") // Merge consecutive line breaks
+    .replace(/^\n+/, "") // Remove leading line breaks
+    .replace(/\n+$/, "") // Remove trailing line breaks
+    .trim(); // Remove leading/trailing whitespace
 }
 
 /**
@@ -159,17 +200,17 @@ export function formatDocument(text: string): string {
  * @returns Text content
  */
 export function extractTextContent(element: VElement | null): string {
-  if (!element) return '';
+  if (!element) return "";
 
   return element.children
-    .map(child => {
-      if (child.nodeType === 'text') {
+    .map((child) => {
+      if (child.nodeType === "text") {
         return (child as VTextNode).textContent;
       } else {
         return extractTextContent(child as VElement);
       }
     })
-    .join('');
+    .join("");
 }
 
 /**
@@ -186,7 +227,7 @@ export function countNodes(element: VElement | null): number {
 
   // Recursively count child elements
   for (const child of element.children) {
-    if (child.nodeType === 'element') {
+    if (child.nodeType === "element") {
       count += countNodes(child as VElement);
     } else {
       // Count text nodes as 1
