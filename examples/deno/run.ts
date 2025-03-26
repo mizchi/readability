@@ -2,7 +2,7 @@ import { extract, toHTML } from "npm:@mizchi/readability@0.3.1";
 import html2md from "npm:html-to-md@0.8.6";
 
 const html = await fetch(
-  "https://zenn.dev/mizchi/articles/ts-using-sampling-logger"
+  Deno.args[0] ?? "https://zenn.dev/mizchi/articles/ts-using-sampling-logger"
 ).then((res) => res.text());
 const extracted = extract(html, { charThreshold: 100 });
 // 結果を表示

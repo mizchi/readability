@@ -40,6 +40,7 @@ const testCasesDirs = [
   "aclu",
   // "aktualne",
   // "archive-of-our-own",
+  // "wordpress", // Add wordpress test case
 ];
 
 function extractHTMLByNewReadability(source: string) {

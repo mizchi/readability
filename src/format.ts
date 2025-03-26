@@ -88,7 +88,8 @@ export function toHTML(element: VElement | null): string {
  */
 function escapeHTML(str: string): string {
   return str
-    .replace(/&/g, "&amp;")
+    .replace(/&/g, "&") // Must be first
+    .replace(/\xa0/g, "&nbsp;") // Handle non-breaking space
     .replace(/</g, "<")
     .replace(/>/g, ">")
     .replace(/"/g, '"')

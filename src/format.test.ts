@@ -94,4 +94,57 @@ describe("toHTML function", () => {
   test("should return empty string for null input", () => {
     expect(toHTML(null)).toBe("");
   });
+
+  test("should preserve whitespace including nbsp when removing span tags", () => {
+    // Create a structure similar to the one causing issues in preprocess.test.ts
+    const p1 = createElement("p");
+    p1.children.push(createTextNode("Some text "));
+    const span1 = createElement("span");
+    span1.children.push(createTextNode("with a span"));
+    p1.children.push(span1);
+    p1.children.push(createTextNode(" inside."));
+
+    const p2 = createElement("p");
+    p2.children.push(createTextNode("Another text\xa0")); // Use \xa0 for nbsp
+    const span2 = createElement("span");
+    span2.children.push(createTextNode("with nbsp"));
+    p2.children.push(span2);
+    p2.children.push(createTextNode("\xa0around.")); // Use \xa0 for nbsp
+
+    const p3 = createElement("p");
+    p3.children.push(createTextNode("Text"));
+    const span3 = createElement("span");
+    span3.children.push(createTextNode("without space"));
+    p3.children.push(span3);
+    p3.children.push(createTextNode("around."));
+
+    const p4 = createElement("p");
+    p4.children.push(createTextNode(" Text with leading space"));
+    const span4 = createElement("span");
+    span4.children.push(createTextNode(" and span"));
+    p4.children.push(span4);
+    p4.children.push(createTextNode("."));
+
+    const p5 = createElement("p");
+    const span5 = createElement("span");
+    span5.children.push(createTextNode("Span at start"));
+    p5.children.push(span5);
+    p5.children.push(createTextNode(" and text."));
+
+    const container = createElement("div");
+    container.children.push(p1, p2, p3, p4, p5);
+
+    // Expected HTML, note &nbsp; for non-breaking spaces
+    const expectedHTML =
+      "<div><p>Some text with a span inside.</p><p>Another text&nbsp;with nbsp&nbsp;around.</p><p>Textwithout spacearound.</p><p> Text with leading space and span.</p><p>Span at start and text.</p></div>";
+
+    // Normalize whitespace for comparison, preserving &nbsp;
+    const normalize = (str: string) =>
+      str
+        .replace(/[ \t\r\n\f]+/g, " ") // Collapse regular whitespace
+        .replace(/\s*(&nbsp;)\s*/g, "$1") // Keep nbsp, remove surrounding space if any
+        .replace(/^ | $/g, ""); // Trim leading/trailing regular spaces only
+
+    expect(normalize(toHTML(container))).toBe(normalize(expectedHTML));
+  });
 });

@@ -35,6 +35,7 @@
     "js-beautify": "^1.15.4",
     "jsdom": "20.0.2",
     "prettier": "^3.5.3",
+    "puppeteer-core": "^24.4.0",
     "release-it": "17.0.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
@@ -43,7 +44,6 @@
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
   },
-  "dependencies": {},
   "peerDependencies": {
     "htmlparser2": "^10.0.0"
   },
