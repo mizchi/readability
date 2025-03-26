@@ -7,7 +7,7 @@
 import type { VElement, VText, VNode } from "./types";
 
 /**
- * Generate HTML string from VElement
+ * Generate HTML string from VElement, omitting span tags and class attributes.
  *
  * @param element VElement to convert
  * @returns HTML string
@@ -17,6 +17,19 @@ export function toHTML(element: VElement | null): string {
 
   const { tagName, attributes, children } = element;
   const tagNameLower = tagName.toLowerCase();
+
+  // Omit span tags, process children directly
+  if (tagNameLower === "span") {
+    return children
+      .map((child) => {
+        if (child.nodeType === "text") {
+          return escapeHTML((child as VText).textContent);
+        } else {
+          return toHTML(child as VElement);
+        }
+      })
+      .join("");
+  }
 
   // List of self-closing tags
   const selfClosingTags = new Set([
@@ -36,8 +49,9 @@ export function toHTML(element: VElement | null): string {
     "wbr",
   ]);
 
-  // Generate attribute string
+  // Generate attribute string, excluding 'class'
   const attrs = Object.entries(attributes)
+    .filter(([key]) => key !== "class") // Exclude class attribute
     .map(([key, value]) => `${key}="${escapeHTML(value)}"`)
     .join(" ");
 

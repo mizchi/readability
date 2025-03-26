@@ -40,7 +40,7 @@ Vercel の `ai`, `@ai-sdk/*` はその辺の処理をラップしている。 Ve
 * Deno
 * Claude
 
-```ts
+```
 #!/usr/bin/env -S deno run -A
 import AnthropicAI from "npm:@anthropic-ai/sdk@0.27.3";
 import { parseArgs } from "node:util";
@@ -106,7 +106,7 @@ Deno の良い点は、 node+npm と違って書き捨てで実行可能な依�
 
 Deno の Node 互換層で記述していたので、IO周りを少しだけDeno用に合わせる必要がある。
 
-```ts
+```
 // CLI Parser
 // node:util で型が付くし、依存を気にせず使える
 import { parseArgs } from "node:util";
@@ -132,7 +132,7 @@ if (!input) {
 
 ## AI SDK + AnthropicAI
 
-```ts
+```
 import { anthropic } from "npm:@ai-sdk/anthropic@0.0.9";
 import { streamText } from "npm:ai@3.4.0";
 import { parseArgs } from "node:util";
@@ -170,7 +170,7 @@ for await (const textPart of textStream) {
 
 ## AI SDK + OpenAI
 
-```ts
+```
 #!/usr/bin/env -S deno run -A
 import { openai } from "npm:@ai-sdk/openai@0.0.61";
 import { streamText } from "npm:ai";
@@ -203,7 +203,7 @@ write("\n");
 
 ## AI SDK + Gemini
 
-```ts
+```
 import { google } from "npm:@ai-sdk/google@0.0.48";
 import { streamText } from "npm:ai@3.4.0";
 import { parseArgs } from "node:util";
@@ -247,7 +247,7 @@ write("\n");
 
 Function Calling(Tools) の応答は結構面倒くさいので、AI SDK で組み合わせてサボる。
 
-```ts
+```
 import { anthropic } from "npm:@ai-sdk/anthropic@0.0.50";
 import { streamText, tool } from "npm:ai@3.4.0";
 import { z } from "npm:zod@3.23.8";
@@ -321,7 +321,7 @@ write("\n");
 
 実行例
 
-```ts
+```
 $ deno run -A vai-claude-tools.ts "Sanfrancisco wheather?"
 > Sanfrancisco wheather?
 I understand you&#039;re asking about the weather in San Francisco. I can help you with that using the weather tool. However, I noticed a small typo in your request - you wrote "wheather" instead of "weather". No worries, I&#039;ll proceed with getting the weather information for San Francisco.
@@ -344,7 +344,7 @@ Is there anything else you&#039;d like to know about the weather in San Francisc
 
 ## Tools + OpenAI
 
-```ts
+```
 import { openai } from "npm:@ai-sdk/openai@0.0.61";
 import { streamText, tool } from "npm:ai@3.4.0";
 import { z } from "npm:zod@3.23.8";
@@ -420,7 +420,7 @@ write("\n");
 
 実行例
 
-```bash
+```
 $ deno run -A vai-openai-tools.ts "Sanfrancisco wheather?"
 [use:call_RHNM66C40SVK7yn0BytrKbqK] weather({
   "location": "San Francisco"
@@ -441,7 +441,7 @@ The current temperature in San Francisco is 65°F.
 
 その上でコピペ用の共通パーツを切り出しておくならこう。
 
-```ts
+```
 import { parseArgs, type ParseArgsConfig } from "node:util";
 
 const _encoder = new TextEncoder();
@@ -497,7 +497,7 @@ ai の StepResult 型が取れないので自前で触るプロパティだけ S
 
 これで openai + tools を書き換える。
 
-```ts
+```
 import { openai } from "npm:@ai-sdk/openai@0.0.61";
 import { streamText, tool } from "npm:ai@3.4.0";
 import { z } from "npm:zod@3.23.8";
@@ -552,7 +552,7 @@ write("\n");
 
 [https://twitter.com/lgrammel/status/1837822959668314255](https://twitter.com/lgrammel/status/1837822959668314255)
 
-```ts
+```
 import { anthropic } from "npm:@ai-sdk/anthropic@0.0.50";
 import { streamText, tool } from "npm:ai@3.4.0";
 import { z } from "npm:zod@3.23.8";

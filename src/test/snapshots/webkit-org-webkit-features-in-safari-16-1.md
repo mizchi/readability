@@ -197,7 +197,7 @@ Can instead be greatly simplified as:
 Or, along with the range syntax changes, as:
 
 ```
-@media ((40em < <span class="keyword">width) <span class="keyword">or</span> (20<span class="keyword">em</span> < <span class="keyword">height</span>)) <span class="keyword">and</span> (<span class="keyword">not</span> (<span class="keyword">pointer</span>: <span class="keyword">none</span>)) {
+@media ((40em < width) or (20em < height)) and (not (pointer: none)) {
   ...
 }
 ```
@@ -233,7 +233,7 @@ Safari 16.4 adds support for [CSS Typed OM](https://developer.mozilla.org/docs/W
 Safari 16.4 now supports [lazy loading](https://developer.mozilla.org/docs/Web/Performance/Lazy_loading) iframes with `loading="lazy"`. You might put it on a video embed iframe, [for example](https://codepen.io/jensimmons/pen/eYLgmgE/0f13453f284ddca8c30122c77784295f?editors=1100), to let the browser know if this element is offscreen, it doesn’t need to load until the user is about to scroll it into view.
 
 ```
-iframe>
+
 ```
 
 By the way, you should always include the height and width attributes on iframes, so browsers can reserve space in the layout for it before the iframe has loaded. If you resize the iframe with CSS, be sure to define both width and height in your CSS. You can also use the [`aspect-ratio`](https://developer.mozilla.org/docs/Web/CSS/aspect-ratio) property to make sure an iframe keeps it’s shape as it’s resized by CSS.
@@ -360,7 +360,7 @@ Media features new to Safari 16.4 also include:
 
 Across all platforms supporting [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable) or [`JSContext`](https://developer.apple.com/documentation/javascriptcore/jscontext/4111147-isinspectable/), a new property is available called `isInspectable` (`inspectable` in Objective-C) on macOS 13.4 and iOS, iPadOS, and tvOS 16.4. It defaults to `false`, and you can set it to `true` to opt-in to content being inspectable using Web Inspector, even in release builds of apps.
 
-<picture><source />![Develop Menu](https://webkit.org/wp-content/uploads/Inspectable-Light.png) Patrick&#039;s iPhone > Example App" class="wp-image-13941" srcset="https://webkit.org/wp-content/uploads/Inspectable-Light.png 2010w, https://webkit.org/wp-content/uploads/Inspectable-Light-300x121.png 300w, https://webkit.org/wp-content/uploads/Inspectable-Light-1024x413.png 1024w, https://webkit.org/wp-content/uploads/Inspectable-Light-768x309.png 768w, https://webkit.org/wp-content/uploads/Inspectable-Light-1536x619.png 1536w" sizes="auto, (max-width: 2010px) 100vw, 2010px"/></picture>
+<picture><source />![Develop Menu](https://webkit.org/wp-content/uploads/Inspectable-Light.png) Patrick&#039;s iPhone > Example App" srcset="https://webkit.org/wp-content/uploads/Inspectable-Light.png 2010w, https://webkit.org/wp-content/uploads/Inspectable-Light-300x121.png 300w, https://webkit.org/wp-content/uploads/Inspectable-Light-1024x413.png 1024w, https://webkit.org/wp-content/uploads/Inspectable-Light-768x309.png 768w, https://webkit.org/wp-content/uploads/Inspectable-Light-1536x619.png 1536w" sizes="auto, (max-width: 2010px) 100vw, 2010px"/></picture>
 
 When an app has enabled inspection, it can be inspected from Safari’s Develop menu in the submenu for either the current computer or an attached device. For iOS and iPadOS, you must also have enabled Web Inspector in the Settings app under **Safari** > **Advanced** > **Web Inspector**.
 

@@ -17,10 +17,13 @@
 関連記事
 
 * [![monster-hunter-wilds-20250302-330206-header](https://automaton-media.com/wp-content/uploads/2025/03/monster-hunter-wilds-20250302-330206-header-150x90.jpg)
+
 とある『モンスターハンターワイルズ』プレイヤーが、「昨日亡くなったお父さん」をゲーム内で再現。そうすれば、一緒に遊べる](https://automaton-media.com/articles/newsjp/monster-hunter-wilds-20250302-330206/)
 * [![monster-hunter-wilds-20250213-328142-header](https://automaton-media.com/wp-content/uploads/2025/02/monster-hunter-wilds-20250213-328142-header-150x90.jpg)
+
 『モンスターハンターワイルズ』ではタマミツネ登場へ。無料タイトルアプデ第1弾にて実装予定](https://automaton-media.com/articles/newsjp/monster-hunter-wilds-20250213-328142/)
 * [![monster-hunter-wilds-20250226-329663-header](https://automaton-media.com/wp-content/uploads/2025/02/monster-hunter-wilds-20250226-329663-header-150x90.jpg)
+
 『モンスターハンターワイルズ』ディスク版ではいきなり「約15GB」の大容量アプデ配信へ。滑り込みビッグデイワンパッチ](https://automaton-media.com/articles/newsjp/monster-hunter-wilds-20250226-329663/)
 
 [![Hideaki Fujiwara](https://automaton-media.com/wp-content/uploads/2022/01/261fb30e148f01d8a7b7752437b9edb5-150x150.jpg)](https://automaton-media.com/author/hideki-fujiwara/)
