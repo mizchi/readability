@@ -4,7 +4,7 @@
  * Provides functions to generate HTML from VElement and stringify it.
  */
 
-import type { VElement, VTextNode, VNode } from "./types";
+import type { VElement, VText, VNode } from "./types";
 
 /**
  * Generate HTML string from VElement
@@ -12,7 +12,7 @@ import type { VElement, VTextNode, VNode } from "./types";
  * @param element VElement to convert
  * @returns HTML string
  */
-export function elementToHTML(element: VElement | null): string {
+export function toHTML(element: VElement | null): string {
   if (!element) return "";
 
   const { tagName, attributes, children } = element;
@@ -53,9 +53,9 @@ export function elementToHTML(element: VElement | null): string {
   const childContent = children
     .map((child) => {
       if (child.nodeType === "text") {
-        return escapeHTML((child as VTextNode).textContent);
+        return escapeHTML((child as VText).textContent);
       } else {
-        return elementToHTML(child as VElement);
+        return toHTML(child as VElement);
       }
     })
     .join("");
@@ -156,7 +156,7 @@ export function stringify(element: VElement | null): string {
   for (const child of children) {
     if (child.nodeType === "text") {
       // Append text node directly
-      const text = (child as VTextNode).textContent.trim();
+      const text = (child as VText).textContent.trim();
       if (text) {
         result += text + " ";
       }
@@ -205,7 +205,7 @@ export function extractTextContent(element: VElement | null): string {
   return element.children
     .map((child) => {
       if (child.nodeType === "text") {
-        return (child as VTextNode).textContent;
+        return (child as VText).textContent;
       } else {
         return extractTextContent(child as VElement);
       }

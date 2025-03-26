@@ -5,34 +5,35 @@
  */
 
 // Basic node type
-export type VNodeType = 'element' | 'text';
+export type VNodeType = "element" | "text";
 
 // Basic node interface
-export interface VNode {
-  nodeType: VNodeType;
+export interface VNodeBase {
+  // nodeType: VNodeType;
   parent?: VElement;
-  // Properties used by the readability algorithm
   readability?: {
     contentScore: number;
   };
 }
 
 // Text node
-export interface VTextNode extends VNode {
-  nodeType: 'text';
+export interface VText extends VNodeBase {
+  nodeType: "text";
   textContent: string;
 }
 
 // Element node
-export interface VElement extends VNode {
-  nodeType: 'element';
+export interface VElement extends VNodeBase {
+  nodeType: "element";
   tagName: string;
   attributes: Record<string, string>;
-  children: Array<VElement | VTextNode>;
+  children: Array<VElement | VText>;
   // Convenient accessors
   id?: string;
   className?: string;
 }
+
+export type VNode = VElement | VText;
 
 // Document structure
 export interface VDocument {

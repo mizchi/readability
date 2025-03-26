@@ -4,6 +4,12 @@ WIP
 
 - Goal: NO DOM API to work on cloudflare
 
+TODO
+
+- [x] Core extraction
+- [ ]
+- [ ] Pass original
+
 ## How to use
 
 ```bash
@@ -11,7 +17,7 @@ npm install -g @mizchi/readability
 ```
 
 ```ts
-import { elementToHTML, extract } from "@mizchi/readability";
+import { toHTML, extract } from "@mizchi/readability";
 import html2md from "html-to-md";
 
 const html = await fetch(
@@ -24,7 +30,7 @@ console.log(`Author: ${extracted.byline}`);
 if (!extracted.root) {
   process.exit(1);
 }
-const htmlContent = elementToHTML(extracted.root);
+const htmlContent = toHTML(extracted.root);
 const md = html2md(htmlContent);
 console.log(md);
 ```

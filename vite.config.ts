@@ -1,24 +1,23 @@
-import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts'
+import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
   plugins: [
     dts({
-      include: 'v3/**/*.ts',
-      exclude: ['v3/**/*.test.ts', 'v3/test/**', 'v3/examples/**'],
-
+      include: "src/**/*.ts",
+      exclude: ["src/**/*.test.ts", "v3/test/**", "v3/examples/**"],
     }),
   ],
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     lib: {
-      entry: 'v3/index.ts',
-      name: 'Readability',
-      formats: ['es'],
-      fileName: () => 'index.js',
+      entry: "src/index.ts",
+      name: "Readability",
+      formats: ["es"],
+      fileName: () => "index.js",
     },
-    target: 'esnext',
+    target: "esnext",
     sourcemap: true,
-    minify: 'esbuild',
+    minify: "esbuild",
   },
 });

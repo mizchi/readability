@@ -4,23 +4,23 @@
  * Utility functions for manipulating the virtual DOM structure
  */
 
-import type { VElement, VNode, VTextNode } from "./types.ts";
+import type { VElement, VNode, VText } from "./types.ts";
 import { DIV_TO_P_ELEMS, PHRASING_ELEMS, REGEXPS } from "./constants.ts";
 
 // Node creation helper functions
 export function createElement(tagName: string): VElement {
   return {
-    nodeType: 'element',
+    nodeType: "element",
     tagName: tagName.toUpperCase(),
     attributes: {},
-    children: []
+    children: [],
   };
 }
 
-export function createTextNode(content: string): VTextNode {
+export function createTextNode(content: string): VText {
   return {
-    nodeType: 'text',
-    textContent: content
+    nodeType: "text",
+    textContent: content,
   };
 }
 
@@ -30,19 +30,22 @@ export function getAttribute(element: VElement, name: string): string | null {
 }
 
 // Get elements by tag name
-export function getElementsByTagName(element: VElement, tagName: string | string[]): VElement[] {
+export function getElementsByTagName(
+  element: VElement,
+  tagName: string | string[]
+): VElement[] {
   const tagNames = Array.isArray(tagName) ? tagName : [tagName];
-  const upperTagNames = tagNames.map(tag => tag.toUpperCase());
+  const upperTagNames = tagNames.map((tag) => tag.toUpperCase());
   const result: VElement[] = [];
 
   // Check if this element matches
-  if (upperTagNames.includes('*') || upperTagNames.includes(element.tagName)) {
+  if (upperTagNames.includes("*") || upperTagNames.includes(element.tagName)) {
     result.push(element);
   }
 
   // Recursively check child elements
   for (const child of element.children) {
-    if (child.nodeType === 'element') {
+    if (child.nodeType === "element") {
       result.push(...getElementsByTagName(child, tagName));
     }
   }
@@ -51,8 +54,15 @@ export function getElementsByTagName(element: VElement, tagName: string | string
 }
 
 // Get the next node (depth-first traversal)
-export function getNextNode(node: VElement | VTextNode, ignoreSelfAndKids?: boolean): VElement | VTextNode | null {
-  if (node.nodeType === 'element' && !ignoreSelfAndKids && node.children.length > 0) {
+export function getNextNode(
+  node: VElement | VText,
+  ignoreSelfAndKids?: boolean
+): VElement | VText | null {
+  if (
+    node.nodeType === "element" &&
+    !ignoreSelfAndKids &&
+    node.children.length > 0
+  ) {
     return node.children[0];
   }
 
@@ -73,18 +83,20 @@ export function getNextNode(node: VElement | VTextNode, ignoreSelfAndKids?: bool
 
 // Check visibility
 export function isProbablyVisible(node: VElement): boolean {
-  const style = node.attributes.style || '';
+  const style = node.attributes.style || "";
   const hidden = node.attributes.hidden !== undefined;
-  const ariaHidden = node.attributes['aria-hidden'] === 'true';
+  const ariaHidden = node.attributes["aria-hidden"] === "true";
 
-  return !style.includes('display: none') &&
-         !style.includes('visibility: hidden') &&
-         !hidden &&
-         !ariaHidden;
+  return (
+    !style.includes("display: none") &&
+    !style.includes("visibility: hidden") &&
+    !hidden &&
+    !ariaHidden
+  );
 }
 
 // Iterate over nodes
-export function forEachNode<T extends VElement | VTextNode>(
+export function forEachNode<T extends VElement | VText>(
   nodeList: T[],
   fn: (node: T, index: number, list: T[]) => void
 ): void {
@@ -92,7 +104,7 @@ export function forEachNode<T extends VElement | VTextNode>(
 }
 
 // Check if any node satisfies the condition
-export function someNode<T extends VElement | VTextNode>(
+export function someNode<T extends VElement | VText>(
   nodeList: T[],
   fn: (node: T, index: number, list: T[]) => boolean
 ): boolean {
@@ -100,7 +112,7 @@ export function someNode<T extends VElement | VTextNode>(
 }
 
 // Check if all nodes satisfy the condition
-export function everyNode<T extends VElement | VTextNode>(
+export function everyNode<T extends VElement | VText>(
   nodeList: T[],
   fn: (node: T, index: number, list: T[]) => boolean
 ): boolean {
@@ -109,7 +121,7 @@ export function everyNode<T extends VElement | VTextNode>(
 
 // Check ancestor elements
 export function hasAncestorTag(
-  node: VElement | VTextNode,
+  node: VElement | VText,
   tagName: string,
   maxDepth: number = -1
 ): boolean {
@@ -135,8 +147,8 @@ export function hasAncestorTag(
 
 // Check for child block elements
 export function hasChildBlockElement(element: VElement): boolean {
-  return someNode(element.children, child => {
-    if (child.nodeType !== 'element') {
+  return someNode(element.children, (child) => {
+    if (child.nodeType !== "element") {
       return false;
     }
 
@@ -146,11 +158,11 @@ export function hasChildBlockElement(element: VElement): boolean {
 
 // Check for phrasing content
 export function isPhrasingContent(node: VNode): boolean {
-  if (node.nodeType === 'text') {
+  if (node.nodeType === "text") {
     return true;
   }
 
-  if (node.nodeType === 'element') {
+  if (node.nodeType === "element") {
     const element = node as VElement;
 
     if (PHRASING_ELEMS.includes(element.tagName)) {
@@ -170,14 +182,17 @@ export function isPhrasingContent(node: VNode): boolean {
 }
 
 // Get inner text
-export function getInnerText(element: VElement | VTextNode, normalizeSpaces: boolean = true): string {
-  let text = '';
+export function getInnerText(
+  element: VElement | VText,
+  normalizeSpaces: boolean = true
+): string {
+  let text = "";
 
-  if (element.nodeType === 'text') {
+  if (element.nodeType === "text") {
     text = element.textContent;
   } else {
     for (const child of element.children) {
-      if (child.nodeType === 'text') {
+      if (child.nodeType === "text") {
         text += child.textContent;
       } else {
         text += getInnerText(child, false);
@@ -188,7 +203,7 @@ export function getInnerText(element: VElement | VTextNode, normalizeSpaces: boo
   text = text.trim();
 
   if (normalizeSpaces) {
-    return text.replace(REGEXPS.normalize, ' ');
+    return text.replace(REGEXPS.normalize, " ");
   }
 
   return text;
@@ -202,11 +217,11 @@ export function getLinkDensity(element: VElement): number {
   }
 
   let linkLength = 0;
-  const links = getElementsByTagName(element, 'a');
+  const links = getElementsByTagName(element, "a");
 
-  forEachNode(links, link => {
-    const href = getAttribute(link, 'href');
-    const coefficient = href && href.startsWith('#') ? 0.3 : 1;
+  forEachNode(links, (link) => {
+    const href = getAttribute(link, "href");
+    const coefficient = href && href.startsWith("#") ? 0.3 : 1;
     linkLength += getInnerText(link).length * coefficient;
   });
 
@@ -219,12 +234,17 @@ export function getTextDensity(element: VElement): number {
   const textLength = text.length;
   if (textLength === 0) return 0;
 
-  const childElements = element.children.filter(child => child.nodeType === 'element');
+  const childElements = element.children.filter(
+    (child) => child.nodeType === "element"
+  );
   return textLength / (childElements.length || 1);
 }
 
 // Get ancestor elements
-export function getNodeAncestors(node: VElement, maxDepth: number = 3): VElement[] {
+export function getNodeAncestors(
+  node: VElement,
+  maxDepth: number = 3
+): VElement[] {
   const ancestors: VElement[] = [];
   let currentNode = node.parent;
   let depth = 0;

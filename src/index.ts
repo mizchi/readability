@@ -10,28 +10,20 @@ export type {
   ReadabilityOptions,
   VDocument,
   VElement,
-  VTextNode
-} from './types.ts';
+  VText as VTextNode,
+} from "./types.ts";
 
 // Export only public functions
-export {
-  parseHTML,
-  serializeToHTML
-} from './parser.ts';
+export { parseHTML, serializeToHTML } from "./parser.ts";
+
+export { extract, extractContent } from "./core.ts";
+
+export { preprocessDocument } from "./preprocess.ts";
 
 export {
-  extract,
-  extractContent
-} from './core.ts';
-
-export {
-  preprocessDocument
-} from './preprocess.ts';
-
-export {
-  elementToHTML,
+  toHTML,
   stringify,
   formatDocument,
   extractTextContent,
-  countNodes
-} from './format.ts';
+  countNodes,
+} from "./format.ts";

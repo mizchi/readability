@@ -4,9 +4,9 @@
  * Parses HTML and creates a virtual DOM structure
  */
 
-import { Parser } from 'htmlparser2';
-import { createElement, createTextNode } from './dom.ts';
-import type { VDocument, VElement, VTextNode } from './types.ts';
+import { Parser } from "htmlparser2";
+import { createElement, createTextNode } from "./dom.ts";
+import type { VDocument, VElement, VText } from "./types.ts";
 
 /**
  * Parses HTML and creates a virtual DOM structure
@@ -15,13 +15,16 @@ import type { VDocument, VElement, VTextNode } from './types.ts';
  * @param baseURI Base URI (used for resolving relative URLs)
  * @returns Virtual DOM document
  */
-export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocument {
+export function parseHTML(
+  html: string,
+  baseURI: string = "about:blank"
+): VDocument {
   // Initialize document structure
   const document: VDocument = {
-    documentElement: createElement('html'),
-    body: createElement('body'),
+    documentElement: createElement("html"),
+    body: createElement("body"),
     baseURI,
-    documentURI: baseURI
+    documentURI: baseURI,
   };
 
   // Setup document structure
@@ -34,11 +37,11 @@ export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocum
   const parser = new Parser({
     onopentag(name, attributes) {
       const element: VElement = {
-        nodeType: 'element',
+        nodeType: "element",
         tagName: name.toUpperCase(),
         attributes: {},
         children: [],
-        parent: currentElement
+        parent: currentElement,
       };
 
       // Set attributes
@@ -58,10 +61,10 @@ export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocum
     },
     ontext(text) {
       // Create text node
-      const textNode: VTextNode = {
-        nodeType: 'text',
+      const textNode: VText = {
+        nodeType: "text",
         textContent: text,
-        parent: currentElement
+        parent: currentElement,
       };
 
       // Add to parent element
@@ -72,7 +75,7 @@ export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocum
       if (currentElement.parent) {
         currentElement = currentElement.parent;
       }
-    }
+    },
   });
 
   parser.write(html);
@@ -87,8 +90,8 @@ export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocum
  * @param element Element to serialize
  * @returns HTML string
  */
-export function serializeToHTML(element: VElement | VTextNode): string {
-  if (element.nodeType === 'text') {
+export function serializeToHTML(element: VElement | VText): string {
+  if (element.nodeType === "text") {
     return element.textContent;
   }
 
@@ -96,16 +99,28 @@ export function serializeToHTML(element: VElement | VTextNode): string {
 
   // List of self-closing tags
   const selfClosingTags = new Set([
-    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
-    'link', 'meta', 'param', 'source', 'track', 'wbr'
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
   ]);
 
   // Create attribute string
   const attributes = Object.entries(element.attributes)
     .map(([key, value]) => `${key}="${value.replace(/"/g, '"')}"`)
-    .join(' ');
+    .join(" ");
 
-  const attributeString = attributes ? ` ${attributes}` : '';
+  const attributeString = attributes ? ` ${attributes}` : "";
 
   // For self-closing tags
   if (selfClosingTags.has(tagName) && element.children.length === 0) {
@@ -114,8 +129,8 @@ export function serializeToHTML(element: VElement | VTextNode): string {
 
   // For tags containing children
   const childrenHTML = element.children
-    .map(child => serializeToHTML(child))
-    .join('');
+    .map((child) => serializeToHTML(child))
+    .join("");
 
   return `<${tagName}${attributeString}>${childrenHTML}</${tagName}>`;
 }

@@ -1,7 +1,7 @@
-import { test, expect, describe } from 'vitest';
-import { parseHTML } from './parser';
-import { extractContent, isProbablyContent } from './core';
-import type { VElement, VTextNode } from './types';
+import { test, expect, describe } from "vitest";
+import { parseHTML } from "./parser";
+import { extractContent, isProbablyContent } from "./core";
+import type { VElement, VText } from "./types";
 
 // Basic test case
 const BASIC_HTML = `
@@ -125,8 +125,8 @@ const HIGH_LINK_DENSITY_HTML = `
 </html>
 `;
 
-describe('Core Readability Functions', () => {
-  test('isProbablyContent - Determine content probability', () => {
+describe("Core Readability Functions", () => {
+  test("isProbablyContent - Determine content probability", () => {
     // Test by creating content elements directly
     const longText = `This is a paragraph with sufficient length of text. This paragraph should be detected as the main content.
     In actual articles, it is common to have several such long paragraphs.
@@ -134,17 +134,17 @@ describe('Core Readability Functions', () => {
     This paragraph is over 140 characters long and has low link density, so it should be detected as content.`;
 
     const longParagraph: VElement = {
-      nodeType: 'element',
-      tagName: 'P',
+      nodeType: "element",
+      tagName: "P",
       attributes: {},
       children: [
         {
-          nodeType: 'text',
+          nodeType: "text",
           textContent: longText,
-          parent: undefined
-        }
+          parent: undefined,
+        },
       ],
-      className: 'content'
+      className: "content",
     };
 
     // Paragraphs with long text are likely content
@@ -152,47 +152,49 @@ describe('Core Readability Functions', () => {
 
     // Header element with short text
     const header: VElement = {
-      nodeType: 'element',
-      tagName: 'H1',
+      nodeType: "element",
+      tagName: "H1",
       attributes: {},
       children: [
         {
-          nodeType: 'text',
-          textContent: 'Short header text',
-          parent: undefined
-        }
-      ]
+          nodeType: "text",
+          textContent: "Short header text",
+          parent: undefined,
+        },
+      ],
     };
 
     // Headers have short text, so less likely to be content
     expect(isProbablyContent(header)).toBe(false);
   });
 
-  test('isProbablyContent - Element with high link density', () => {
+  test("isProbablyContent - Element with high link density", () => {
     const doc = parseHTML(HIGH_LINK_DENSITY_HTML);
 
     // Navigation element with high link density
     const navigation = doc.body.children.find(
-      (child): child is VElement => child.nodeType === 'element' && child.className === 'navigation'
+      (child): child is VElement =>
+        child.nodeType === "element" && child.className === "navigation"
     );
 
     // Normal content element
     const content = doc.body.children.find(
-      (child): child is VElement => child.nodeType === 'element' && child.className === 'content'
+      (child): child is VElement =>
+        child.nodeType === "element" && child.className === "content"
     );
 
-    if (navigation && navigation.nodeType === 'element') {
+    if (navigation && navigation.nodeType === "element") {
       // High link density, so less likely to be content
       expect(isProbablyContent(navigation)).toBe(false);
     }
 
-    if (content && content.nodeType === 'element') {
+    if (content && content.nodeType === "element") {
       // Low link density, so likely to be content
       expect(isProbablyContent(content)).toBe(true);
     }
   });
 
-  test('extractContent - Basic HTML', () => {
+  test("extractContent - Basic HTML", () => {
     const doc = parseHTML(BASIC_HTML);
     const result = extractContent(doc);
 
@@ -205,19 +207,23 @@ describe('Core Readability Functions', () => {
     // Check if extracted content includes test article text
     if (result.root) {
       const contentText = result.root.children
-        .filter((child): child is VElement => child.nodeType === 'element' && child.tagName === 'P')
-        .map((p: VElement) => p.children
-          .filter((c): c is VTextNode => c.nodeType === 'text')
-          .map((t: VTextNode) => t.textContent)
-          .join('')
+        .filter(
+          (child): child is VElement =>
+            child.nodeType === "element" && child.tagName === "P"
         )
-        .join('');
+        .map((p: VElement) =>
+          p.children
+            .filter((c): c is VText => c.nodeType === "text")
+            .map((t: VText) => t.textContent)
+            .join("")
+        )
+        .join("");
 
-      expect(contentText).toContain('This is the body of the test article');
+      expect(contentText).toContain("This is the body of the test article");
     }
   });
 
-  test('extractContent - Semantic tags', () => {
+  test("extractContent - Semantic tags", () => {
     const doc = parseHTML(SEMANTIC_HTML);
     const result = extractContent(doc);
 
@@ -230,16 +236,17 @@ describe('Core Readability Functions', () => {
     // Check if extracted content includes text within the article tag
     if (result.root) {
       const isArticleOrContainsArticle =
-        result.root.tagName === 'ARTICLE' ||
-        result.root.children.some((child): boolean =>
-          child.nodeType === 'element' && child.tagName === 'ARTICLE'
+        result.root.tagName === "ARTICLE" ||
+        result.root.children.some(
+          (child): boolean =>
+            child.nodeType === "element" && child.tagName === "ARTICLE"
         );
 
       expect(isArticleOrContainsArticle).toBe(true);
     }
   });
 
-  test('extractContent - Complex HTML', () => {
+  test("extractContent - Complex HTML", () => {
     const doc = parseHTML(COMPLEX_HTML);
     const result = extractContent(doc);
 
@@ -253,9 +260,10 @@ describe('Core Readability Functions', () => {
     if (result.root) {
       // Check if the element with class 'content' or its parent is selected
       const contentOrParentOfContent =
-        result.root.className === 'content' ||
-        result.root.children.some((child): boolean =>
-          child.nodeType === 'element' && child.className === 'content'
+        result.root.className === "content" ||
+        result.root.children.some(
+          (child): boolean =>
+            child.nodeType === "element" && child.className === "content"
         );
 
       expect(contentOrParentOfContent).toBe(true);
