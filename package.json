@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/mizchi/readability",
   "devDependencies": {
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.13.13",
     "esbuild": "^0.25.1",
     "html-to-md": "^0.8.6",
