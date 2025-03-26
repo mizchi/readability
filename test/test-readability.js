@@ -2,10 +2,7 @@
 
 var JSDOM = require("jsdom").JSDOM;
 var xmlNameValidator = require("xml-name-validator").name;
-var chai = require("chai");
-var sinon = require("sinon");
-chai.config.includeStack = true;
-var expect = chai.expect;
+import { describe, it, expect, beforeAll, vi } from "vitest";
 
 var Readability = require("../_original/index").Readability;
 var JSDOMParser = require("../_original/JSDOMParser");
@@ -62,11 +59,9 @@ function runTestsWithItems(
   expectedMetadata
 ) {
   describe(label, function () {
-    this.timeout(30000);
-
     var result;
 
-    before(function () {
+    beforeAll(function () {
       try {
         var doc = domGenerationFn(source);
         // Provide one class name to preserve, which we know appears in a few
@@ -79,7 +74,10 @@ function runTestsWithItems(
     });
 
     it("should return a result object", function () {
-      expect(result).to.include.keys("content", "title", "excerpt", "byline");
+      expect(result).toHaveProperty("content");
+      expect(result).toHaveProperty("title");
+      expect(result).toHaveProperty("excerpt");
+      expect(result).toHaveProperty("byline");
     });
 
     it("should extract expected content", function () {
@@ -139,7 +137,7 @@ function runTestsWithItems(
             var actualDesc = nodeStr(actualNode);
             var expectedDesc = nodeStr(expectedNode);
             if (actualDesc != expectedDesc) {
-              expect(actualDesc, findableNodeDesc(actualNode)).eql(
+              expect(actualDesc, findableNodeDesc(actualNode)).toEqual(
                 expectedDesc
               );
               return false;
@@ -148,7 +146,7 @@ function runTestsWithItems(
             if (actualNode.nodeType == 3) {
               var actualText = htmlTransform(actualNode.textContent);
               var expectedText = htmlTransform(expectedNode.textContent);
-              expect(actualText, findableNodeDesc(actualNode)).eql(
+              expect(actualText, findableNodeDesc(actualNode)).toEqual(
                 expectedText
               );
               if (actualText != expectedText) {
@@ -166,7 +164,7 @@ function runTestsWithItems(
                 ") should match (" +
                 expectedNodeAttributes.join(",") +
                 ") 1";
-              expect(actualNodeAttributes.length, desc).eql(
+              expect(actualNodeAttributes.length, desc).toEqual(
                 expectedNodeAttributes.length
               );
               for (var i = 0; i < actualNodeAttributes.length; i++) {
@@ -180,14 +178,14 @@ function runTestsWithItems(
                     ") attribute " +
                     attr +
                     " should match"
-                ).eql(actualValue);
+                ).toEqual(actualValue);
               }
             }
           } else {
             expect(
               nodeStr(actualNode),
               "Should have a node from both DOMs"
-            ).eql(nodeStr(expectedNode));
+            ).toEqual(nodeStr(expectedNode));
             return false;
           }
           return true;
@@ -198,34 +196,34 @@ function runTestsWithItems(
     });
 
     it("should extract expected title", function () {
-      expect(result.title).eql(expectedMetadata.title);
+      expect(result.title).toEqual(expectedMetadata.title);
     });
 
     it("should extract expected byline", function () {
-      expect(result.byline).eql(expectedMetadata.byline);
+      expect(result.byline).toEqual(expectedMetadata.byline);
     });
 
     it("should extract expected excerpt", function () {
-      expect(result.excerpt).eql(expectedMetadata.excerpt);
+      expect(result.excerpt).toEqual(expectedMetadata.excerpt);
     });
 
     it("should extract expected site name", function () {
-      expect(result.siteName).eql(expectedMetadata.siteName);
+      expect(result.siteName).toEqual(expectedMetadata.siteName);
     });
 
     expectedMetadata.dir &&
       it("should extract expected direction", function () {
-        expect(result.dir).eql(expectedMetadata.dir);
+        expect(result.dir).toEqual(expectedMetadata.dir);
       });
 
     expectedMetadata.lang &&
       it("should extract expected language", function () {
-        expect(result.lang).eql(expectedMetadata.lang);
+        expect(result.lang).toEqual(expectedMetadata.lang);
       });
 
     expectedMetadata.publishedTime &&
       it("should extract expected published time", function () {
-        expect(result.publishedTime).eql(expectedMetadata.publishedTime);
+        expect(result.publishedTime).toEqual(expectedMetadata.publishedTime);
       });
   });
 }
@@ -245,42 +243,42 @@ describe("Readability API", function () {
   describe("#constructor", function () {
     var doc = new JSDOMParser().parse("<html><div>yo</div></html>");
     it("should accept a debug option", function () {
-      expect(new Readability(doc)._debug).eql(false);
-      expect(new Readability(doc, { debug: true })._debug).eql(true);
+      expect(new Readability(doc)._debug).toEqual(false);
+      expect(new Readability(doc, { debug: true })._debug).toEqual(true);
     });
 
     it("should accept a nbTopCandidates option", function () {
-      expect(new Readability(doc)._nbTopCandidates).eql(5);
+      expect(new Readability(doc)._nbTopCandidates).toEqual(5);
       expect(
         new Readability(doc, { nbTopCandidates: 42 })._nbTopCandidates
-      ).eql(42);
+      ).toEqual(42);
     });
 
     it("should accept a maxElemsToParse option", function () {
-      expect(new Readability(doc)._maxElemsToParse).eql(0);
+      expect(new Readability(doc)._maxElemsToParse).toEqual(0);
       expect(
         new Readability(doc, { maxElemsToParse: 42 })._maxElemsToParse
-      ).eql(42);
+      ).toEqual(42);
     });
 
     it("should accept a keepClasses option", function () {
-      expect(new Readability(doc)._keepClasses).eql(false);
-      expect(new Readability(doc, { keepClasses: true })._keepClasses).eql(
+      expect(new Readability(doc)._keepClasses).toEqual(false);
+      expect(new Readability(doc, { keepClasses: true })._keepClasses).toEqual(
         true
       );
-      expect(new Readability(doc, { keepClasses: false })._keepClasses).eql(
+      expect(new Readability(doc, { keepClasses: false })._keepClasses).toEqual(
         false
       );
     });
 
     it("should accept a allowedVideoRegex option or default it", function () {
-      expect(new Readability(doc)._allowedVideoRegex).eql(
+      expect(new Readability(doc)._allowedVideoRegex).toEqual(
         Readability.prototype.REGEXPS.videos
       );
       const allowedVideoRegex = /\/\/mydomain.com\/.*'/;
       expect(
         new Readability(doc, { allowedVideoRegex })._allowedVideoRegex
-      ).eql(allowedVideoRegex);
+      ).toEqual(allowedVideoRegex);
     });
   });
 
@@ -291,40 +289,40 @@ describe("Readability API", function () {
       var doc = new JSDOMParser().parse("<html><div>yo</div></html>");
       expect(function () {
         new Readability(doc, { maxElemsToParse: 1 }).parse();
-      }).to.Throw("Aborting parsing document; 2 elements found");
+      }).toThrow("Aborting parsing document; 2 elements found");
     });
 
     it("should run _cleanClasses with default configuration", function () {
       var doc = new JSDOMParser().parse(exampleSource);
       var parser = new Readability(doc);
 
-      parser._cleanClasses = sinon.fake();
+      parser._cleanClasses = vi.fn();
 
       parser.parse();
 
-      expect(parser._cleanClasses.called).eql(true);
+      expect(parser._cleanClasses).toHaveBeenCalled();
     });
 
     it("should run _cleanClasses when option keepClasses = false", function () {
       var doc = new JSDOMParser().parse(exampleSource);
       var parser = new Readability(doc, { keepClasses: false });
 
-      parser._cleanClasses = sinon.fake();
+      parser._cleanClasses = vi.fn();
 
       parser.parse();
 
-      expect(parser._cleanClasses.called).eql(true);
+      expect(parser._cleanClasses).toHaveBeenCalled();
     });
 
     it("shouldn't run _cleanClasses when option keepClasses = true", function () {
       var doc = new JSDOMParser().parse(exampleSource);
       var parser = new Readability(doc, { keepClasses: true });
 
-      parser._cleanClasses = sinon.fake();
+      parser._cleanClasses = vi.fn();
 
       parser.parse();
 
-      expect(parser._cleanClasses.called).eql(false);
+      expect(parser._cleanClasses).not.toHaveBeenCalled();
     });
 
     it("should use custom content serializer sent as option", function () {
@@ -337,7 +335,7 @@ describe("Readability API", function () {
           return xml.serializeToString(el.firstChild);
         },
       }).parse().content;
-      expect(content).eql(expected_xhtml);
+      expect(content).toEqual(expected_xhtml);
     });
 
     it("should use custom video regex sent as option", function () {
@@ -354,7 +352,7 @@ describe("Readability API", function () {
         charThreshold: 20,
         allowedVideoRegex: /.*mycustomdomain.com.*/,
       }).parse().content;
-      expect(content).eql(expected_xhtml);
+      expect(content).toEqual(expected_xhtml);
     });
   });
 });

@@ -1,9 +1,7 @@
 /* eslint-env node, mocha */
 
 var JSDOM = require("jsdom").JSDOM;
-var chai = require("chai");
-chai.config.includeStack = true;
-var expect = chai.expect;
+import { describe, it, expect } from "vitest";
 
 var testPages = require("./utils").getTestPages();
 var isProbablyReaderable = require("../_original/index").isProbablyReaderable;
@@ -19,7 +17,7 @@ describe("isProbablyReaderable - test pages", function () {
       it(
         "The result should " + (expected ? "" : "not ") + "be readerable",
         function () {
-          expect(isProbablyReaderable(doc)).eql(expected);
+          expect(isProbablyReaderable(doc)).toEqual(expected);
         }
       );
     });
@@ -27,7 +25,7 @@ describe("isProbablyReaderable - test pages", function () {
 });
 
 describe("isProbablyReaderable", function () {
-  const makeDoc = source => new JSDOM(source).window.document;
+  const makeDoc = (source) => new JSDOM(source).window.document;
   var verySmallDoc = makeDoc('<html><p id="main">hello there</p></html>'); // content length: 11
   var smallDoc = makeDoc(
     `<html><p id="main">${"hello there ".repeat(11)}</p></html>`
@@ -40,50 +38,58 @@ describe("isProbablyReaderable", function () {
   ); // content length: 600
 
   it("should only declare large documents as readerable when default options", function () {
-    expect(isProbablyReaderable(verySmallDoc), "very small doc").to.be.false; // score: 0
-    expect(isProbablyReaderable(smallDoc), "small doc").to.be.false; // score: 0
-    expect(isProbablyReaderable(largeDoc), "large doc").to.be.false; // score: ~1.7
-    expect(isProbablyReaderable(veryLargeDoc), "very large doc").to.be.true; // score: ~21.4
+    expect(isProbablyReaderable(verySmallDoc), "very small doc").toBe(false); // score: 0
+    expect(isProbablyReaderable(smallDoc), "small doc").toBe(false); // score: 0
+    expect(isProbablyReaderable(largeDoc), "large doc").toBe(false); // score: ~1.7
+    expect(isProbablyReaderable(veryLargeDoc), "very large doc").toBe(true); // score: ~21.4
   });
 
   it("should declare small and large documents as readerable when lower minContentLength", function () {
     var options = { minContentLength: 120, minScore: 0 };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").to.be
-      .false;
-    expect(isProbablyReaderable(smallDoc, options), "small doc").to.be.true;
-    expect(isProbablyReaderable(largeDoc, options), "large doc").to.be.true;
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").to.be
-      .true;
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
+      false
+    );
+    expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(true);
+    expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true);
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
+      true
+    );
   });
 
   it("should only declare largest document as readerable when higher minContentLength", function () {
     var options = { minContentLength: 200, minScore: 0 };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").to.be
-      .false;
-    expect(isProbablyReaderable(smallDoc, options), "small doc").to.be.false;
-    expect(isProbablyReaderable(largeDoc, options), "large doc").to.be.false;
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").to.be
-      .true;
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
+      false
+    );
+    expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(false);
+    expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(false);
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
+      true
+    );
   });
 
   it("should declare small and large documents as readerable when lower minScore", function () {
     var options = { minContentLength: 0, minScore: 4 };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").to.be
-      .false; // score: ~3.3
-    expect(isProbablyReaderable(smallDoc, options), "small doc").to.be.true; // score: ~11.4
-    expect(isProbablyReaderable(largeDoc, options), "large doc").to.be.true; // score: ~11.9
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").to.be
-      .true; // score: ~24.4
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
+      false
+    ); // score: ~3.3
+    expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(true); // score: ~11.4
+    expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true); // score: ~11.9
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
+      true
+    ); // score: ~24.4
   });
 
   it("should declare large documents as readerable when higher minScore", function () {
     var options = { minContentLength: 0, minScore: 11.5 };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").to.be
-      .false; // score: ~3.3
-    expect(isProbablyReaderable(smallDoc, options), "small doc").to.be.false; // score: ~11.4
-    expect(isProbablyReaderable(largeDoc, options), "large doc").to.be.true; // score: ~11.9
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").to.be
-      .true; // score: ~24.4
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
+      false
+    ); // score: ~3.3
+    expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(false); // score: ~11.4
+    expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true); // score: ~11.9
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
+      true
+    ); // score: ~24.4
   });
 
   it("should use node visibility checker provided as option - not visible", function () {
@@ -94,8 +100,8 @@ describe("isProbablyReaderable", function () {
         return false;
       },
     };
-    expect(isProbablyReaderable(veryLargeDoc, options)).to.be.false;
-    expect(called).to.be.true;
+    expect(isProbablyReaderable(veryLargeDoc, options)).toBe(false);
+    expect(called).toBe(true);
   });
 
   it("should use node visibility checker provided as option - visible", function () {
@@ -106,8 +112,8 @@ describe("isProbablyReaderable", function () {
         return true;
       },
     };
-    expect(isProbablyReaderable(veryLargeDoc, options)).to.be.true;
-    expect(called).to.be.true;
+    expect(isProbablyReaderable(veryLargeDoc, options)).toBe(true);
+    expect(called).toBe(true);
   });
 
   it("should use node visibility checker provided as parameter - not visible", function () {
@@ -116,8 +122,8 @@ describe("isProbablyReaderable", function () {
       called = true;
       return false;
     };
-    expect(isProbablyReaderable(veryLargeDoc, visibilityChecker)).to.be.false;
-    expect(called).to.be.true;
+    expect(isProbablyReaderable(veryLargeDoc, visibilityChecker)).toBe(false);
+    expect(called).toBe(true);
   });
 
   it("should use node visibility checker provided as parameter - visible", function () {
@@ -126,7 +132,7 @@ describe("isProbablyReaderable", function () {
       called = true;
       return true;
     };
-    expect(isProbablyReaderable(veryLargeDoc, visibilityChecker)).to.be.true;
-    expect(called).to.be.true;
+    expect(isProbablyReaderable(veryLargeDoc, visibilityChecker)).toBe(true);
+    expect(called).toBe(true);
   });
 });

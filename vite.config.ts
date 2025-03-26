@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
+/// <reference types="vitest" />
+
 export default defineConfig({
   plugins: [
     dts({
@@ -19,5 +21,19 @@ export default defineConfig({
     target: "esnext",
     sourcemap: true,
     minify: "esbuild",
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    // test ディレクトリ以下の .js ファイルをテスト対象に含める
+    include: ["src/**/*.test.ts", "test/**/*.js"],
+    // テスト対象から除外するファイル
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "test/debug-testcase.js",
+      "test/generate-testcase.js",
+      "test/utils.js",
+    ],
   },
 });
