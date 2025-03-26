@@ -16,7 +16,12 @@ export type {
 // Export only public functions
 export { parseHTML, serializeToHTML } from "./parser.ts";
 
-export { extract, extractContent, findMainCandidates } from "./core.ts";
+export {
+  extract,
+  extractContent,
+  findMainCandidates,
+  createExtractor,
+} from "./core.ts";
 
 export { preprocessDocument } from "./preprocess.ts";
 

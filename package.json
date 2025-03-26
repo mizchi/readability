@@ -41,7 +41,8 @@
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
   },
-  "dependencies": {
+  "dependencies": {},
+  "peerDependencies": {
     "htmlparser2": "^10.0.0"
   },
   "files": [

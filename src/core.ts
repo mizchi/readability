@@ -9,7 +9,9 @@ import type {
   VElement,
   ReadabilityArticle,
   ReadabilityOptions,
+  Parser,
 } from "./types.ts";
+import { isVElement } from "./types.ts"; // Import isVElement as a value
 import {
   getInnerText,
   getLinkDensity,
@@ -17,6 +19,7 @@ import {
   getElementsByTagName,
   isProbablyVisible,
   getNodeAncestors,
+  createElement, // Import createElement
 } from "./dom.ts";
 import {
   REGEXPS,
@@ -430,11 +433,69 @@ export function extract(
   options: ReadabilityOptions = {}
 ): ReadabilityArticle {
   // Parse HTML to create virtual DOM
-  const doc = parseHTML(html);
+  // Use custom parser if provided, otherwise use default
+  const parser = options.parser || parseHTML; // Assuming parseHTML is the default from ./parser.ts
+  const parsedResult = parser(html);
+  let doc: VDocument;
+
+  // Wrap VElement result in a VDocument if necessary
+  if (isVElement(parsedResult)) {
+    doc = {
+      documentElement: createElement("html"),
+      body: parsedResult,
+      // baseURI and documentURI might need adjustment based on context if parsing fragments
+    };
+    doc.documentElement.children = [doc.body];
+    doc.body.parent = doc.documentElement;
+  } else {
+    doc = parsedResult;
+  }
 
   // Execute preprocessing
   preprocessDocument(doc);
 
   // Extract content
   return extractContent(doc, options);
+}
+
+/**
+ * Creates an extractor function with a specific parser configured.
+ * @param opts - Options containing the parser to use.
+ * @returns An extract function that uses the configured parser.
+ */
+export function createExtractor(opts: {
+  parser: Parser;
+}): (
+  html: string,
+  options?: Omit<ReadabilityOptions, "parser">
+) => ReadabilityArticle {
+  const { parser } = opts;
+
+  return (
+    html: string,
+    options: Omit<ReadabilityOptions, "parser"> = {}
+  ): ReadabilityArticle => {
+    // Parse HTML using the configured parser
+    const parsedResult = parser(html);
+    let doc: VDocument;
+
+    // Wrap VElement result in a VDocument if necessary
+    if (isVElement(parsedResult)) {
+      doc = {
+        documentElement: createElement("html"),
+        body: parsedResult,
+        // baseURI and documentURI might need adjustment based on context if parsing fragments
+      };
+      doc.documentElement.children = [doc.body];
+      doc.body.parent = doc.documentElement;
+    } else {
+      doc = parsedResult;
+    }
+
+    // Execute preprocessing
+    preprocessDocument(doc);
+
+    // Extract content using the main logic, passing other options
+    return extractContent(doc, options);
+  }; // Add missing closing brace
 }

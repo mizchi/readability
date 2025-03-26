@@ -43,6 +43,21 @@ export interface VDocument {
   documentURI?: string;
 }
 
+// Parser function type
+export type Parser = (html: string) => VDocument | VElement; // Can return a full document or just a root element (fragment)
+
+// Type guard to check if a node is a VElement
+export function isVElement(
+  node: VNode | VDocument | VElement
+): node is VElement {
+  return (
+    typeof node === "object" &&
+    node !== null &&
+    "nodeType" in node &&
+    node.nodeType === "element"
+  );
+}
+
 // Readability result
 export interface ReadabilityArticle {
   title: string | null;
@@ -55,4 +70,5 @@ export interface ReadabilityArticle {
 export interface ReadabilityOptions {
   charThreshold?: number;
   nbTopCandidates?: number;
+  parser?: Parser; // Optional custom HTML parser
 }

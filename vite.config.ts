@@ -19,6 +19,10 @@ export default defineConfig({
       fileName: () => "index.js",
     },
     target: "esnext",
+    rollupOptions: {
+      // htmlparser2 をバンドルに含めないようにする
+      external: ["htmlparser2"],
+    },
     sourcemap: true,
     minify: "esbuild",
   },
