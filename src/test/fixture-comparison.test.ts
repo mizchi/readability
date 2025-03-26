@@ -36,6 +36,10 @@ const testCasesDirs = [
   // "002",
   "003-metadata-preferred",
   "004-metadata-space-separated-properties",
+  // "005-unescape-html-entities",
+  "aclu",
+  // "aktualne",
+  // "archive-of-our-own",
 ];
 
 function extractHTMLByNewReadability(source: string) {
@@ -65,8 +69,25 @@ describe("Readability Fixture Comparison Tests", () => {
       const { source, expected } = testCase;
       // HTML を正規化して比較
       const normExpectedHTML = normalizeHtml(expected);
+      const article = extract(source); // extract の結果を保持
       const newReadabilityHTML = extractHTMLByNewReadability(source);
       const normNewReadabilityHTML = normalizeHtml(newReadabilityHTML);
+
+      // 005 の場合のみログ出力
+      if (dir === "005-unescape-html-entities") {
+        console.log("--- 005 Source ---");
+        console.log(source);
+        console.log("--- 005 Expected ---");
+        console.log(expected);
+        console.log("--- 005 Actual Article ---");
+        console.log(article); // article オブジェクトの内容を出力
+        console.log("--- 005 Actual HTML ---");
+        console.log(newReadabilityHTML); // 生成された HTML を出力
+        console.log("--- 005 Normalized Expected ---");
+        console.log(normExpectedHTML);
+        console.log("--- 005 Normalized Actual ---");
+        console.log(normNewReadabilityHTML);
+      }
 
       // 正規化された HTML の長さで比率を計算
       const originalMainRatio = normExpectedHTML.length / source.length;
