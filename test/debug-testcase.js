@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-var Readability = require("../Readability");
+var Readability = require("../_original/Readability");
 var { JSDOM } = require("jsdom");
 var fs = require("fs");
 var path = require("path");

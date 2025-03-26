@@ -1,6 +1,6 @@
-import { parseHTML, serializeToHTML } from './v2/html_parser.ts';
-import { Readability } from './v2/readability/index.ts';
-import type { VElement } from './v2/types.ts';
+import { parseHTML, serializeToHTML } from '../v2/html_parser.ts';
+import { Readability } from '../v2/readability/index.ts';
+import type { VElement } from '../v2/types.ts';
 
 // ブログのようなHTMLテキストを作成
 const person = 'テスト著者';

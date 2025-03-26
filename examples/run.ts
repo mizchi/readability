@@ -4,9 +4,9 @@
  * URLからHTMLを取得して本文抽出を実行する例
  */
 
-import { extract } from '../index.ts';
-import type { ReadabilityArticle } from '../types.ts';
-import { extractTextContent, elementToHTML } from '../format.ts';
+import { extract } from '../v3/index.ts';
+import type { ReadabilityArticle } from '../v3/types.ts';
+import { extractTextContent, elementToHTML } from '../v3/format.ts';
 
 /**
  * URLからHTMLを取得して本文抽出を実行する

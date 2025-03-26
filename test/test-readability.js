@@ -7,8 +7,8 @@ var sinon = require("sinon");
 chai.config.includeStack = true;
 var expect = chai.expect;
 
-var Readability = require("../index").Readability;
-var JSDOMParser = require("../JSDOMParser");
+var Readability = require("../_original/index").Readability;
+var JSDOMParser = require("../_original/JSDOMParser");
 var prettyPrint = require("./utils").prettyPrint;
 
 var testPages = require("./utils").getTestPages();

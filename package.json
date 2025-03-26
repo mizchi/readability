@@ -4,12 +4,11 @@
   "description": "A standalone version of the readability library used for Firefox Reader View.",
   "main": "v3/dist/index.js",
   "types": "v3/dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "build": "vite build",
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
-    "test": "mocha test/test-*.js",
-    "test:v3": "vitest v3 --run",
+    "test:original": "mocha test/test-*.js",
+    "test": "vitest v3 --run",
     "generate-testcase": "node test/generate-testcase.js",
     "release": "echo wip # release-it"
   },

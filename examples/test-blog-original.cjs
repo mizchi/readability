@@ -1,6 +1,6 @@
 // オリジナルのReadabilityを使用したテスト
 const { JSDOM } = require('jsdom');
-const { Readability } = require('./index');
+const { Readability } = require('../_original/index');
 
 // test-blog.tsからHTMLデータを取得
 const blogHTML = `

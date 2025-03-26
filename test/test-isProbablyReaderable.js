@@ -6,7 +6,7 @@ chai.config.includeStack = true;
 var expect = chai.expect;
 
 var testPages = require("./utils").getTestPages();
-var isProbablyReaderable = require("../index").isProbablyReaderable;
+var isProbablyReaderable = require("../_original/index").isProbablyReaderable;
 
 describe("isProbablyReaderable - test pages", function () {
   testPages.forEach(function (testPage) {

@@ -4,9 +4,9 @@
  * URLからHTMLを取得して本文のHTML構造をそのまま出力する例
  */
 
-import { extract } from '../index.ts';
-import type { ReadabilityArticle } from '../types.ts';
-import { elementToHTML, stringify } from '../format.ts';
+import { extract } from '../v3/index.ts';
+import type { ReadabilityArticle } from '../v3/types.ts';
+import { elementToHTML, stringify } from '../v3/format.ts';
 import html2md from "html-to-md";
 /**
  * URLからHTMLを取得して本文のHTML構造を抽出する

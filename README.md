@@ -1,12 +1,14 @@
-# Readability.js | TS Rewriting (by AI)
+# Readability.js | TS Rewriting
 
-WIP under `src/*`
+WIP in `v3/*`
 
 - Goal: NO DOM API to work on cloudflare
-- AI Rewriting
-- Verry fuzzy impl now
 
 ## How to use
+
+```bash
+npm install -g @mizchi/readability
+```
 
 ```ts
 import { elementToHTML, extract } from "@mizchi/readability";

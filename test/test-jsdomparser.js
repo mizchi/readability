@@ -4,7 +4,7 @@ var chai = require("chai");
 chai.config.includeStack = true;
 var expect = chai.expect;
 
-var JSDOMParser = require("../JSDOMParser");
+var JSDOMParser = require("../_original/JSDOMParser");
 
 var BASETESTCASE =
   '<html><body><p>Some text and <a class="someclass" href="#">a link</a></p>' +
