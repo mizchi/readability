@@ -12,6 +12,10 @@ export type {
   VElement,
   VText as VTextNode,
   PageType as ArticleType, // Export ArticleType enum
+  // AriaSnapshot関連の型をエクスポート
+  AriaNode,
+  AriaNodeType,
+  AriaTree,
 } from "./types.ts";
 
 // Export only public functions
@@ -35,3 +39,6 @@ export {
 } from "./format.ts";
 
 export { toMarkdown } from "./markdown.ts";
+
+// AriaSnapshot関連の関数をエクスポート
+export { buildAriaTree, ariaTreeToString } from "./aria.ts";

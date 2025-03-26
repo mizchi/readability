@@ -4,7 +4,15 @@
  * Utility functions for manipulating the virtual DOM structure
  */
 
-import type { VElement, VNode, VText } from "./types.ts";
+import type {
+  VElement,
+  VNode,
+  VText,
+  AriaNode,
+  AriaNodeType,
+  AriaTree,
+  VDocument,
+} from "./types.ts";
 import { DIV_TO_P_ELEMS, PHRASING_ELEMS, REGEXPS } from "./constants.ts";
 
 // Node creation helper functions

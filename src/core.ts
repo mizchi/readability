@@ -10,6 +10,7 @@ import {
   type ReadabilityArticle,
   type ReadabilityOptions,
   type Parser,
+  type AriaTree,
   PageType, // Import ArticleType as a value
 } from "./types.ts";
 import { isVElement } from "./types.ts"; // Import isVElement as a value
@@ -22,6 +23,10 @@ import {
   getLinkDensity, // getLinkDensity を import
   getTextDensity, // getTextDensity を import
 } from "./dom.ts";
+import {
+  buildAriaTree, // aria treeを構築する関数
+  ariaTreeToString, // aria treeを文字列に変換する関数
+} from "./aria.ts";
 import {
   REGEXPS,
   DEFAULT_TAGS_TO_SCORE,
@@ -595,6 +600,8 @@ export function extractContent(
 ): ReadabilityArticle {
   const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;
   const nbTopCandidates = options.nbTopCandidates || DEFAULT_N_TOP_CANDIDATES;
+  const generateAriaTree =
+    options.generateAriaTree !== undefined ? options.generateAriaTree : true;
 
   // Preprocess: Remove unwanted tags before finding candidates
   // preprocessDocument(doc); // preprocess は extract 関数で行う
@@ -664,6 +671,19 @@ export function extractContent(
     structuralElements = findStructuralElements(doc);
   }
 
+  // AriaTreeの生成
+  // 本文抽出に失敗した場合、または明示的に要求された場合にAriaTreeを生成
+  let ariaTree: AriaTree | undefined = undefined;
+  if (generateAriaTree && (!articleContent || options.generateAriaTree)) {
+    ariaTree = buildAriaTree(doc);
+
+    // デバッグ用にaria treeの文字列表現をコンソールに出力
+    if (process.env.NODE_ENV === "development") {
+      console.log("Generated AriaTree:");
+      console.log(ariaTreeToString(ariaTree));
+    }
+  }
+
   return {
     title,
     byline,
@@ -674,6 +694,8 @@ export function extractContent(
     header: structuralElements?.header,
     footer: structuralElements?.footer,
     otherSignificantNodes: structuralElements?.otherSignificantNodes,
+    // AriaTreeを追加
+    ariaTree,
   };
 }
 
@@ -717,11 +739,12 @@ export function extract(
  */
 export function createExtractor(opts: {
   parser: Parser;
+  generateAriaTree?: boolean; // AriaTreeを生成するかどうかのオプションを追加
 }): (
   html: string,
   options?: Omit<ReadabilityOptions, "parser">
 ) => ReadabilityArticle {
-  const { parser } = opts;
+  const { parser, generateAriaTree } = opts;
 
   return (
     html: string,
@@ -748,6 +771,13 @@ export function createExtractor(opts: {
     preprocessDocument(doc);
 
     // Extract content using the main logic, passing other options
-    return extractContent(doc, options);
-  }; // Add missing closing brace
+    // generateAriaTreeオプションを追加
+    return extractContent(doc, {
+      ...options,
+      generateAriaTree:
+        options.generateAriaTree !== undefined
+          ? options.generateAriaTree
+          : generateAriaTree,
+    });
+  };
 }

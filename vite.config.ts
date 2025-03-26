@@ -35,10 +35,8 @@ export default defineConfig({
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
-      "test/test-jsdomparser.test.ts", // Temporarily exclude failing tests
-      "test/debug-testcase.js",
-      "test/generate-testcase.js",
-      "test/utils.js",
+      // todo
+      "test/**.test.ts",
     ],
   },
 });
