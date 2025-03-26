@@ -191,6 +191,7 @@ export interface ReadabilityOptions {
   nbTopCandidates?: number;
   parser?: Parser; // Optional custom HTML parser
   generateAriaTree?: boolean; // aria treeを生成するかどうか
+  forcedPageType?: PageType; // 強制的に設定するページタイプ
 }
 
 // Enum for classifying article types

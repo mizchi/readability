@@ -38,10 +38,11 @@ function truncateLongText(line: string, maxLength: number = 50): string {
 const html = await fetch("https://zenn.dev/").then((res) => res.text());
 
 // 本文抽出とaria tree生成を同時に行う
-const result = extract(html, { generateAriaTree: true });
-
-// pageTypeを強制的にOTHERに設定
-result.pageType = PageType.OTHER;
+// forcedPageTypeオプションを使用してページタイプを強制的に設定
+const result = extract(html, {
+  generateAriaTree: true,
+  forcedPageType: PageType.OTHER, // 強制的にOTHERに設定
+});
 
 console.log("=== 抽出結果 ===");
 console.log(`タイトル: ${result.title}`);
@@ -155,13 +156,11 @@ const shortHtml = `
 </body>
 </html>
 `;
-
 const shortResult = extract(shortHtml, {
   charThreshold: 500, // 閾値を高く設定して本文抽出を失敗させる
   generateAriaTree: true,
+  forcedPageType: PageType.OTHER, // 強制的にOTHERに設定
 });
-
-// pageTypeを強制的にOTHERに設定
 shortResult.pageType = PageType.OTHER;
 
 console.log(`タイトル: ${shortResult.title}`);

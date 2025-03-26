@@ -26,6 +26,7 @@ export {
   extractContent,
   findMainCandidates,
   createExtractor,
+  classifyPageType, // classifyPageType 関数をエクスポート
 } from "./core.ts";
 
 export { preprocessDocument } from "./preprocess.ts";

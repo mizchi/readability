@@ -592,6 +592,98 @@ function getSiteName(doc: VDocument): string | null {
 }
 
 /**
+ * ページタイプを判定する関数
+ *
+ * 判定基準:
+ * 1. 有意に長い本文がない
+ * 2. 候補が平衡している（スコアの差が小さい）
+ * 3. ページの構造に対して有意にリンクが多い
+ */
+export function classifyPageType(
+  doc: VDocument,
+  candidates: VElement[],
+  charThreshold: number = DEFAULT_CHAR_THRESHOLD
+): PageType {
+  // 候補がない場合は OTHER
+  if (candidates.length === 0) {
+    return PageType.OTHER;
+  }
+
+  const topCandidate = candidates[0];
+
+  // 1. セマンティックタグの確認
+  // main, article タグが使われている場合は ARTICLE の可能性が高い
+  if (
+    topCandidate.tagName === "main" ||
+    topCandidate.tagName === "article" ||
+    topCandidate.className?.toLowerCase().includes("content") ||
+    topCandidate.id?.toLowerCase().includes("content") ||
+    // 子要素にセマンティックタグがあるかもチェック
+    topCandidate.children.some(
+      (child) =>
+        child.nodeType === "element" &&
+        (child.tagName === "main" || child.tagName === "article")
+    )
+  ) {
+    // セマンティックタグが使われている場合でも、テキスト長とリンク密度を確認
+    const textLength = getInnerText(topCandidate).length;
+    const linkDensity = getLinkDensity(topCandidate);
+
+    if (textLength >= charThreshold / 2 && linkDensity <= 0.5) {
+      return PageType.ARTICLE;
+    }
+  }
+
+  // 2. テキスト長とリンク密度の確認
+  const textLength = getInnerText(topCandidate).length;
+  const linkDensity = getLinkDensity(topCandidate);
+
+  if (textLength >= charThreshold && linkDensity <= 0.5) {
+    return PageType.ARTICLE;
+  }
+
+  // 3. 候補のスコア差を確認（平衡性）
+  if (candidates.length >= 2) {
+    const topScore = topCandidate.readability?.contentScore || 0;
+    const secondScore = candidates[1].readability?.contentScore || 0;
+
+    // スコア差が小さい場合（20%以内）は、候補が平衡していると判断
+    const scoreDifference = topScore - secondScore;
+    const scoreRatio = secondScore / topScore;
+
+    if (scoreRatio > 0.8) {
+      // 候補が平衡している場合、リンク密度と全体のリンク数を確認
+      const totalLinks = getElementsByTagName(doc.body, "a").length;
+      const bodyTextLength = getInnerText(doc.body).length;
+      const bodyLinkDensity = totalLinks / (bodyTextLength || 1);
+
+      // リンク密度が高い場合は OTHER（リスト/インデックスページの可能性）
+      if (bodyLinkDensity > 0.25 || linkDensity > 0.3) {
+        return PageType.OTHER;
+      }
+    }
+  }
+
+  // 4. 全体のリンク数と本文の比率を確認
+  const totalLinks = getElementsByTagName(doc.body, "a").length;
+  const bodyTextLength = getInnerText(doc.body).length;
+
+  // リンクが多く、本文が少ない場合は OTHER
+  if (totalLinks > 30 && bodyTextLength < charThreshold * 1.5) {
+    return PageType.OTHER;
+  }
+
+  // 5. 最終判定
+  // ある程度のテキスト量があり、リンク密度が低い場合は ARTICLE
+  if (textLength >= 140 && linkDensity <= 0.5) {
+    return PageType.ARTICLE;
+  }
+
+  // それ以外の場合は OTHER
+  return PageType.OTHER;
+}
+
+/**
  * Main function for content extraction
  */
 export function extractContent(
@@ -610,7 +702,10 @@ export function extractContent(
   const candidates = findMainCandidates(doc, nbTopCandidates);
   let topCandidate: VElement | null = null;
   let articleContent: VElement | null = null;
-  let pageType: PageType = PageType.OTHER; // デフォルトは OTHER
+
+  // ページタイプを強制的に設定するか、自動判定する
+  let pageType: PageType =
+    options.forcedPageType || classifyPageType(doc, candidates, charThreshold);
 
   // 候補が存在する場合、最適なものを選択
   if (candidates.length > 0) {
@@ -620,37 +715,13 @@ export function extractContent(
     const textLength = getInnerText(topCandidate).length;
     const linkDensity = getLinkDensity(topCandidate);
 
-    // まず、セマンティックタグ（main, article）が使われているかチェック
-    if (
-      topCandidate.tagName === "main" ||
-      topCandidate.tagName === "article" ||
-      topCandidate.className?.toLowerCase().includes("content") ||
-      topCandidate.id?.toLowerCase().includes("content") ||
-      // 子要素にセマンティックタグがあるかもチェック
-      topCandidate.children.some(
-        (child) =>
-          child.nodeType === "element" &&
-          (child.tagName === "main" || child.tagName === "article")
-      )
-    ) {
-      // セマンティックタグが使われている場合は、テキスト長に関わらずARTICLEとする
-      pageType = PageType.ARTICLE;
+    // ページタイプが ARTICLE の場合、本文を抽出
+    if (pageType === PageType.ARTICLE) {
       if (textLength >= charThreshold && linkDensity <= 0.5) {
         articleContent = topCandidate;
       }
-    } else if (textLength >= charThreshold && linkDensity <= 0.5) {
-      // 十分なテキスト量があり、リンク密度が低い場合
-      articleContent = topCandidate;
-      pageType = PageType.ARTICLE;
-    } else if (textLength >= 140 && linkDensity <= 0.5) {
-      // ある程度のテキスト量があり、リンク密度が低い場合
-      pageType = PageType.ARTICLE;
-    } else {
-      // 短すぎるテキストやリンク密度が高すぎる場合はOTHERのまま
-      pageType = PageType.OTHER;
     }
   }
-  // 候補が全く見つからなかった場合、pageType は OTHER のまま
 
   // Get metadata
   const title = getArticleTitle(doc);
@@ -740,11 +811,12 @@ export function extract(
 export function createExtractor(opts: {
   parser: Parser;
   generateAriaTree?: boolean; // AriaTreeを生成するかどうかのオプションを追加
+  forcedPageType?: PageType; // 強制的に設定するページタイプを追加
 }): (
   html: string,
   options?: Omit<ReadabilityOptions, "parser">
 ) => ReadabilityArticle {
-  const { parser, generateAriaTree } = opts;
+  const { parser, generateAriaTree, forcedPageType } = opts;
 
   return (
     html: string,
@@ -771,13 +843,17 @@ export function createExtractor(opts: {
     preprocessDocument(doc);
 
     // Extract content using the main logic, passing other options
-    // generateAriaTreeオプションを追加
+    // generateAriaTreeオプションとforcedPageTypeオプションを追加
     return extractContent(doc, {
       ...options,
       generateAriaTree:
         options.generateAriaTree !== undefined
           ? options.generateAriaTree
           : generateAriaTree,
+      forcedPageType:
+        options.forcedPageType !== undefined
+          ? options.forcedPageType
+          : forcedPageType,
     });
   };
 }
