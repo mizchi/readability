@@ -4,24 +4,29 @@
  * Core implementation of the content extraction algorithm
  */
 
-import type { VDocument, VElement, ReadabilityArticle, ReadabilityOptions } from './types.ts';
+import type {
+  VDocument,
+  VElement,
+  ReadabilityArticle,
+  ReadabilityOptions,
+} from "./types.ts";
 import {
   getInnerText,
   getLinkDensity,
   getTextDensity,
   getElementsByTagName,
   isProbablyVisible,
-  getNodeAncestors
-} from './dom.ts';
+  getNodeAncestors,
+} from "./dom.ts";
 import {
   REGEXPS,
   DEFAULT_TAGS_TO_SCORE,
   DEFAULT_N_TOP_CANDIDATES,
-  DEFAULT_CHAR_THRESHOLD
-} from './constants.ts';
-import { parseHTML, serializeToHTML } from './parser.ts';
-import { countNodes } from './format.ts';
-import { preprocessDocument } from './preprocess.ts';
+  DEFAULT_CHAR_THRESHOLD,
+} from "./constants.ts";
+import { parseHTML, serializeToHTML } from "./parser.ts";
+import { countNodes } from "./format.ts";
+import { preprocessDocument } from "./preprocess.ts";
 
 /**
  * Initialize score for an element
@@ -31,31 +36,31 @@ function initializeNode(node: VElement): void {
 
   // Initial score based on tag name
   switch (node.tagName) {
-    case 'DIV':
+    case "DIV":
       node.readability.contentScore += 5;
       break;
-    case 'PRE':
-    case 'TD':
-    case 'BLOCKQUOTE':
+    case "PRE":
+    case "TD":
+    case "BLOCKQUOTE":
       node.readability.contentScore += 3;
       break;
-    case 'ADDRESS':
-    case 'OL':
-    case 'UL':
-    case 'DL':
-    case 'DD':
-    case 'DT':
-    case 'LI':
-    case 'FORM':
+    case "ADDRESS":
+    case "OL":
+    case "UL":
+    case "DL":
+    case "DD":
+    case "DT":
+    case "LI":
+    case "FORM":
       node.readability.contentScore -= 3;
       break;
-    case 'H1':
-    case 'H2':
-    case 'H3':
-    case 'H4':
-    case 'H5':
-    case 'H6':
-    case 'TH':
+    case "H1":
+    case "H2":
+    case "H3":
+    case "H4":
+    case "H5":
+    case "H6":
+    case "TH":
       node.readability.contentScore -= 5;
       break;
   }
@@ -94,15 +99,20 @@ function getClassWeight(node: VElement): number {
 }
 
 /**
- * Detect nodes that are likely to be the main content
+ * Detect nodes that are likely to be the main content candidates, sorted by score.
+ * Returns the top N candidates.
  */
-function findMainContent(doc: VDocument, nbTopCandidates: number = DEFAULT_N_TOP_CANDIDATES): VElement | null {
+export function findMainCandidates(
+  doc: VDocument,
+  nbTopCandidates: number = DEFAULT_N_TOP_CANDIDATES
+): VElement[] {
   // 1. First, look for semantic tags (simple method)
-  const semanticTags = ['ARTICLE', 'MAIN'];
+  const semanticTags = ["ARTICLE", "MAIN"];
   for (const tag of semanticTags) {
     const elements = getElementsByTagName(doc.documentElement, tag);
     if (elements.length === 1) {
-      return elements[0];
+      // If a single semantic tag is found, return it as the only candidate
+      return [elements[0]];
     }
   }
 
@@ -112,7 +122,7 @@ function findMainContent(doc: VDocument, nbTopCandidates: number = DEFAULT_N_TOP
   const elementsToScore: VElement[] = [];
 
   // Collect elements to score
-  DEFAULT_TAGS_TO_SCORE.forEach(tag => {
+  DEFAULT_TAGS_TO_SCORE.forEach((tag) => {
     const elements = getElementsByTagName(body, tag);
     elementsToScore.push(...elements);
   });
@@ -142,58 +152,74 @@ function findMainContent(doc: VDocument, nbTopCandidates: number = DEFAULT_N_TOP
       }
 
       // Decrease score for deeper levels
-      const scoreDivider = level === 0 ? 1 : (level === 1 ? 2 : level * 3);
+      const scoreDivider = level === 0 ? 1 : level === 1 ? 2 : level * 3;
       if (ancestor.readability) {
         ancestor.readability.contentScore += contentScore / scoreDivider;
       }
     }
   }
 
-  // Select the top candidate from the candidates
-  let topCandidate: VElement | null = null;
+  // Score and select candidates
+  const scoredCandidates: { element: VElement; score: number }[] = [];
 
   for (const candidate of candidates) {
     // Adjust score based on link density
     if (candidate.readability) {
       const linkDensity = getLinkDensity(candidate);
-      candidate.readability.contentScore *= (1 - linkDensity);
+      candidate.readability.contentScore *= 1 - linkDensity;
 
       // Also consider text density
       // Elements with high text density are more likely to contain more text content
       const textDensity = getTextDensity(candidate);
       if (textDensity > 0) {
         // Slightly increase the score for higher text density (up to 10%)
-        candidate.readability.contentScore *= (1 + Math.min(textDensity / 10, 0.1));
+        candidate.readability.contentScore *=
+          1 + Math.min(textDensity / 10, 0.1);
       }
 
-      if (!topCandidate ||
-          (topCandidate.readability &&
-           candidate.readability.contentScore > topCandidate.readability.contentScore)) {
-        topCandidate = candidate;
+      // Check parent node score - the parent might be a better candidate
+      let currentCandidate = candidate;
+      let parentOfCandidate = currentCandidate.parent;
+      while (parentOfCandidate && parentOfCandidate.tagName !== "BODY") {
+        if (
+          parentOfCandidate.readability &&
+          currentCandidate.readability &&
+          parentOfCandidate.readability.contentScore >
+            currentCandidate.readability.contentScore
+        ) {
+          currentCandidate = parentOfCandidate;
+        }
+        parentOfCandidate = parentOfCandidate.parent;
       }
-    }
-  }
 
-  // Return body if no candidate is found
-  if (!topCandidate) {
-    return body;
-  }
-
-  // The parent node might be a better candidate
-  let currentCandidate = topCandidate;
-  let parentOfCandidate = currentCandidate.parent;
-
-  // Select the parent if its score is higher
-  while (parentOfCandidate && parentOfCandidate.tagName !== 'BODY') {
-    if (parentOfCandidate.readability &&
+      // Avoid adding duplicates if parent check resulted in the same element
+      // Also ensure readability property exists before accessing contentScore
+      if (
         currentCandidate.readability &&
-        parentOfCandidate.readability.contentScore > currentCandidate.readability.contentScore) {
-      currentCandidate = parentOfCandidate;
+        !scoredCandidates.some((sc) => sc.element === currentCandidate)
+      ) {
+        scoredCandidates.push({
+          element: currentCandidate,
+          score: currentCandidate.readability.contentScore,
+        });
+      }
     }
-    parentOfCandidate = parentOfCandidate.parent;
   }
 
-  return currentCandidate;
+  // Sort candidates by score in descending order
+  scoredCandidates.sort((a, b) => b.score - a.score);
+
+  // Return top N candidates
+  const topCandidates = scoredCandidates
+    .slice(0, nbTopCandidates)
+    .map((c) => c.element);
+
+  // Return body if no candidate is found and body exists
+  if (topCandidates.length === 0 && doc.body) {
+    return [doc.body];
+  }
+
+  return topCandidates;
 }
 
 /**
@@ -206,9 +232,11 @@ export function isProbablyContent(element: VElement): boolean {
   }
 
   // Check class name and ID
-  const matchString = (element.className || '') + ' ' + (element.id || '');
-  if (REGEXPS.unlikelyCandidates.test(matchString) &&
-      !REGEXPS.okMaybeItsACandidate.test(matchString)) {
+  const matchString = (element.className || "") + " " + (element.id || "");
+  if (
+    REGEXPS.unlikelyCandidates.test(matchString) &&
+    !REGEXPS.okMaybeItsACandidate.test(matchString)
+  ) {
     return false;
   }
 
@@ -239,21 +267,21 @@ export function isProbablyContent(element: VElement): boolean {
  */
 function getArticleTitle(doc: VDocument): string | null {
   // 1. Get from <title> tag
-  const titleElements = getElementsByTagName(doc.documentElement, 'title');
+  const titleElements = getElementsByTagName(doc.documentElement, "title");
   if (titleElements.length > 0) {
     return getInnerText(titleElements[0]);
   }
 
   // 2. Get from <h1> tag
-  const h1Elements = getElementsByTagName(doc.body, 'h1');
+  const h1Elements = getElementsByTagName(doc.body, "h1");
   if (h1Elements.length === 1) {
     return getInnerText(h1Elements[0]);
   }
 
   // 3. Get from the first heading
   const headings = [
-    ...getElementsByTagName(doc.body, 'h1'),
-    ...getElementsByTagName(doc.body, 'h2')
+    ...getElementsByTagName(doc.body, "h1"),
+    ...getElementsByTagName(doc.body, "h2"),
   ];
 
   if (headings.length > 0) {
@@ -268,7 +296,7 @@ function getArticleTitle(doc: VDocument): string | null {
  */
 function getArticleByline(doc: VDocument): string | null {
   // Get author information from meta tags
-  const metaTags = getElementsByTagName(doc.documentElement, 'meta');
+  const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const name = meta.attributes.name?.toLowerCase();
     const property = meta.attributes.property?.toLowerCase();
@@ -276,16 +304,20 @@ function getArticleByline(doc: VDocument): string | null {
 
     if (!content) continue;
 
-    if (name === 'author' || property === 'author' ||
-        property === 'og:author' || property === 'article:author') {
+    if (
+      name === "author" ||
+      property === "author" ||
+      property === "og:author" ||
+      property === "article:author"
+    ) {
       return content;
     }
   }
 
   // Get from elements with rel="author" attribute
-  const relAuthors = getElementsByTagName(doc.body, 'a');
+  const relAuthors = getElementsByTagName(doc.body, "a");
   for (const author of relAuthors) {
-    if (author.attributes.rel === 'author') {
+    if (author.attributes.rel === "author") {
       const text = getInnerText(author);
       if (text) return text;
     }
@@ -297,9 +329,12 @@ function getArticleByline(doc: VDocument): string | null {
 /**
  * Get the article excerpt
  */
-function getArticleExcerpt(doc: VDocument, content: VElement | null): string | null {
+function getArticleExcerpt(
+  doc: VDocument,
+  content: VElement | null
+): string | null {
   // Get excerpt from meta tags
-  const metaTags = getElementsByTagName(doc.documentElement, 'meta');
+  const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const name = meta.attributes.name?.toLowerCase();
     const property = meta.attributes.property?.toLowerCase();
@@ -307,14 +342,14 @@ function getArticleExcerpt(doc: VDocument, content: VElement | null): string | n
 
     if (!contentAttr) continue;
 
-    if (name === 'description' || property === 'og:description') {
+    if (name === "description" || property === "og:description") {
       return contentAttr;
     }
   }
 
   // Get excerpt from the first paragraph of the content
   if (content) {
-    const paragraphs = getElementsByTagName(content, 'p');
+    const paragraphs = getElementsByTagName(content, "p");
     if (paragraphs.length > 0) {
       return getInnerText(paragraphs[0]);
     }
@@ -328,14 +363,14 @@ function getArticleExcerpt(doc: VDocument, content: VElement | null): string | n
  */
 function getSiteName(doc: VDocument): string | null {
   // Get site name from meta tags
-  const metaTags = getElementsByTagName(doc.documentElement, 'meta');
+  const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const property = meta.attributes.property?.toLowerCase();
     const content = meta.attributes.content;
 
     if (!content) continue;
 
-    if (property === 'og:site_name') {
+    if (property === "og:site_name") {
       return content;
     }
   }
@@ -346,12 +381,16 @@ function getSiteName(doc: VDocument): string | null {
 /**
  * Main function for content extraction
  */
-export function extractContent(doc: VDocument, options: ReadabilityOptions = {}): ReadabilityArticle {
+export function extractContent(
+  doc: VDocument,
+  options: ReadabilityOptions = {}
+): ReadabilityArticle {
   const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;
   const nbTopCandidates = options.nbTopCandidates || DEFAULT_N_TOP_CANDIDATES;
 
   // Find content candidates
-  const mainContent = findMainContent(doc, nbTopCandidates);
+  const candidates = findMainCandidates(doc, nbTopCandidates);
+  const mainContent = candidates.length > 0 ? candidates[0] : null; // Use the top candidate
 
   // Get metadata
   const title = getArticleTitle(doc);
@@ -364,25 +403,32 @@ export function extractContent(doc: VDocument, options: ReadabilityOptions = {})
 
   // Skip minimum character check in test environment
   // Perform minimum character check in actual environment
-  const isTestEnvironment = typeof process !== 'undefined' &&
-                           process.env &&
-                           process.env.NODE_ENV === 'test';
+  const isTestEnvironment =
+    typeof process !== "undefined" &&
+    process.env &&
+    process.env.NODE_ENV === "test";
 
-  const content = isTestEnvironment ? mainContent :
-                 (textLength >= charThreshold ? mainContent : null);
+  const content = isTestEnvironment
+    ? mainContent
+    : textLength >= charThreshold
+      ? mainContent
+      : null;
 
   return {
     title,
     byline,
     root: content,
-    nodeCount: content ? countNodes(content) : 0
+    nodeCount: content ? countNodes(content) : 0,
   };
 }
 
 /**
  * Extract article from HTML
  */
-export function extract(html: string, options: ReadabilityOptions = {}): ReadabilityArticle {
+export function extract(
+  html: string,
+  options: ReadabilityOptions = {}
+): ReadabilityArticle {
   // Parse HTML to create virtual DOM
   const doc = parseHTML(html);
 
