@@ -1,7 +1,7 @@
 /**
- * Readability v3 - HTMLパーサー
- * 
- * HTMLを解析して仮想DOM構造を作成する
+ * Readability v3 - HTML Parser
+ *
+ * Parses HTML and creates a virtual DOM structure
  */
 
 import { Parser } from 'htmlparser2';
@@ -9,28 +9,28 @@ import { createElement, createTextNode } from './dom.ts';
 import type { VDocument, VElement, VTextNode } from './types.ts';
 
 /**
- * HTMLを解析して仮想DOM構造を作成する
- * 
- * @param html HTML文字列
- * @param baseURI ベースURI（相対URLの解決に使用）
- * @returns 仮想DOMドキュメント
+ * Parses HTML and creates a virtual DOM structure
+ *
+ * @param html HTML string
+ * @param baseURI Base URI (used for resolving relative URLs)
+ * @returns Virtual DOM document
  */
 export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocument {
-  // ドキュメント構造の初期化
+  // Initialize document structure
   const document: VDocument = {
     documentElement: createElement('html'),
     body: createElement('body'),
     baseURI,
     documentURI: baseURI
   };
-  
-  // ドキュメント構造のセットアップ
+
+  // Setup document structure
   document.documentElement.children = [document.body];
   document.body.parent = document.documentElement;
-  
-  // 現在処理中の要素
+
+  // Currently processing element
   let currentElement: VElement = document.body;
-  
+
   const parser = new Parser({
     onopentag(name, attributes) {
       const element: VElement = {
@@ -40,82 +40,82 @@ export function parseHTML(html: string, baseURI: string = 'about:blank'): VDocum
         children: [],
         parent: currentElement
       };
-      
-      // 属性の設定
+
+      // Set attributes
       for (const [key, value] of Object.entries(attributes)) {
         element.attributes[key] = value;
       }
-      
-      // 特別なプロパティの設定
+
+      // Set special properties
       if (attributes.id) element.id = attributes.id;
       if (attributes.class) element.className = attributes.class;
-      
-      // 親要素に追加
+
+      // Add to parent element
       currentElement.children.push(element);
-      
-      // 現在の要素を更新
+
+      // Update current element
       currentElement = element;
     },
     ontext(text) {
-      // テキストノードを作成
+      // Create text node
       const textNode: VTextNode = {
         nodeType: 'text',
         textContent: text,
         parent: currentElement
       };
-      
-      // 親要素に追加
+
+      // Add to parent element
       currentElement.children.push(textNode);
     },
     onclosetag() {
-      // 親要素に戻る
+      // Return to parent element
       if (currentElement.parent) {
         currentElement = currentElement.parent;
       }
     }
   });
-  
+
   parser.write(html);
   parser.end();
-  
+
   return document;
 }
 
 /**
- * 仮想DOM要素をHTML文字列にシリアライズする
- * 
- * @param element シリアライズする要素
- * @returns HTML文字列
+ * Serializes a virtual DOM element to an HTML string
+ *
+ * @param element Element to serialize
+ * @returns HTML string
  */
 export function serializeToHTML(element: VElement | VTextNode): string {
   if (element.nodeType === 'text') {
     return element.textContent;
   }
-  
+
   const tagName = element.tagName.toLowerCase();
-  
-  // 自己終了タグのリスト
+
+  // List of self-closing tags
   const selfClosingTags = new Set([
     'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
     'link', 'meta', 'param', 'source', 'track', 'wbr'
   ]);
-  
-  // 属性文字列の作成
+
+  // Create attribute string
   const attributes = Object.entries(element.attributes)
-    .map(([key, value]) => `${key}="${value.replace(/"/g, '&quot;')}"`)
+    .map(([key, value]) => `${key}="${value.replace(/"/g, '"')}"`)
     .join(' ');
-  
+
   const attributeString = attributes ? ` ${attributes}` : '';
-  
-  // 自己終了タグの場合
+
+  // For self-closing tags
   if (selfClosingTags.has(tagName) && element.children.length === 0) {
     return `<${tagName}${attributeString}/>`;
   }
-  
-  // 子要素を含むタグの場合
+
+  // For tags containing children
   const childrenHTML = element.children
     .map(child => serializeToHTML(child))
     .join('');
-  
+
   return `<${tagName}${attributeString}>${childrenHTML}</${tagName}>`;
 }

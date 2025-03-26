@@ -1,40 +1,40 @@
 /**
- * Readability v3 - 型定義
- * 
- * DOM依存のない実装のための型定義
+ * Readability v3 - Type Definitions
+ *
+ * Type definitions for DOM-independent implementation
  */
 
-// ノードの基本型
+// Basic node type
 export type VNodeType = 'element' | 'text';
 
-// 基本ノードインターフェース
+// Basic node interface
 export interface VNode {
   nodeType: VNodeType;
   parent?: VElement;
-  // readabilityアルゴリズムで使用される特性
+  // Properties used by the readability algorithm
   readability?: {
     contentScore: number;
   };
 }
 
-// テキストノード
+// Text node
 export interface VTextNode extends VNode {
   nodeType: 'text';
   textContent: string;
 }
 
-// 要素ノード
+// Element node
 export interface VElement extends VNode {
   nodeType: 'element';
   tagName: string;
   attributes: Record<string, string>;
   children: Array<VElement | VTextNode>;
-  // 便利なアクセサ
+  // Convenient accessors
   id?: string;
   className?: string;
 }
 
-// ドキュメント構造
+// Document structure
 export interface VDocument {
   documentElement: VElement;
   body: VElement;
@@ -42,7 +42,7 @@ export interface VDocument {
   documentURI?: string;
 }
 
-// Readabilityの結果
+// Readability result
 export interface ReadabilityArticle {
   title: string | null;
   byline: string | null;
@@ -50,7 +50,7 @@ export interface ReadabilityArticle {
   nodeCount: number;
 }
 
-// Readabilityのオプション
+// Readability options
 export interface ReadabilityOptions {
   charThreshold?: number;
   nbTopCandidates?: number;

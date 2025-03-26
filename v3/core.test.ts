@@ -3,48 +3,48 @@ import { parseHTML } from './parser';
 import { extractContent, isProbablyContent } from './core';
 import type { VElement, VTextNode } from './types';
 
-// 基本的なテストケース
+// Basic test case
 const BASIC_HTML = `
 <html>
   <head>
-    <title>テストページ</title>
+    <title>Test Page</title>
   </head>
   <body>
     <div id="content">
-      <h1>テスト記事のタイトル</h1>
-      <p class="byline">著者: テスト太郎</p>
-      <p>これはテスト記事の本文です。Readabilityのテストに使用します。</p>
-      <p>十分な長さのテキストを持つ段落が必要です。これは本文として検出されるべき段落です。
-      実際の記事では、このような長い段落がいくつか含まれていることが一般的です。
-      テキストの長さはスコアリングアルゴリズムにおいて重要な要素となります。</p>
+      <h1>Test Article Title</h1>
+      <p class="byline">Author: Test Taro</p>
+      <p>This is the body of the test article. Used for Readability testing.</p>
+      <p>A paragraph with sufficient length of text is required. This paragraph should be detected as the main content.
+      In actual articles, it is common to have several such long paragraphs.
+      Text length is an important factor in the scoring algorithm.</p>
     </div>
   </body>
 </html>
 `;
 
-// セマンティックタグを使用したHTML
+// HTML using semantic tags
 const SEMANTIC_HTML = `
 <html>
   <head>
-    <title>セマンティックタグのテスト</title>
+    <title>Semantic Tag Test</title>
   </head>
   <body>
     <header>
-      <h1>ウェブサイトのヘッダー</h1>
+      <h1>Website Header</h1>
       <nav>
         <ul>
-          <li><a href="#">ホーム</a></li>
+          <li><a href="#">Home</a></li>
           <li><a href="#">About</a></li>
         </ul>
       </nav>
     </header>
     <main>
       <article>
-        <h1>記事のタイトル</h1>
-        <p>これは記事の本文です。セマンティックタグを使用しています。</p>
-        <p>この段落はarticleタグ内にあり、本文として検出されるべきです。
-        十分な長さのテキストを持つことで、スコアリングアルゴリズムによって
-        重要なコンテンツとして認識されます。</p>
+        <h1>Article Title</h1>
+        <p>This is the body of the article. Using semantic tags.</p>
+        <p>This paragraph is inside the article tag and should be detected as the main content.
+        Having sufficient length of text allows the scoring algorithm to
+        recognize it as important content.</p>
       </article>
     </main>
     <footer>
@@ -54,85 +54,85 @@ const SEMANTIC_HTML = `
 </html>
 `;
 
-// 複数の候補がある複雑なHTML
+// Complex HTML with multiple candidates
 const COMPLEX_HTML = `
 <html>
   <head>
-    <title>複雑なレイアウト</title>
+    <title>Complex Layout</title>
   </head>
   <body>
     <header class="site-header">
-      <h1>ニュースサイト</h1>
-      <nav>メニュー項目がここに入ります</nav>
+      <h1>News Site</h1>
+      <nav>Menu items go here</nav>
     </header>
     <div class="container">
       <div class="sidebar">
         <div class="widget">
-          <h3>関連記事</h3>
+          <h3>Related Articles</h3>
           <ul>
-            <li><a href="#">記事1</a></li>
-            <li><a href="#">記事2</a></li>
+            <li><a href="#">Article 1</a></li>
+            <li><a href="#">Article 2</a></li>
           </ul>
         </div>
       </div>
       <div class="content">
-        <h1>メインコンテンツのタイトル</h1>
+        <h1>Main Content Title</h1>
         <div class="meta">
-          <span class="author">著者: コンテンツ作成者</span>
-          <span class="date">2025年3月25日</span>
+          <span class="author">Author: Content Creator</span>
+          <span class="date">March 25, 2025</span>
         </div>
-        <p>これはメインコンテンツの最初の段落です。この部分は本文として検出されるべきです。</p>
-        <p>これは二つ目の段落です。十分な長さのテキストを持つことで、スコアリングアルゴリズムによって
-        重要なコンテンツとして認識されます。実際の記事では、このような長い段落がいくつか含まれていることが
-        一般的です。テキストの長さはスコアリングアルゴリズムにおいて重要な要素となります。</p>
-        <p>三つ目の段落もあります。複数の段落があることで、このdiv要素のスコアが高くなります。</p>
+        <p>This is the first paragraph of the main content. This part should be detected as the main content.</p>
+        <p>This is the second paragraph. Having sufficient length of text allows the scoring algorithm to
+        recognize it as important content. In actual articles, it is common to have several such long paragraphs.
+        Text length is an important factor in the scoring algorithm.</p>
+        <p>There is also a third paragraph. Having multiple paragraphs increases the score of this div element.</p>
       </div>
       <div class="comments">
-        <h3>コメント</h3>
+        <h3>Comments</h3>
         <div class="comment">
-          <p>これは記事へのコメントです。長いコメントかもしれませんが、本文ではありません。
-          コメントセクションは通常、本文から除外されるべきです。</p>
+          <p>This is a comment on the article. It might be a long comment, but it's not the main content.
+          The comment section should usually be excluded from the main content.</p>
         </div>
       </div>
     </div>
     <footer>
-      <p>フッター情報がここに入ります</p>
+      <p>Footer information goes here</p>
     </footer>
   </body>
 </html>
 `;
 
-// リンク密度が高いHTML
+// HTML with high link density
 const HIGH_LINK_DENSITY_HTML = `
 <html>
   <body>
     <div class="navigation">
-      <a href="#">リンク1</a>
-      <a href="#">リンク2</a>
-      <a href="#">リンク3</a>
-      <a href="#">リンク4</a>
-      <a href="#">リンク5</a>
-      <span>ほんの少しのテキスト</span>
+      <a href="#">Link 1</a>
+      <a href="#">Link 2</a>
+      <a href="#">Link 3</a>
+      <a href="#">Link 4</a>
+      <a href="#">Link 5</a>
+      <span>Just a little text</span>
     </div>
     <div class="content">
-      <p>これは本文です。リンクはほとんどありません。</p>
-      <p>十分な長さのテキストを持つ段落が必要です。これは本文として検出されるべき段落です。
-      実際の記事では、このような長い段落がいくつか含まれていることが一般的です。
-      テキストの長さはスコアリングアルゴリズムにおいて重要な要素となります。</p>
-      <a href="#">参考リンク</a>
+      <p>This is the main content. There are almost no links.</p>
+      <p>A paragraph with sufficient length of text is required. This paragraph should be detected as the main content.
+      In actual articles, it is common to have several such long paragraphs.
+      Text length is an important factor in the scoring algorithm.</p>
+      <a href="#">Reference Link</a>
     </div>
   </body>
 </html>
 `;
 
 describe('Core Readability Functions', () => {
-  test('isProbablyContent - 本文の可能性判定', () => {
-    // 直接コンテンツ要素を作成してテスト
-    const longText = `これは十分な長さのテキストを持つ段落です。これは本文として検出されるべき段落です。
-    実際の記事では、このような長い段落がいくつか含まれていることが一般的です。
-    テキストの長さはスコアリングアルゴリズムにおいて重要な要素となります。
-    この段落は140文字以上あり、リンク密度も低いため、本文として検出されるはずです。`;
-    
+  test('isProbablyContent - Determine content probability', () => {
+    // Test by creating content elements directly
+    const longText = `This is a paragraph with sufficient length of text. This paragraph should be detected as the main content.
+    In actual articles, it is common to have several such long paragraphs.
+    Text length is an important factor in the scoring algorithm.
+    This paragraph is over 140 characters long and has low link density, so it should be detected as content.`;
+
     const longParagraph: VElement = {
       nodeType: 'element',
       tagName: 'P',
@@ -146,11 +146,11 @@ describe('Core Readability Functions', () => {
       ],
       className: 'content'
     };
-    
-    // 長いテキストを持つ段落は本文の可能性が高い
+
+    // Paragraphs with long text are likely content
     expect(isProbablyContent(longParagraph)).toBe(true);
-    
-    // 短いテキストを持つヘッダー要素
+
+    // Header element with short text
     const header: VElement = {
       nodeType: 'element',
       tagName: 'H1',
@@ -158,51 +158,51 @@ describe('Core Readability Functions', () => {
       children: [
         {
           nodeType: 'text',
-          textContent: '短いヘッダーテキスト',
+          textContent: 'Short header text',
           parent: undefined
         }
       ]
     };
-    
-    // ヘッダーは短いテキストなので、本文の可能性は低い
+
+    // Headers have short text, so less likely to be content
     expect(isProbablyContent(header)).toBe(false);
   });
 
-  test('isProbablyContent - リンク密度の高い要素', () => {
+  test('isProbablyContent - Element with high link density', () => {
     const doc = parseHTML(HIGH_LINK_DENSITY_HTML);
-    
-    // リンク密度が高いナビゲーション要素
+
+    // Navigation element with high link density
     const navigation = doc.body.children.find(
       (child): child is VElement => child.nodeType === 'element' && child.className === 'navigation'
     );
-    
-    // 通常のコンテンツ要素
+
+    // Normal content element
     const content = doc.body.children.find(
       (child): child is VElement => child.nodeType === 'element' && child.className === 'content'
     );
-    
+
     if (navigation && navigation.nodeType === 'element') {
-      // リンク密度が高いので、本文の可能性は低い
+      // High link density, so less likely to be content
       expect(isProbablyContent(navigation)).toBe(false);
     }
-    
+
     if (content && content.nodeType === 'element') {
-      // リンク密度が低いので、本文の可能性は高い
+      // Low link density, so likely to be content
       expect(isProbablyContent(content)).toBe(true);
     }
   });
 
-  test('extractContent - 基本的なHTML', () => {
+  test('extractContent - Basic HTML', () => {
     const doc = parseHTML(BASIC_HTML);
     const result = extractContent(doc);
-    
-    // コンテンツが抽出されることを確認
+
+    // Check if content is extracted
     expect(result.root).not.toBeNull();
-    
-    // ノード数が計算されることを確認
+
+    // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
-    
-    // 抽出されたコンテンツにテスト記事のテキストが含まれることを確認
+
+    // Check if extracted content includes test article text
     if (result.root) {
       const contentText = result.root.children
         .filter((child): child is VElement => child.nodeType === 'element' && child.tagName === 'P')
@@ -212,52 +212,52 @@ describe('Core Readability Functions', () => {
           .join('')
         )
         .join('');
-      
-      expect(contentText).toContain('これはテスト記事の本文です');
+
+      expect(contentText).toContain('This is the body of the test article');
     }
   });
 
-  test('extractContent - セマンティックタグ', () => {
+  test('extractContent - Semantic tags', () => {
     const doc = parseHTML(SEMANTIC_HTML);
     const result = extractContent(doc);
-    
-    // コンテンツが抽出されることを確認
+
+    // Check if content is extracted
     expect(result.root).not.toBeNull();
-    
-    // ノード数が計算されることを確認
+
+    // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
-    
-    // 抽出されたコンテンツにarticleタグ内のテキストが含まれることを確認
+
+    // Check if extracted content includes text within the article tag
     if (result.root) {
-      const isArticleOrContainsArticle = 
+      const isArticleOrContainsArticle =
         result.root.tagName === 'ARTICLE' ||
-        result.root.children.some((child): boolean => 
+        result.root.children.some((child): boolean =>
           child.nodeType === 'element' && child.tagName === 'ARTICLE'
         );
-      
+
       expect(isArticleOrContainsArticle).toBe(true);
     }
   });
 
-  test('extractContent - 複雑なHTML', () => {
+  test('extractContent - Complex HTML', () => {
     const doc = parseHTML(COMPLEX_HTML);
     const result = extractContent(doc);
-    
-    // コンテンツが抽出されることを確認
+
+    // Check if content is extracted
     expect(result.root).not.toBeNull();
-    
-    // ノード数が計算されることを確認
+
+    // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
-    
-    // 抽出されたコンテンツにメインコンテンツのテキストが含まれることを確認
+
+    // Check if extracted content includes main content text
     if (result.root) {
-      // contentクラスの要素またはその親要素が選択されていることを確認
-      const contentOrParentOfContent = 
+      // Check if the element with class 'content' or its parent is selected
+      const contentOrParentOfContent =
         result.root.className === 'content' ||
-        result.root.children.some((child): boolean => 
+        result.root.children.some((child): boolean =>
           child.nodeType === 'element' && child.className === 'content'
         );
-      
+
       expect(contentOrParentOfContent).toBe(true);
     }
   });

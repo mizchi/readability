@@ -1,7 +1,7 @@
 /**
- * Readability v3 - 定数定義
- * 
- * 本文抽出アルゴリズムで使用される定数
+ * Readability v3 - Constant Definitions
+ *
+ * Constants used in the content extraction algorithm
  */
 
 // The number of top candidates to consider when analysing how
@@ -28,10 +28,10 @@ export const REGEXPS = {
     /article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story/i,
   negative:
     /-ad-|hidden|^hid$| hid$| hid |^hid |banner|combx|comment|com-|contact|footer|gdpr|masthead|media|meta|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|widget/i,
-  
+
   // Commas as used in Latin, Sindhi, Chinese and various other scripts.
   commas: /\u002C|\u060C|\uFE50|\uFE10|\uFE11|\u2E41|\u2E34|\u2E32|\uFF0C/g,
-  
+
   // For normalizing whitespace
   normalize: /\s{2,}/g,
 };

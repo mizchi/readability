@@ -27,29 +27,6 @@ const md = html2md(htmlContent);
 console.log(md);
 ```
 
-## Usage
-
-```ts
-import { elementToHTML, parse } from "@mizchi/readability";
-import type { ReadabilityArticle } from "../types.ts";
-import { elementToHTML, stringify } from "../format.ts";
-import html2md from "html-to-md";
-
-const html = await fetch(
-  "https://zenn.dev/mizchi/articles/ts-using-sampling-logger",
-).then((res) => res.text());
-const article = await fetchAndExtractHTML(html);
-// 結果を表示
-console.log(`Title: ${article.title}`);
-console.log(`Author: ${article.byline || "不明"}`);
-if (!article.root) {
-  process.exit(1);
-}
-const htmlContent = elementToHTML(article.root);
-const md = html2md(htmlContent);
-console.log(md);
-```
-
 ---
 
 # Readability.js

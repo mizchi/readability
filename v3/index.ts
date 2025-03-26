@@ -1,11 +1,11 @@
 /**
- * Readability v3 - エントリーポイント
- * 
- * DOM依存のない本文抽出ライブラリ
+ * Readability v3 - Entry Point
+ *
+ * DOM-independent content extraction library
  */
 
-// 公開する型定義のみエクスポート
-export type { 
+// Export only public type definitions
+export type {
   ReadabilityArticle,
   ReadabilityOptions,
   VDocument,
@@ -13,7 +13,7 @@ export type {
   VTextNode
 } from './types.ts';
 
-// 公開する関数のみエクスポート
+// Export only public functions
 export {
   parseHTML,
   serializeToHTML

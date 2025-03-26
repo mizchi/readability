@@ -22,7 +22,7 @@ It’s an alarming reality — the possibility that your every move online is be
 
 Total Cookie Protection offers strong protections against tracking without affecting your browsing experience.
 
-![The top text reads: Total Cookie Protection. On the left side, the text reads: Before TCP. An illustration below shows three cookies over a browser window that say "facebook.com." Below, two text boxes read: fuzzyslippers.com and woodworks.com. On the right side, three separate browser windows contain one cookie each. The web address fields for the separate windows read: fuzzyslippers.com, facebook.com and woodworks.com.](https://blog.mozilla.org/wp-content/blogs.dir/278/files/2023/04/moz_TotalCookieProtection_1200x800@2x-1024x682.jpg)
+![](https://blog.mozilla.org/wp-content/blogs.dir/278/files/2023/04/moz_TotalCookieProtection_1200x800@2x-1024x682.jpg)
 
 Total Cookie Protection stops cookies from tracking you around the web.
 

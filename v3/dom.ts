@@ -1,13 +1,13 @@
 /**
- * Readability v3 - DOM操作ユーティリティ
- * 
- * 仮想DOM構造を操作するためのユーティリティ関数
+ * Readability v3 - DOM Manipulation Utilities
+ *
+ * Utility functions for manipulating the virtual DOM structure
  */
 
 import type { VElement, VNode, VTextNode } from "./types.ts";
 import { DIV_TO_P_ELEMS, PHRASING_ELEMS, REGEXPS } from "./constants.ts";
 
-// ノードの作成ヘルパー関数
+// Node creation helper functions
 export function createElement(tagName: string): VElement {
   return {
     nodeType: 'element',
@@ -24,139 +24,139 @@ export function createTextNode(content: string): VTextNode {
   };
 }
 
-// 属性の取得
+// Get attribute
 export function getAttribute(element: VElement, name: string): string | null {
   return element.attributes[name] || null;
 }
 
-// 要素の取得（タグ名で）
+// Get elements by tag name
 export function getElementsByTagName(element: VElement, tagName: string | string[]): VElement[] {
   const tagNames = Array.isArray(tagName) ? tagName : [tagName];
   const upperTagNames = tagNames.map(tag => tag.toUpperCase());
   const result: VElement[] = [];
-  
-  // この要素が一致するか確認
+
+  // Check if this element matches
   if (upperTagNames.includes('*') || upperTagNames.includes(element.tagName)) {
     result.push(element);
   }
-  
-  // 子要素を再帰的に確認
+
+  // Recursively check child elements
   for (const child of element.children) {
     if (child.nodeType === 'element') {
       result.push(...getElementsByTagName(child, tagName));
     }
   }
-  
+
   return result;
 }
 
-// 次のノードを取得（深さ優先探索）
+// Get the next node (depth-first traversal)
 export function getNextNode(node: VElement | VTextNode, ignoreSelfAndKids?: boolean): VElement | VTextNode | null {
   if (node.nodeType === 'element' && !ignoreSelfAndKids && node.children.length > 0) {
     return node.children[0];
   }
-  
-  // 兄弟ノードを探す
+
+  // Look for sibling nodes
   const siblings = node.parent?.children || [];
   const index = siblings.indexOf(node);
   if (index !== -1 && index < siblings.length - 1) {
     return siblings[index + 1];
   }
-  
-  // 親の兄弟を探す
+
+  // Look for parent's siblings
   if (node.parent) {
     return getNextNode(node.parent, true);
   }
-  
+
   return null;
 }
 
-// 可視性の確認
+// Check visibility
 export function isProbablyVisible(node: VElement): boolean {
   const style = node.attributes.style || '';
   const hidden = node.attributes.hidden !== undefined;
   const ariaHidden = node.attributes['aria-hidden'] === 'true';
-  
-  return !style.includes('display: none') && 
-         !style.includes('visibility: hidden') && 
-         !hidden && 
+
+  return !style.includes('display: none') &&
+         !style.includes('visibility: hidden') &&
+         !hidden &&
          !ariaHidden;
 }
 
-// ノードの反復処理
+// Iterate over nodes
 export function forEachNode<T extends VElement | VTextNode>(
-  nodeList: T[], 
+  nodeList: T[],
   fn: (node: T, index: number, list: T[]) => void
 ): void {
   nodeList.forEach(fn);
 }
 
-// いずれかのノードが条件を満たすか確認
+// Check if any node satisfies the condition
 export function someNode<T extends VElement | VTextNode>(
-  nodeList: T[], 
+  nodeList: T[],
   fn: (node: T, index: number, list: T[]) => boolean
 ): boolean {
   return nodeList.some(fn);
 }
 
-// すべてのノードが条件を満たすか確認
+// Check if all nodes satisfy the condition
 export function everyNode<T extends VElement | VTextNode>(
-  nodeList: T[], 
+  nodeList: T[],
   fn: (node: T, index: number, list: T[]) => boolean
 ): boolean {
   return nodeList.every(fn);
 }
 
-// 先祖要素のチェック
+// Check ancestor elements
 export function hasAncestorTag(
-  node: VElement | VTextNode, 
-  tagName: string, 
+  node: VElement | VTextNode,
+  tagName: string,
   maxDepth: number = -1
 ): boolean {
   tagName = tagName.toUpperCase();
   let depth = 0;
   let currentNode = node.parent;
-  
+
   while (currentNode) {
     if (maxDepth > 0 && depth > maxDepth) {
       return false;
     }
-    
+
     if (currentNode.tagName === tagName) {
       return true;
     }
-    
+
     currentNode = currentNode.parent;
     depth++;
   }
-  
+
   return false;
 }
 
-// 子ブロック要素の確認
+// Check for child block elements
 export function hasChildBlockElement(element: VElement): boolean {
   return someNode(element.children, child => {
     if (child.nodeType !== 'element') {
       return false;
     }
-    
+
     return DIV_TO_P_ELEMS.has(child.tagName) || hasChildBlockElement(child);
   });
 }
 
-// フレージングコンテンツの確認
+// Check for phrasing content
 export function isPhrasingContent(node: VNode): boolean {
   if (node.nodeType === 'text') {
     return true;
   }
-  
+
   if (node.nodeType === 'element') {
     const element = node as VElement;
-    
+
     if (PHRASING_ELEMS.includes(element.tagName)) {
       return true;
     }
-    
+
     if (
       element.tagName === "A" ||
       element.tagName === "DEL" ||
@@ -165,14 +165,14 @@ export function isPhrasingContent(node: VNode): boolean {
       return everyNode(element.children, isPhrasingContent);
     }
   }
-  
+
   return false;
 }
 
-// 内部テキストの取得
+// Get inner text
 export function getInnerText(element: VElement | VTextNode, normalizeSpaces: boolean = true): string {
   let text = '';
-  
+
   if (element.nodeType === 'text') {
     text = element.textContent;
   } else {
@@ -184,56 +184,56 @@ export function getInnerText(element: VElement | VTextNode, normalizeSpaces: boo
       }
     }
   }
-  
+
   text = text.trim();
-  
+
   if (normalizeSpaces) {
     return text.replace(REGEXPS.normalize, ' ');
   }
-  
+
   return text;
 }
 
-// リンク密度の取得
+// Get link density
 export function getLinkDensity(element: VElement): number {
   const textLength = getInnerText(element).length;
   if (textLength === 0) {
     return 0;
   }
-  
+
   let linkLength = 0;
   const links = getElementsByTagName(element, 'a');
-  
+
   forEachNode(links, link => {
     const href = getAttribute(link, 'href');
     const coefficient = href && href.startsWith('#') ? 0.3 : 1;
     linkLength += getInnerText(link).length * coefficient;
   });
-  
+
   return linkLength / textLength;
 }
 
-// テキスト密度の取得
+// Get text density
 export function getTextDensity(element: VElement): number {
   const text = getInnerText(element);
   const textLength = text.length;
   if (textLength === 0) return 0;
-  
+
   const childElements = element.children.filter(child => child.nodeType === 'element');
   return textLength / (childElements.length || 1);
 }
 
-// 先祖要素の取得
+// Get ancestor elements
 export function getNodeAncestors(node: VElement, maxDepth: number = 3): VElement[] {
   const ancestors: VElement[] = [];
   let currentNode = node.parent;
   let depth = 0;
-  
+
   while (currentNode && (maxDepth <= 0 || depth < maxDepth)) {
     ancestors.push(currentNode);
     currentNode = currentNode.parent;
     depth++;
   }
-  
+
   return ancestors;
 }
