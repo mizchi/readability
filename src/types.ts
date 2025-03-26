@@ -60,9 +60,13 @@ export function isVElement(
 export interface ReadabilityArticle {
   title: string | null;
   byline: string | null;
-  root: VElement | null;
+  root: VElement | null; // メインコンテンツのルート要素 (閾値以上の場合)
   nodeCount: number;
-  pageType: PageType; // Add articleType property
+  pageType: PageType;
+  // 構造要素 (pageTypeがARTICLEだがrootがnullの場合などに設定される)
+  header?: VElement | null;
+  footer?: VElement | null;
+  otherSignificantNodes?: VElement[];
 }
 
 // Readability options

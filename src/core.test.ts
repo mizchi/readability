@@ -135,6 +135,49 @@ const HIGH_LINK_DENSITY_HTML = `
 </html>
 `;
 
+// HTML with clear header/footer but short main content
+const SHORT_ARTICLE_WITH_STRUCTURE_HTML = `
+<html>
+  <head>
+    <title>Short Article Test</title>
+  </head>
+  <body>
+    <header id="page-header" role="banner">
+      <h1>Website Title</h1>
+      <nav>Menu</nav>
+    </header>
+    <main>
+      <article>
+        <h1>Short Article</h1>
+        <p>This content is too short to pass the threshold.</p>
+      </article>
+    </main>
+    <aside>Related links</aside>
+    <footer id="page-footer" role="contentinfo">
+      <p>Copyright Info</p>
+    </footer>
+  </body>
+</html>
+`;
+
+// HTML with only header/footer, no main/article tag
+const NO_MAIN_CONTENT_HTML = `
+<html>
+  <head>
+    <title>No Main Content</title>
+  </head>
+  <body>
+    <div class="header-class">
+      <h1>Site Header</h1>
+    </div>
+    <p>Some random text, but not enough.</p>
+    <div class="footer-class">
+      <p>Footer Text</p>
+    </div>
+  </body>
+</html>
+`;
+
 describe("Core Readability Functions", () => {
   test("isProbablyContent - Determine content probability", () => {
     // Test by creating content elements directly
@@ -302,5 +345,63 @@ describe("Core Readability Functions", () => {
     // Check if content is null due to threshold
     expect(result.root).toBeNull();
     expect(result.nodeCount).toBe(0);
+    // Structural elements should not be populated for OTHER type
+    expect(result.header).toBeUndefined();
+    expect(result.footer).toBeUndefined();
+    expect(result.otherSignificantNodes).toBeUndefined();
+  });
+
+  test("extractContent - Short article with structure (ARTICLE, root=null, structure populated)", () => {
+    const doc = parseHTML(SHORT_ARTICLE_WITH_STRUCTURE_HTML);
+    // Use a threshold that the main content won't pass
+    const result = extractContent(doc, { charThreshold: 500 });
+
+    // Check article type - should be ARTICLE because a candidate was found and deemed probable
+    expect(result.pageType).toBe(PageType.ARTICLE);
+
+    // Check if content is null due to threshold
+    expect(result.root).toBeNull();
+    expect(result.nodeCount).toBe(0);
+
+    // Check if structural elements are populated
+    expect(result.header).not.toBeNull();
+    expect(result.header?.tagName).toBe("header");
+    expect(result.header?.id).toBe("page-header");
+
+    expect(result.footer).not.toBeNull();
+    expect(result.footer?.tagName).toBe("footer");
+    expect(result.footer?.id).toBe("page-footer");
+
+    expect(result.otherSignificantNodes).not.toBeUndefined();
+    expect(result.otherSignificantNodes?.length).toBeGreaterThan(0);
+    // Check if <main> or <article> was detected as significant
+    const significantTagNames = result.otherSignificantNodes?.map(
+      (n) => n.tagName
+    );
+    expect(significantTagNames).toContain("main");
+    expect(significantTagNames).toContain("article");
+  });
+
+  test("extractContent - No real main content (OTHER, root=null)", () => {
+    const doc = parseHTML(NO_MAIN_CONTENT_HTML);
+    const result = extractContent(doc, { charThreshold: 500 });
+
+    // Check article type - should be OTHER as no strong candidate likely found
+    expect(result.pageType).toBe(PageType.OTHER);
+
+    // Check if content is null
+    expect(result.root).toBeNull();
+    expect(result.nodeCount).toBe(0);
+
+    // Structural elements might be found by findStructuralElements, but pageType is OTHER
+    // Depending on strictness, we might expect them to be undefined if pageType is OTHER.
+    // Let's assume for now they are *not* populated if the final type is OTHER.
+    expect(result.header).toBeUndefined();
+    expect(result.footer).toBeUndefined();
+    expect(result.otherSignificantNodes).toBeUndefined();
+
+    // Alternative check: If findStructuralElements *is* called even for OTHER (less likely based on current core.ts logic)
+    // then we might check if header/footer *were* found, e.g.:
+    // expect(findStructuralElements(doc).header).not.toBeNull(); // This tests findStructuralElements directly
   });
 });
