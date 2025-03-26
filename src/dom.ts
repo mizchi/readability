@@ -11,7 +11,7 @@ import { DIV_TO_P_ELEMS, PHRASING_ELEMS, REGEXPS } from "./constants.ts";
 export function createElement(tagName: string): VElement {
   return {
     nodeType: "element",
-    tagName: tagName.toUpperCase(),
+    tagName: tagName.toLowerCase(), // Use lowercase
     attributes: {},
     children: [],
   };
@@ -35,11 +35,11 @@ export function getElementsByTagName(
   tagName: string | string[]
 ): VElement[] {
   const tagNames = Array.isArray(tagName) ? tagName : [tagName];
-  const upperTagNames = tagNames.map((tag) => tag.toUpperCase());
+  const lowerTagNames = tagNames.map((tag) => tag.toLowerCase()); // Use lowercase
   const result: VElement[] = [];
 
-  // Check if this element matches
-  if (upperTagNames.includes("*") || upperTagNames.includes(element.tagName)) {
+  // Check if this element matches (using lowercase)
+  if (lowerTagNames.includes("*") || lowerTagNames.includes(element.tagName)) {
     result.push(element);
   }
 
@@ -125,7 +125,7 @@ export function hasAncestorTag(
   tagName: string,
   maxDepth: number = -1
 ): boolean {
-  tagName = tagName.toUpperCase();
+  tagName = tagName.toLowerCase(); // Use lowercase
   let depth = 0;
   let currentNode = node.parent;
 
@@ -169,10 +169,11 @@ export function isPhrasingContent(node: VNode): boolean {
       return true;
     }
 
+    // Check specific tags in lowercase
     if (
-      element.tagName === "A" ||
-      element.tagName === "DEL" ||
-      element.tagName === "INS"
+      element.tagName === "a" ||
+      element.tagName === "del" ||
+      element.tagName === "ins"
     ) {
       return everyNode(element.children, isPhrasingContent);
     }
@@ -217,7 +218,7 @@ export function getLinkDensity(element: VElement): number {
   }
 
   let linkLength = 0;
-  const links = getElementsByTagName(element, "a");
+  const links = getElementsByTagName(element, "a"); // Use lowercase 'a'
 
   forEachNode(links, (link) => {
     const href = getAttribute(link, "href");

@@ -9,9 +9,9 @@
 export const DEFAULT_N_TOP_CANDIDATES = 5;
 
 // Element tags to score by default.
-export const DEFAULT_TAGS_TO_SCORE = "section,h2,h3,h4,h5,h6,p,td,pre"
-  .toUpperCase()
-  .split(",");
+export const DEFAULT_TAGS_TO_SCORE = "section,h2,h3,h4,h5,h6,p,td,pre".split(
+  ","
+);
 
 // The default number of chars an article must have in order to return a result
 export const DEFAULT_CHAR_THRESHOLD = 500;
@@ -38,56 +38,57 @@ export const REGEXPS = {
 
 // DIV_TO_P_ELEMS is used for hasChildBlockElement
 export const DIV_TO_P_ELEMS = new Set([
-  "BLOCKQUOTE",
-  "DL",
-  "DIV",
-  "IMG",
-  "OL",
-  "P",
-  "PRE",
-  "TABLE",
-  "UL",
+  "blockquote",
+  "dl",
+  "div",
+  "img",
+  "ol",
+  "p",
+  "pre",
+  "table",
+  "ul",
 ]);
 
 // PHRASING_ELEMS is used for isPhrasingContent
 export const PHRASING_ELEMS = [
-  "ABBR",
-  "AUDIO",
-  "B",
-  "BDO",
-  "BR",
-  "BUTTON",
-  "CITE",
-  "CODE",
-  "DATA",
-  "DATALIST",
-  "DFN",
-  "EM",
-  "EMBED",
-  "I",
-  "IMG",
-  "INPUT",
-  "KBD",
-  "LABEL",
-  "MARK",
-  "MATH",
-  "METER",
-  "NOSCRIPT",
-  "OBJECT",
-  "OUTPUT",
-  "PROGRESS",
-  "Q",
-  "RUBY",
-  "SAMP",
-  "SCRIPT",
-  "SELECT",
-  "SMALL",
-  "SPAN",
-  "STRONG",
-  "SUB",
-  "SUP",
-  "TEXTAREA",
-  "TIME",
-  "VAR",
-  "WBR",
+  // Existing elements converted to lowercase
+  "abbr",
+  "audio",
+  "b",
+  "bdo",
+  "br",
+  "button",
+  "cite",
+  "code",
+  "data",
+  "datalist",
+  "dfn",
+  "em",
+  "embed",
+  "i",
+  "img",
+  "input",
+  "kbd",
+  "label",
+  "mark",
+  "math",
+  "meter",
+  "noscript",
+  "object",
+  "output",
+  "progress",
+  "q",
+  "ruby",
+  "samp",
+  "script",
+  "select",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "textarea",
+  "time",
+  "var",
+  "wbr",
 ];

@@ -135,7 +135,7 @@ describe("Core Readability Functions", () => {
 
     const longParagraph: VElement = {
       nodeType: "element",
-      tagName: "P",
+      tagName: "p", // Lowercase
       attributes: {},
       children: [
         {
@@ -153,7 +153,7 @@ describe("Core Readability Functions", () => {
     // Header element with short text
     const header: VElement = {
       nodeType: "element",
-      tagName: "H1",
+      tagName: "h1", // Lowercase
       attributes: {},
       children: [
         {
@@ -209,7 +209,7 @@ describe("Core Readability Functions", () => {
       const contentText = result.root.children
         .filter(
           (child): child is VElement =>
-            child.nodeType === "element" && child.tagName === "P"
+            child.nodeType === "element" && child.tagName === "p" // Lowercase
         )
         .map((p: VElement) =>
           p.children
@@ -236,10 +236,10 @@ describe("Core Readability Functions", () => {
     // Check if extracted content includes text within the article tag
     if (result.root) {
       const isArticleOrContainsArticle =
-        result.root.tagName === "ARTICLE" ||
+        result.root.tagName === "article" || // Lowercase
         result.root.children.some(
           (child): boolean =>
-            child.nodeType === "element" && child.tagName === "ARTICLE"
+            child.nodeType === "element" && child.tagName === "article" // Lowercase
         );
 
       expect(isArticleOrContainsArticle).toBe(true);

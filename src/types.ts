@@ -1,6 +1,5 @@
 /**
- * Readability v3 - Type Definitions
- *
+ * Readability - Type Definitions
  * Type definitions for DOM-independent implementation
  */
 
@@ -9,7 +8,6 @@ export type VNodeType = "element" | "text";
 
 // Basic node interface
 export interface VNodeBase {
-  // nodeType: VNodeType;
   parent?: VElement;
   readability?: {
     contentScore: number;

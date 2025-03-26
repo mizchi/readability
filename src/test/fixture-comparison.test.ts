@@ -50,8 +50,8 @@ function extractHTMLByNewReadability(source: string) {
 
 // HTML を正規化する関数
 function normalizeHtml(html: string) {
-  // 元の正規化ロジックに戻す
-  return html.replace(/\s+/g, " ");
+  // Convert to lowercase and normalize whitespace
+  return html.toLowerCase().replace(/\s+/g, " ");
 }
 
 // 各テストケースに対してテストを実行

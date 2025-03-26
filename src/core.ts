@@ -37,33 +37,33 @@ import { preprocessDocument } from "./preprocess.ts";
 function initializeNode(node: VElement): void {
   node.readability = { contentScore: 0 };
 
-  // Initial score based on tag name
+  // Initial score based on tag name (now lowercase)
   switch (node.tagName) {
-    case "DIV":
+    case "div":
       node.readability.contentScore += 5;
       break;
-    case "PRE":
-    case "TD":
-    case "BLOCKQUOTE":
+    case "pre":
+    case "td":
+    case "blockquote":
       node.readability.contentScore += 3;
       break;
-    case "ADDRESS":
-    case "OL":
-    case "UL":
-    case "DL":
-    case "DD":
-    case "DT":
-    case "LI":
-    case "FORM":
+    case "address":
+    case "ol":
+    case "ul":
+    case "dl":
+    case "dd":
+    case "dt":
+    case "li":
+    case "form":
       node.readability.contentScore -= 3;
       break;
-    case "H1":
-    case "H2":
-    case "H3":
-    case "H4":
-    case "H5":
-    case "H6":
-    case "TH":
+    case "h1":
+    case "h2":
+    case "h3":
+    case "h4":
+    case "h5":
+    case "h6":
+    case "th":
       node.readability.contentScore -= 5;
       break;
   }
@@ -109,8 +109,8 @@ export function findMainCandidates(
   doc: VDocument,
   nbTopCandidates: number = DEFAULT_N_TOP_CANDIDATES
 ): VElement[] {
-  // 1. First, look for semantic tags (simple method)
-  const semanticTags = ["ARTICLE", "MAIN"];
+  // 1. First, look for semantic tags (simple method) (now lowercase)
+  const semanticTags = ["article", "main"];
   for (const tag of semanticTags) {
     const elements = getElementsByTagName(doc.documentElement, tag);
     if (elements.length === 1) {
@@ -269,19 +269,19 @@ export function isProbablyContent(element: VElement): boolean {
  * Get the article title
  */
 function getArticleTitle(doc: VDocument): string | null {
-  // 1. Get from <title> tag
+  // 1. Get from <title> tag (lowercase)
   const titleElements = getElementsByTagName(doc.documentElement, "title");
   if (titleElements.length > 0) {
     return getInnerText(titleElements[0]);
   }
 
-  // 2. Get from <h1> tag
+  // 2. Get from <h1> tag (lowercase)
   const h1Elements = getElementsByTagName(doc.body, "h1");
   if (h1Elements.length === 1) {
     return getInnerText(h1Elements[0]);
   }
 
-  // 3. Get from the first heading
+  // 3. Get from the first heading (lowercase)
   const headings = [
     ...getElementsByTagName(doc.body, "h1"),
     ...getElementsByTagName(doc.body, "h2"),
@@ -298,7 +298,7 @@ function getArticleTitle(doc: VDocument): string | null {
  * Get the article byline (author information)
  */
 function getArticleByline(doc: VDocument): string | null {
-  // Get author information from meta tags
+  // Get author information from meta tags (lowercase)
   const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const name = meta.attributes.name?.toLowerCase();
@@ -317,7 +317,7 @@ function getArticleByline(doc: VDocument): string | null {
     }
   }
 
-  // Get from elements with rel="author" attribute
+  // Get from elements with rel="author" attribute (lowercase 'a')
   const relAuthors = getElementsByTagName(doc.body, "a");
   for (const author of relAuthors) {
     if (author.attributes.rel === "author") {
@@ -336,7 +336,7 @@ function getArticleExcerpt(
   doc: VDocument,
   content: VElement | null
 ): string | null {
-  // Get excerpt from meta tags
+  // Get excerpt from meta tags (lowercase)
   const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const name = meta.attributes.name?.toLowerCase();
@@ -350,7 +350,7 @@ function getArticleExcerpt(
     }
   }
 
-  // Get excerpt from the first paragraph of the content
+  // Get excerpt from the first paragraph of the content (lowercase 'p')
   if (content) {
     const paragraphs = getElementsByTagName(content, "p");
     if (paragraphs.length > 0) {
@@ -365,7 +365,7 @@ function getArticleExcerpt(
  * Get the site name
  */
 function getSiteName(doc: VDocument): string | null {
-  // Get site name from meta tags
+  // Get site name from meta tags (lowercase)
   const metaTags = getElementsByTagName(doc.documentElement, "meta");
   for (const meta of metaTags) {
     const property = meta.attributes.property?.toLowerCase();
@@ -438,7 +438,7 @@ export function extract(
   const parsedResult = parser(html);
   let doc: VDocument;
 
-  // Wrap VElement result in a VDocument if necessary
+  // Wrap VElement result in a VDocument if necessary (lowercase 'html')
   if (isVElement(parsedResult)) {
     doc = {
       documentElement: createElement("html"),
@@ -479,7 +479,7 @@ export function createExtractor(opts: {
     const parsedResult = parser(html);
     let doc: VDocument;
 
-    // Wrap VElement result in a VDocument if necessary
+    // Wrap VElement result in a VDocument if necessary (lowercase 'html')
     if (isVElement(parsedResult)) {
       doc = {
         documentElement: createElement("html"),

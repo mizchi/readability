@@ -38,7 +38,7 @@ export function parseHTML(
     onopentag(name, attributes) {
       const element: VElement = {
         nodeType: "element",
-        tagName: name.toUpperCase(),
+        tagName: name.toLowerCase(), // Use lowercase
         attributes: {},
         children: [],
         parent: currentElement,

@@ -4,28 +4,28 @@
  * Performs preprocessing before HTML parsing
  */
 
-import type { VDocument, VElement } from './types.ts';
-import { getElementsByTagName } from './dom.ts';
+import type { VDocument, VElement } from "./types.ts";
+import { getElementsByTagName } from "./dom.ts";
 
-// List of semantic tags to remove
+// List of semantic tags to remove (now lowercase)
 const TAGS_TO_REMOVE = [
-  'ASIDE',      // Supplementary information not directly related to the main content, like sidebars
-  'NAV',        // Navigation menus
-  'HEADER',     // Page headers
-  'FOOTER',     // Page footers
-  'SCRIPT',     // JavaScript
-  'STYLE',      // CSS
-  'NOSCRIPT',   // Alternative content for when JavaScript is disabled
-  'IFRAME',     // Embedded frames (e.g., ads, social media widgets)
-  'FORM',       // Form elements (e.g., login forms)
-  'BUTTON',     // Button elements
-  'OBJECT',     // Embedded objects
-  'EMBED',      // Embedded content
-  'APPLET',     // Old embedded Java applets
-  'MAP',        // Image maps
-  'DIALOG',     // Dialog boxes
-  // 'AUDIO',      // Audio players
-  // 'VIDEO',      // Video players
+  "aside", // Supplementary information not directly related to the main content, like sidebars
+  "nav", // Navigation menus
+  "header", // Page headers
+  "footer", // Page footers
+  "script", // JavaScript
+  "style", // CSS
+  "noscript", // Alternative content for when JavaScript is disabled
+  "iframe", // Embedded frames (e.g., ads, social media widgets)
+  "form", // Form elements (e.g., login forms)
+  "button", // Button elements
+  "object", // Embedded objects
+  "embed", // Embedded content
+  "applet", // Old embedded Java applets
+  "map", // Image maps
+  "dialog", // Dialog boxes
+  // 'audio',      // Audio players
+  // 'video',      // Video players
   // Excluded because they might be necessary for the main content
   // 'FIGURE',  // Figures (with captions)
   // 'CANVAS',  // Canvas elements
@@ -34,9 +34,22 @@ const TAGS_TO_REMOVE = [
 
 // Patterns for class names or ID names likely indicating ads
 const AD_PATTERNS = [
-  /ad-/i, /^ad$/i, /^ads$/i, /advert/i, /banner/i, /sponsor/i, /promo/i,
-  /google-ad/i, /adsense/i, /doubleclick/i, /amazon/i, /affiliate/i,
-  /commercial/i, /paid/i, /shopping/i, /recommendation/i
+  /ad-/i,
+  /^ad$/i,
+  /^ads$/i,
+  /advert/i,
+  /banner/i,
+  /sponsor/i,
+  /promo/i,
+  /google-ad/i,
+  /adsense/i,
+  /doubleclick/i,
+  /amazon/i,
+  /affiliate/i,
+  /commercial/i,
+  /paid/i,
+  /shopping/i,
+  /recommendation/i,
 ];
 
 /**
@@ -79,7 +92,7 @@ function removeUnwantedTags(doc: VDocument): void {
  */
 function removeAds(doc: VDocument): void {
   // Get all elements under body
-  const allElements = getElementsByTagName(doc.body, '*');
+  const allElements = getElementsByTagName(doc.body, "*");
 
   // Remove elements that seem to be ads
   for (const element of allElements) {
@@ -97,8 +110,8 @@ function removeAds(doc: VDocument): void {
  */
 function isLikelyAd(element: VElement): boolean {
   // Check class name and ID
-  const className = element.className || '';
-  const id = element.id || '';
+  const className = element.className || "";
+  const id = element.id || "";
   const combinedString = `${className} ${id}`;
 
   // Check if it matches ad patterns
@@ -109,10 +122,12 @@ function isLikelyAd(element: VElement): boolean {
   }
 
   // Check ad-related attributes
-  if (element.attributes.role === 'advertisement' ||
-      element.attributes['data-ad'] !== undefined ||
-      element.attributes['data-ad-client'] !== undefined ||
-      element.attributes['data-ad-slot'] !== undefined) {
+  if (
+    element.attributes.role === "advertisement" ||
+    element.attributes["data-ad"] !== undefined ||
+    element.attributes["data-ad-client"] !== undefined ||
+    element.attributes["data-ad-slot"] !== undefined
+  ) {
     return true;
   }
 
@@ -124,10 +139,12 @@ function isLikelyAd(element: VElement): boolean {
  */
 function isVisible(element: VElement): boolean {
   // Check style attribute
-  const style = element.attributes.style || '';
-  if (style.includes('display: none') ||
-      style.includes('visibility: hidden') ||
-      style.includes('opacity: 0')) {
+  const style = element.attributes.style || "";
+  if (
+    style.includes("display: none") ||
+    style.includes("visibility: hidden") ||
+    style.includes("opacity: 0")
+  ) {
     return false;
   }
 
@@ -137,7 +154,7 @@ function isVisible(element: VElement): boolean {
   }
 
   // Check aria-hidden attribute
-  if (element.attributes['aria-hidden'] === 'true') {
+  if (element.attributes["aria-hidden"] === "true") {
     return false;
   }
 

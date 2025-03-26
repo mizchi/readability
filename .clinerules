@@ -1,0 +1,15 @@
+Mozzila/Readablity のコアロジックを切り出して再実装しているモジュール。
+
+```
+_original - 元の実装
+_v2   - original 実装に準拠度高めに実装しようとしたが、破棄
+src   - 現在の実装
+```
+
+完全な再現性はないが、モダンブラウザ向けに再実装している。
+
+## Stack
+
+- pnpm
+- TypeScript
+- vitest

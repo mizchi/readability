@@ -9,5 +9,6 @@ const extracted = extract(html, { charThreshold: 100 });
 console.log(`Title: ${extracted.title}`);
 console.log(`Author: ${extracted.byline}`);
 const htmlContent = toHTML(extracted.root);
+// @ts-ignore deno can't resolve
 const md = html2md(htmlContent);
 console.log(md);
