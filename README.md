@@ -1,28 +1,29 @@
-# Readability.js | TS Rewriting
+# @mizchi/readability
 
 WIP
 
-- Goal: NO DOM API to work on cloudflare
-
-TODO
-
-- [x] Core extraction
-- [ ]
-- [ ] Pass original
+- [x] Main Conetnt Extraction
+- [x] NO DOM API(for Cloudflare)
+- [ ] Pass original tests
+- [ ] List View
+- [ ] AI Automation for MCP
+- [ ] Custom Parser (now only supports `htmlparser2`)
+- [ ] Puppeteer/Lightpanda Integration
+- [ ] Accessibilty Analyze
+- [ ] Markdown Serializer
 
 ## How to use
 
 ```bash
-npm install -g @mizchi/readability
+npm install --save @mizchi/readability htmlparser2 html-to-md
 ```
 
 ```ts
 import { toHTML, extract } from "@mizchi/readability";
 import html2md from "html-to-md";
 
-const html = await fetch(
-  "https://zenn.dev/mizchi/articles/ts-using-sampling-logger",
-).then((res) => res.text());
+const url = "https://zenn.dev/mizchi/articles/ts-using-sampling-logger";
+const html = await fetch(url).then((res) => res.text());
 const extracted = extract(html, { charThreshold: 100 });
 // 結果を表示
 console.log(`Title: ${extracted.title}`);
