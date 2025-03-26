@@ -10,12 +10,49 @@ function escapeMarkdown(text: string): string {
   // *, _, `, [, ], \ をエスケープ
   // HTMLエンティティもデコードしておく（例: & -> &）
   const decodedText = text
-    .replace(/&/g, "&")
+    .replace(/&/g, "&") // Decode common entities first
     .replace(/</g, "<")
     .replace(/>/g, ">")
     .replace(/"/g, '"')
-    .replace(/&#039;/g, "'");
+    .replace(/&#039;/g, "'")
+    .replace(/&nbsp;/g, " "); // Treat non-breaking space as regular space
   return decodedText.replace(/([*_`\[\]\\])/g, "\\$1");
+}
+
+/**
+ * Joins an array of markdown strings, adding spaces where needed between inline elements/text.
+ * @param parts Array of markdown strings (results from processing child nodes).
+ * @returns Joined markdown string with appropriate spacing.
+ */
+function joinMarkdownParts(parts: string[]): string {
+  let result = "";
+  for (let i = 0; i < parts.length; i++) {
+    const currentPart = parts[i];
+    // Skip parts that are effectively empty after potential whitespace collapsing in text nodes
+    if (!currentPart || currentPart.trim() === "") continue;
+
+    if (result === "") {
+      // For the first part, trim leading whitespace unless it's intentional (like in code)
+      // This is tricky. Let's assume block handlers will trim later.
+      result = currentPart;
+    } else {
+      // Stricter space check: only add space if previous doesn't end with any whitespace
+      // and current doesn't start with any whitespace.
+      const endsWithWhitespace = /\s$/.test(result); // Check only space/tab/newline at the very end
+      const startsWithWhitespace = /^\s/.test(currentPart); // Check only space/tab/newline at the very start
+
+      if (!endsWithWhitespace && !startsWithWhitespace) {
+        // Don't add space if current part starts with punctuation
+        const firstChar = currentPart.charAt(0);
+        if (!/[.,!?;:)]/.test(firstChar)) {
+          result += " "; // Add a single space
+        }
+      }
+      result += currentPart;
+    }
+  }
+  // Final trim at the end of join? No, let the block handlers do the final trim.
+  return result;
 }
 
 /**
@@ -34,15 +71,12 @@ function convertNodeToMarkdown(
 ): string {
   if (node.nodeType === "text") {
     if (parentTagName === "pre" || parentTagName === "code") {
-      return node.textContent; // Keep raw text in pre/code
+      return node.textContent; // Keep raw text
     }
-    // Collapse multiple whitespace chars into one, but preserve newlines somewhat?
-    // For now, trim leading/trailing whitespace from text nodes unless they are significant (e.g., inside inline elements?)
-    // Let's trim whitespace aggressively for now and see.
-    const trimmedText = node.textContent.trim();
-    if (!trimmedText) return ""; // Ignore empty text nodes
-    // Escape the trimmed text
-    return escapeMarkdown(trimmedText);
+    // Replace sequences of space/tab with a single space. Keep newlines and leading/trailing spaces for joiner.
+    let text = node.textContent.replace(/[ \t]+/g, " ");
+    if (!text) return ""; // Ignore if completely empty
+    return escapeMarkdown(text); // Escape potentially space-padded text
   }
 
   if (node.nodeType === "element") {
@@ -63,12 +97,22 @@ function convertNodeToMarkdown(
       "blockquote",
       "hr",
       "table",
-      "div", // Treat div as block for spacing
+      "div",
+    ].includes(tagName);
+    const isInline = [
+      "a",
+      "strong",
+      "b",
+      "em",
+      "i",
+      "code",
+      "img",
+      "br",
+      "span",
     ].includes(tagName);
 
-    // Process children, passing context including isFirstChild
-    let childrenMarkdown = "";
-    let lastChildWasBlock = false;
+    // Process children, store results in an array
+    const childrenResults: string[] = [];
     element.children.forEach((child, index) => {
       const isCurrentChildFirst = index === 0;
       const childResult = convertNodeToMarkdown(
@@ -78,37 +122,16 @@ function convertNodeToMarkdown(
         tagName === "ul" || tagName === "ol" || tagName === "blockquote"
           ? depth + 1
           : depth,
-        isCurrentChildFirst // Pass isFirstChild status
+        isCurrentChildFirst
       );
-
-      // Add spacing logic here? Or rely on element handlers?
-      // Let's refine spacing within handlers for now.
-      childrenMarkdown += childResult;
-
-      // Update lastChildWasBlock for the next iteration (though not used currently)
-      lastChildWasBlock =
-        child.nodeType === "element" &&
-        [
-          "p",
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-          "ul",
-          "ol",
-          "pre",
-          "blockquote",
-          "hr",
-          "table",
-          "div",
-        ].includes(child.tagName.toLowerCase());
+      childrenResults.push(childResult);
     });
 
+    // Join children results using the helper function for smart spacing
+    let childrenMarkdown = joinMarkdownParts(childrenResults);
+
     // Trim children's markdown ONLY if appropriate for the current tag
-    // Most block elements should trim their content. Inline elements should not.
-    const trimmedChildren = childrenMarkdown.trim();
+    const trimmedChildren = childrenMarkdown.trim(); // Trim for block elements
 
     switch (tagName) {
       // Headings: Trim content, add block spacing
@@ -127,13 +150,9 @@ function convertNodeToMarkdown(
 
       case "p":
         if (!trimmedChildren) return ""; // Ignore empty paragraphs
-        // Add block spacing, unless it's the very first element in a list item or blockquote?
-        // Let's add block spacing generally for now. Final cleanup might adjust.
-        // If parent is li/blockquote and this p is the first child, maybe less spacing?
-        // This gets complex. Default to standard block spacing.
         return `${trimmedChildren}\n\n`;
 
-      // Inline elements: Use raw childrenMarkdown, do not trim or add spaces here.
+      // Inline elements: Use raw joined childrenMarkdown (no trim)
       case "strong":
       case "b":
         return `**${childrenMarkdown}**`;
@@ -142,8 +161,8 @@ function convertNodeToMarkdown(
         return `*${childrenMarkdown}*`;
       case "code":
         if (parentTagName !== "pre") {
-          // Inline code: Refined logic for delimiters and padding
-          let codeContent = childrenMarkdown; // Use raw content from children
+          // Inline code: Use raw childrenMarkdown, apply padding logic carefully.
+          let codeContent = childrenMarkdown; // Content already joined by joinMarkdownParts
           const backtickSequences = codeContent.match(/`+/g) || [];
           const longestSequence = backtickSequences.reduce(
             (max, seq) => Math.max(max, seq.length),
@@ -151,7 +170,6 @@ function convertNodeToMarkdown(
           );
           let delimiter = "`".repeat(longestSequence + 1);
 
-          // If content is only backticks, ensure delimiter is longer
           if (
             codeContent.match(/^`+$/) &&
             codeContent.length >= delimiter.length
@@ -159,130 +177,156 @@ function convertNodeToMarkdown(
             delimiter = "`".repeat(codeContent.length + 1);
           }
 
-          // Determine if padding is needed:
-          // - If content is empty or only whitespace.
-          // - If content starts or ends with a backtick.
-          // - If the chosen delimiter sequence appears within the content.
+          // Determine padding based on GFM rules:
+          // Add space if content starts/ends with backtick, OR if content consists only of backticks.
+          // Also add space if content is empty or whitespace only to ensure delimiters are visible.
+          const startsOrEndsWithBacktick =
+            codeContent.startsWith("`") || codeContent.endsWith("`");
+          // Check if the content consists *only* of one or more backticks
+          const consistsOnlyOfBackticks = /^`+$/.test(codeContent);
+          const isEmptyOrWhitespace = !codeContent.trim();
+
           const needsPadding =
-            !codeContent.trim() ||
-            codeContent.startsWith("`") ||
-            codeContent.endsWith("`") ||
-            (delimiter.length > 1 && codeContent.includes(delimiter)); // Check if delimiter itself is in content only if delimiter > 1
+            startsOrEndsWithBacktick ||
+            consistsOnlyOfBackticks ||
+            isEmptyOrWhitespace;
 
-          const paddedContent = needsPadding ? ` ${codeContent} ` : codeContent;
+          // Apply padding *inside* the delimiters if needed
+          const finalContent = needsPadding ? ` ${codeContent} ` : codeContent;
 
-          return `${delimiter}${paddedContent}${delimiter}`;
+          // Recalculate delimiter length based on the potentially padded content? No, delimiter depends on original content.
+          // The delimiter length calculation seems correct based on longest sequence in original content.
+
+          return `${delimiter}${finalContent}${delimiter}`;
         }
         // Code inside pre: Return raw content
         return childrenMarkdown;
       case "pre": {
-        // Find code block content, avoid trimming internal whitespace
         const codeChild = element.children.find(
           (c): c is VElement => c.nodeType === "element" && c.tagName === "code"
         );
-        // Get raw text content, joining text nodes. If codeChild exists, use its content.
+        // Get raw text content directly from text nodes
         const rawCodeContent = (codeChild || element).children
-          .filter((c): c is VText => c.nodeType === "text") // Filter only text nodes
-          .map((c) => c.textContent) // Get their text content
+          .filter((c): c is VText => c.nodeType === "text")
+          .map((c) => c.textContent)
           .join("");
-
         const lang =
           codeChild?.attributes.class?.replace(/^language-/, "") || "";
-        // Trim trailing newline/whitespace from content, add block spacing
-        return `\`\`\`${lang}\n${rawCodeContent.replace(/\s+$/, "")}\n\`\`\`\n\n`;
+        // Remove only leading/trailing blank lines/whitespace, keep internal structure
+        const cleanedCodeContent = rawCodeContent.replace(/^\s*\n|\s+$/g, "");
+        // Ensure newline before closing ```, no trailing newline after ```
+        return `\`\`\`${lang}\n${cleanedCodeContent}\n\`\`\``;
       }
       case "blockquote": {
-        // Process children's markdown (already includes spacing between blocks if any)
-        // Trim leading/trailing whitespace from the whole blockquote content before processing lines
+        // Content is already joined with potential spaces. Trim the whole block.
         const content = childrenMarkdown.trim();
-        if (!content) return ""; // Ignore empty blockquotes
-
+        if (!content) return "";
         const lines = content.split("\n");
-        // Add "> " prefix. Handle empty lines (resulting from \n\n between paragraphs) correctly.
         const quotedLines = lines.map((line) =>
           line.trim() === "" ? ">" : `> ${line}`
         );
-        // Join lines and add block spacing
         return quotedLines.join("\n") + "\n\n";
       }
       case "ul":
       case "ol":
-        // Filter out empty results from children (e.g., whitespace text nodes processed earlier)
+        // Process only li children, join results with newline
         const listItems = element.children
-          .filter((c) => c.nodeType === "element" && c.tagName === "li") // Only process li elements directly
-          .map((child, index) =>
-            convertNodeToMarkdown(
-              child,
-              tagName,
-              depth + 1, // Correct depth increment
-              index === 0
-            )
+          .filter(
+            (c): c is VElement => c.nodeType === "element" && c.tagName === "li"
           )
-          .filter((item) => item.trim() !== ""); // Filter truly empty items
+          .map((child, index) =>
+            convertNodeToMarkdown(child, tagName, depth + 1, index === 0)
+          )
+          .filter((item) => item.trim() !== ""); // Filter empty items AFTER processing
 
-        if (listItems.length === 0) return ""; // Ignore empty lists
-
-        // Join list items with a single newline. Assume li handler does not add trailing newline.
-        const listContent = listItems.join("\n");
-
-        // Add block spacing around the entire list block
-        return `${listContent}\n\n`; // Removed leading \n, added trailing \n\n
+        if (listItems.length === 0) return "";
+        // Join list items first
+        let listContent = listItems.join("\n");
+        // Indent the entire list block based on its depth
+        const listIndent = "  ".repeat(Math.max(0, depth - 1));
+        if (listIndent) {
+          listContent = listContent
+            .split("\n")
+            .map((line) => (line.trim() ? `${listIndent}${line}` : line))
+            .join("\n");
+        }
+        // Add block spacing after the list
+        return listContent + "\n\n";
 
       case "li": {
-        // Indentation for the marker itself
-        const markerIndent = "  ".repeat(Math.max(0, depth - 1)); // depth is already incremented by ul/ol
+        // li only handles its marker and content, no indentation here
         const marker = parentTagName === "ol" ? "1." : "-";
-        // Indentation for subsequent lines of the list item content
-        const contentIndent = "  ".repeat(depth);
+        // const contentIndent = "  ".repeat(depth); // No longer needed here
 
-        // Process children's markdown. Trim leading/trailing whitespace from the combined result.
-        let content = childrenMarkdown.trim();
-        if (!content) return ""; // Should not happen if ul/ol filters empty li, but good practice
+        // Process children, separating main content from nested lists
+        const mainContentParts: string[] = [];
+        const nestedListParts: string[] = [];
 
-        const lines = content.split("\n");
-        // First line starts with the marker
-        const firstLine = `${markerIndent}${marker} ${lines[0] || ""}`;
+        element.children.forEach((child) => {
+          if (
+            child.nodeType === "element" &&
+            (child.tagName === "ul" || child.tagName === "ol")
+          ) {
+            const nestedListMd = convertNodeToMarkdown(
+              child,
+              tagName,
+              depth + 1
+            );
+            // The recursive call to convertNodeToMarkdown handles the indentation
+            // based on the increased depth. The ul/ol handler will indent it.
+            if (nestedListMd) {
+              // Add the raw nested list markdown. Trim trailing newlines.
+              nestedListParts.push(nestedListMd.replace(/\n+$/, ""));
+            }
+          } else {
+            // Process text/inline content
+            mainContentParts.push(convertNodeToMarkdown(child, tagName, depth));
+          }
+        });
 
-        // Indent subsequent lines
-        const subsequentLines = lines
-          .slice(1)
-          .map((line) => (line.trim() ? `${contentIndent}${line}` : "")) // Indent non-empty lines
-          .filter(Boolean) // Remove empty strings from map result
-          .join("\n");
+        // Join the main content parts smartly and trim
+        const mainContent = joinMarkdownParts(mainContentParts).trim();
 
-        // Join first and subsequent lines. No trailing newline needed here.
-        return subsequentLines ? `${firstLine}\n${subsequentLines}` : firstLine;
+        // Format: Marker + Space + Content
+        let result = `${marker} ${mainContent}`;
+
+        // Append nested lists (already processed recursively), ensuring a newline before each
+        if (nestedListParts.length > 0) {
+          if (mainContent) {
+            result += "\n"; // Add newline only if there was main content
+          }
+          // Join the already correctly indented nested lists.
+          result += nestedListParts.join("\n"); // Join with a single newline
+        }
+
+        return result; // No trailing newline for li itself
       }
       case "a":
         const href = element.attributes.href || "";
-        // Check for image link specifically
+        // Image link: Use raw childrenMarkdown
         if (
           element.children.length === 1 &&
           element.children[0].nodeType === "element" &&
           element.children[0].tagName === "img"
         ) {
-          // Image link: childrenMarkdown already contains the formatted image
-          return `[${childrenMarkdown}](${href})`; // No trim needed for image
+          return `[${childrenMarkdown}](${href})`;
         }
-        // Regular link: Trim the link text
-        return `[${childrenMarkdown.trim()}](${href})`;
+        // Regular link: Use raw childrenMarkdown (join handles spacing)
+        return `[${childrenMarkdown}](${href})`;
       case "img":
-        // Alt text should be escaped
         const alt = escapeMarkdown(element.attributes.alt || "");
         const src = element.attributes.src || "";
-        // Title should also be escaped if present
         const title = element.attributes.title
           ? ` "${escapeMarkdown(element.attributes.title)}"`
           : "";
         return `![${alt}](${src}${title})`;
 
       case "hr":
-        return "---\n\n"; // Ensure block spacing
+        return "---\n\n";
       case "br":
         return "  \n"; // Keep hard line break
 
       case "table": {
-        // Table logic refinement: Ensure cell content is processed correctly and add block spacing.
         let headerRow: string[] = [];
         const bodyRows: string[][] = [];
         let maxColumns = 0;
@@ -296,10 +340,14 @@ function convertNodeToMarkdown(
             c.nodeType === "element" && c.tagName === "tbody"
         );
 
-        // Function to process cell content (td/th)
+        // Process cell content: Recursively convert, then trim whitespace *within* the cell
         const processCell = (cell: VElement): string => {
-          // Recursively convert cell content, then trim whitespace within the cell
-          return convertNodeToMarkdown(cell, cell.tagName, depth + 1).trim();
+          // Pass 'td' or 'th' as parentTagName
+          return convertNodeToMarkdown(
+            cell,
+            cell.tagName.toLowerCase(),
+            depth + 1
+          ).trim();
         };
 
         // Process header row
@@ -318,7 +366,7 @@ function convertNodeToMarkdown(
           }
         }
 
-        // Process body rows (use tbody if exists, otherwise direct children of table)
+        // Process body rows
         const rowsContainer = tbody || element;
         rowsContainer.children
           .filter(
@@ -340,26 +388,22 @@ function convertNodeToMarkdown(
         let tableMd = "";
         const separator = Array(maxColumns).fill("---").join(" | ");
 
-        // Add header row and separator
         if (headerRow.length > 0) {
-          while (headerRow.length < maxColumns) headerRow.push(""); // Pad header
+          while (headerRow.length < maxColumns) headerRow.push("");
           tableMd += `| ${headerRow.join(" | ")} |\n`;
           tableMd += `| ${separator} |\n`;
         } else if (bodyRows.length > 0 && maxColumns > 0) {
-          // Add separator even without header for GFM compatibility if there are body rows
           tableMd += `| ${separator} |\n`;
         }
 
-        // Add body rows
         bodyRows.forEach((row) => {
-          while (row.length < maxColumns) row.push(""); // Pad row
+          while (row.length < maxColumns) row.push("");
           tableMd += `| ${row.join(" | ")} |\n`;
         });
 
-        // Add block spacing only if tableMd is not empty
-        return tableMd ? `${tableMd.trim()}\n\n` : ""; // Trim trailing newline from last row, add block spacing
+        return tableMd ? `${tableMd.trim()}\n\n` : "";
       }
-      // thead, tbody, tr, th, td are handled within table logic by processCell/processRow
+      // thead, tbody, tr, th, td are handled within table
 
       // Ignored tags
       case "script":
@@ -380,26 +424,15 @@ function convertNodeToMarkdown(
       case "svg":
         return "";
 
-      // Default: Render children for unknown tags. Add block spacing if it seems block-like.
+      // Default: Render children for unknown/other tags.
+      // If block-like, trim and add spacing. If inline-like, return as is.
       default:
-        // If it's not a known inline tag, assume block-like spacing.
-        const knownInline = [
-          "a",
-          "strong",
-          "b",
-          "em",
-          "i",
-          "code",
-          "img",
-          "br",
-          "span",
-        ]; // span is typically inline
-        if (knownInline.includes(tagName)) {
-          return childrenMarkdown; // Return raw children for inline
-        } else {
-          // Assume block: trim content and add block spacing
+        if (isBlock) {
           const trimmedDefaultContent = childrenMarkdown.trim();
           return trimmedDefaultContent ? `${trimmedDefaultContent}\n\n` : "";
+        } else {
+          // Assume inline or unknown, return joined content without extra spacing/trimming
+          return childrenMarkdown;
         }
     }
   }
@@ -425,8 +458,11 @@ export function toMarkdown(element: VElement | null): string {
   // 2. Normalize block spacing: Replace 3 or more newlines with exactly two.
   markdown = markdown.replace(/\n{3,}/g, "\n\n");
 
-  // 3. Ensure consistency: Maybe remove space before newline?
+  // 3. Remove spaces before newlines? (Optional, might be too aggressive)
   // markdown = markdown.replace(/ +\n/g, '\n');
+
+  // 4. Ensure final string ends with a single newline if not empty
+  // if (markdown) markdown += '\n'; // Re-evaluate if this is desired
 
   return markdown;
 }

@@ -180,15 +180,7 @@ More Content`;
   - Nested 2.1
   - Nested 2.2
 - Item 3`;
-    // Normalize whitespace for comparison as indentation might vary slightly
-    const normalize = (str: string) =>
-      str
-        .replace(/[ \t]+/g, " ")
-        .replace(/\n +/g, "\n")
-        .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 
   test("should handle nested lists (ol)", () => {
@@ -213,14 +205,7 @@ More Content`;
   1. Nested 2.1
   1. Nested 2.2
 1. Third`;
-    const normalize = (str: string) =>
-      str
-        .replace(/[ \t]+/g, " ")
-        .replace(/\n +/g, "\n")
-        .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 
   test("should escape Markdown special characters in text", () => {
@@ -247,6 +232,7 @@ More Content`;
       This *should* not be escaped.
       Neither _should_ [this].
 \`\`\``;
+    // Restore .trim() for now to focus on content formatting
     expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 
@@ -262,11 +248,12 @@ More Content`;
     const html = `<p>Code with backticks: <code>foo \`bar\` baz</code> and double: <code>foo \`\`bar\`\` baz</code>.</p><p>Code starting/ending with backtick: <code>\`start</code> and <code>end\`</code>.</p><p>Just backticks: <code>\`</code> and <code>\`\`</code></p>`;
     const parsed = parseHTML(html);
     const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
-    const expectedMarkdown = `Code with backticks: \`\`foo \`bar\` baz\`\` and double: \`foo \`\`bar\`\` baz\`.
+    // Corrected expected value based on CommonMark Dingus behavior
+    const expectedMarkdown = `Code with backticks: \`\`foo \`bar\` baz\`\` and double: \`\`\`foo \`\`bar\`\` baz\`\`\`.
 
-Code starting/ending with backtick: \` \`start \` and \` end\` \`.
+Code starting/ending with backtick: \`\` \`start \`\` and \`\` end\` \`\`.
 
-Just backticks: \` \` \` and \` \`\` \``;
+Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
     expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 
