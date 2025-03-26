@@ -32,3 +32,5 @@ export {
   extractTextContent,
   countNodes,
 } from "./format.ts";
+
+export { toMarkdown } from "./markdown.ts";
