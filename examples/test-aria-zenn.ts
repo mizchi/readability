@@ -1,11 +1,22 @@
 // const { extract, ariaTreeToString } = require("../src/index");
 import { extract, ariaTreeToString } from "../src/index.ts";
+import { toMarkdown } from "../src/markdown.ts";
+import { getContentByPageType, PageType } from "../src/types.ts";
 
 import fs from "fs";
 import path from "path";
 
 // 長いテキストを切り詰める関数
 function truncateLongText(line: string, maxLength: number = 50): string {
+  // URL属性（href, src, alt）を含む行はtruncateしない
+  if (
+    line.includes("[href=") ||
+    line.includes("[src=") ||
+    line.includes("[alt=")
+  ) {
+    return line;
+  }
+
   // テキストを含む行を検出（": "または" "の後にテキストがある行）
   const textMatch = line.match(/^(\s*-.+?(?::|"))\s+(.+?)(\s*(?:\[.*\])?\s*)$/);
   if (textMatch) {
@@ -19,14 +30,18 @@ function truncateLongText(line: string, maxLength: number = 50): string {
 }
 
 // テスト用のHTMLファイルを読み込む
-const htmlPath = path.join(
-  import.meta.dirname,
-  "../test/test-pages/wikipedia/source.html"
-);
-const html = fs.readFileSync(htmlPath, "utf-8");
+// const htmlPath = path.join(
+//   import.meta.dirname,
+//   "../test/test-pages/wikipedia/source.html"
+// );
+// const html = fs.readFileSync(htmlPath, "utf-8");
+const html = await fetch("https://zenn.dev/").then((res) => res.text());
 
 // 本文抽出とaria tree生成を同時に行う
 const result = extract(html, { generateAriaTree: true });
+
+// pageTypeを強制的にOTHERに設定
+result.pageType = PageType.OTHER;
 
 console.log("=== 抽出結果 ===");
 console.log(`タイトル: ${result.title}`);
@@ -34,31 +49,37 @@ console.log(`本文抽出: ${result.root ? "成功" : "失敗"}`);
 console.log(`ノード数: ${result.nodeCount}`);
 console.log(`ページタイプ: ${result.pageType}`);
 
-// AriaTreeが生成されているか確認
-if (result.ariaTree) {
+// AIに記事を読ませるための処理手順
+// pageTypeに応じたデータを取得
+const content = getContentByPageType(result);
+
+// 1. もし本文が抽出されれば（ARTICLEの場合）、markdownのサマリーを表示
+// 2. 本文が抽出されなければ（OTHERの場合）、aria treeの要約を表示
+if (result.root) {
+  // 本文が抽出された場合
+  console.log("\n=== Markdown サマリー ===");
+  const markdown = toMarkdown(result.root);
+  console.log(markdown);
+} else if (result.ariaTree) {
+  // 本文が抽出されなかった場合、AriaTreeの要約を表示
   console.log("\n=== AriaTree情報 ===");
-  // console.log(`AriaTreeノード数: ${result.ariaTree.nodeCount}`);
 
   // AriaTreeの最初の数行だけ表示（全体は大きすぎるため）
   const treeString = ariaTreeToString(result.ariaTree);
   const treeLines = treeString.split("\n").slice(0, 20);
-  // console.log("\n=== AriaTree構造（最初の20行）===");
-  // console.log(treeLines.join("\n"));
-  // console.log("...(省略)...");
 
   // コンパクトな結果も表示
   console.log("\n=== AriaTree構造（コンパクト版）===");
   // 最初の3レベルまでのノードだけを表示
   const compactLines = treeString
     .split("\n")
-    .filter((line) => {
-      const indentLevel = line.match(/^(\s*)/)?.[1].length || 0;
-      return indentLevel <= 4; // 2スペースのインデントで3レベルまで
-    })
-    .map((line) => truncateLongText(line, 60))
-    .slice(0, 15); // 最初の15行だけ表示
+    // .filter((line) => {
+    //   const indentLevel = line.match(/^(\s*)/)?.[1].length || 0;
+    //   return indentLevel <= 4; // 2スペースのインデントで3レベルまで
+    // })
+    .map((line) => truncateLongText(line, 60));
+  // .slice(0, 15); // 最初の15行だけ表示
   console.log(compactLines.join("\n"));
-  console.log("...(省略)...");
 
   // 特定のロールを持つノードを探す例
   const findRoleNodes = (
@@ -140,33 +161,49 @@ const shortResult = extract(shortHtml, {
   generateAriaTree: true,
 });
 
+// pageTypeを強制的にOTHERに設定
+shortResult.pageType = PageType.OTHER;
+
 console.log(`タイトル: ${shortResult.title}`);
 console.log(`本文抽出: ${shortResult.root ? "成功" : "失敗"}`);
 console.log(`ノード数: ${shortResult.nodeCount}`);
 console.log(`ページタイプ: ${shortResult.pageType}`);
 
-// 構造要素の確認
-console.log("\n=== 構造要素 ===");
-console.log(`ヘッダー: ${shortResult.header ? "あり" : "なし"}`);
-console.log(`フッター: ${shortResult.footer ? "あり" : "なし"}`);
-console.log(
-  `その他の重要ノード: ${shortResult.otherSignificantNodes?.length || 0}個`
-);
+// AIに記事を読ませるための処理手順
+// pageTypeに応じたデータを取得
+const shortContent = getContentByPageType(shortResult);
 
-// AriaTreeの確認
-if (shortResult.ariaTree) {
-  console.log("\n=== AriaTree構造 ===");
-  console.log(ariaTreeToString(shortResult.ariaTree));
+// 1. もし本文が抽出されれば（ARTICLEの場合）、markdownのサマリーを表示
+// 2. 本文が抽出されなければ（OTHERの場合）、aria treeの要約を表示
+if (shortResult.root) {
+  // 本文が抽出された場合
+  console.log("\n=== Markdown サマリー ===");
+  const markdown = toMarkdown(shortResult.root);
+  console.log(markdown);
+} else {
+  // 構造要素の確認
+  console.log("\n=== 構造要素 ===");
+  console.log(`ヘッダー: ${shortResult.header ? "あり" : "なし"}`);
+  console.log(`フッター: ${shortResult.footer ? "あり" : "なし"}`);
+  console.log(
+    `その他の重要ノード: ${shortResult.otherSignificantNodes?.length || 0}個`
+  );
 
-  // コンパクト版も表示
-  console.log("\n=== AriaTree構造（コンパクト版）===");
-  const compactString = ariaTreeToString(shortResult.ariaTree)
-    .split("\n")
-    .filter((line) => {
-      const indentLevel = line.match(/^(\s*)/)?.[1].length || 0;
-      return indentLevel <= 4; // 最初の2レベルまで
-    })
-    .map((line) => truncateLongText(line))
-    .join("\n");
-  console.log(compactString);
+  // AriaTreeの確認
+  if (shortResult.ariaTree) {
+    console.log("\n=== AriaTree構造 ===");
+    console.log(ariaTreeToString(shortResult.ariaTree));
+
+    // コンパクト版も表示
+    console.log("\n=== AriaTree構造（コンパクト版）===");
+    const compactString = ariaTreeToString(shortResult.ariaTree)
+      .split("\n")
+      .filter((line) => {
+        const indentLevel = line.match(/^(\s*)/)?.[1].length || 0;
+        return indentLevel <= 4; // 最初の2レベルまで
+      })
+      .map((line) => truncateLongText(line))
+      .join("\n");
+    console.log(compactString);
+  }
 }

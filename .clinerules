@@ -14,4 +14,6 @@ src   - 現在の実装
 - TypeScript
 - vitest
 
-vitest を実行する時は `pnpm vitest --run` でじ
+vitest を実行する時は `pnpm vitest --run` で実行する。
+
+examples 以下のスクリプトは `pnpm tsx examples/xxx.ts` で実行する。この時、ESM を使う。

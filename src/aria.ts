@@ -314,7 +314,55 @@ export function buildAriaTree(doc: VDocument): AriaTree {
   const rootNode = buildAriaNode(doc.body);
 
   // ツリーを圧縮
-  const compressedRoot = compressAriaTree(rootNode);
+  let compressedRoot = compressAriaTree(rootNode);
+
+  // ルートレベルでの入れ子も解消
+  // ルートがtextで、子がある場合、意味のある子を直接ルートにする
+  if (
+    compressedRoot.type === "text" &&
+    compressedRoot.children &&
+    compressedRoot.children.length > 0
+  ) {
+    // 意味のある子ノードを探す（main, article, sectionなど）
+    const significantChild = compressedRoot.children.find((child) =>
+      [
+        "main",
+        "article",
+        "section",
+        "navigation",
+        "banner",
+        "contentinfo",
+      ].includes(child.type)
+    );
+
+    // 意味のある子ノードがあれば、それをルートにする
+    if (significantChild) {
+      // 元のルートの名前を子ノードにマージ（必要な場合）
+      if (compressedRoot.name && !significantChild.name) {
+        significantChild.name = compressedRoot.name;
+      }
+
+      compressedRoot = significantChild;
+    }
+    // 意味のある子ノードがなく、子が1つだけの場合
+    else if (compressedRoot.children.length === 1) {
+      const child = compressedRoot.children[0];
+
+      // 子の名前をマージ
+      if (child.name) {
+        compressedRoot.name = compressedRoot.name
+          ? `${compressedRoot.name} ${child.name}`
+          : child.name;
+      }
+
+      // 子の子をルートに移動
+      if (child.children && child.children.length > 0) {
+        compressedRoot.children = child.children;
+      } else {
+        delete compressedRoot.children;
+      }
+    }
+  }
 
   // ノード数をカウント
   const nodeCount = countNodes(compressedRoot);
@@ -324,90 +372,271 @@ export function buildAriaTree(doc: VDocument): AriaTree {
     nodeCount,
   };
 }
-
 /**
  * AriaTreeを圧縮する
  * - 意味のあるノードだけを残す
- * - 子を一つしか持たないtextの入れ子をたたむ
+ * - 同じタイプの入れ子をたたむ（特にtextの入れ子）
  * - 連続するtextを一つにまとめる
+ * - 空のtextノードを削除
+ * - textの下がgenericのみの場合、親textにマージ
+ * - 同じタイプのノードを配列化
  */
 export function compressAriaTree(node: AriaNode): AriaNode {
   // 子ノードがない場合はそのまま返す
   if (!node.children || node.children.length === 0) {
+    // 要件1: textの中身が空のとき、これを削除
+    if (node.type === "text" && (!node.name || node.name.trim() === "")) {
+      return {
+        type: "generic",
+        role: "generic",
+        originalElement: node.originalElement,
+      };
+    }
     return node;
   }
 
-  // 子ノードを圧縮
-  let compressedChildren: AriaNode[] = [];
+  // まず、子ノードを再帰的に圧縮
+  const processedChildren = node.children
+    .map((child) => compressAriaTree(child))
+    .filter((child) => !isInsignificantNode(child))
+    // 要件1: textの中身が空のノードを削除
+    .filter(
+      (child) =>
+        !(child.type === "text" && (!child.name || child.name.trim() === ""))
+    );
 
-  // 連続するtextノードをマージするための変数
-  let currentTextNode: AriaNode | null = null;
+  // 特殊ケース: textノードが意味のあるノードを1つだけ含む場合、そのノードを直接返す
+  if (node.type === "text" && processedChildren.length === 1) {
+    const significantChild = processedChildren[0];
+    const significantTypes = [
+      "main",
+      "article",
+      "section",
+      "navigation",
+      "banner",
+      "contentinfo",
+    ];
 
-  for (const child of node.children) {
-    // 子ノードを再帰的に圧縮
-    const compressedChild = compressAriaTree(child);
-
-    // 意味のないノードはスキップ
-    if (isInsignificantNode(compressedChild)) {
-      continue;
-    }
-
-    // textノードの場合
-    if (compressedChild.type === "text") {
-      // 前のノードもtextの場合はマージ
-      if (currentTextNode && currentTextNode.type === "text") {
-        // 名前をマージ
-        if (compressedChild.name) {
-          currentTextNode.name = currentTextNode.name
-            ? `${currentTextNode.name} ${compressedChild.name}`
-            : compressedChild.name;
-        }
-
-        // 子ノードがあれば追加
-        if (compressedChild.children && compressedChild.children.length > 0) {
-          currentTextNode.children = currentTextNode.children || [];
-          currentTextNode.children.push(...compressedChild.children);
-        }
-      } else {
-        // 新しいtextノードとして追加
-        currentTextNode = compressedChild;
-        compressedChildren.push(currentTextNode);
+    if (significantTypes.includes(significantChild.type)) {
+      // 親の名前を子にマージ（必要な場合）
+      if (node.name && !significantChild.name) {
+        significantChild.name = node.name;
       }
-    } else {
-      // text以外のノードはそのまま追加
-      currentTextNode = null;
-      compressedChildren.push(compressedChild);
+      return significantChild;
     }
   }
 
-  // 子ノードを一つしか持たないtextの入れ子をたたむ
-  compressedChildren = compressedChildren.map((child) => {
-    if (
-      child.type === "text" &&
-      child.children &&
-      child.children.length === 1
-    ) {
-      const grandchild = child.children[0];
-      // 孫ノードの名前を親ノードにマージ
-      if (grandchild.name) {
-        child.name = child.name
-          ? `${child.name} ${grandchild.name}`
-          : grandchild.name;
-      }
-      // 孫ノードの子を親ノードに移動
-      if (grandchild.children && grandchild.children.length > 0) {
-        child.children = grandchild.children;
-      } else {
-        delete child.children;
+  // 要件2: textの下がgenericのみの場合、親textにマージ
+  if (
+    node.type === "text" &&
+    processedChildren.length > 0 &&
+    processedChildren.every((child) => child.type === "generic")
+  ) {
+    // genericの子を持つtextノードの場合、子ノードの子をすべて自分の子にする
+    const newChildren: AriaNode[] = [];
+    for (const child of processedChildren) {
+      if (child.children && child.children.length > 0) {
+        newChildren.push(...child.children);
       }
     }
-    return child;
-  });
+    if (newChildren.length > 0) {
+      return { ...node, children: newChildren };
+    }
+  }
+
+  // 一般ケース: 子要素が1つしかない場合、親にマージ
+  if (processedChildren.length === 1) {
+    const child = processedChildren[0];
+
+    // 親がgenericで名前がない場合、または親と子が同じタイプの場合
+    if ((node.type === "generic" && !node.name) || node.type === child.type) {
+      // 親の名前を子にマージ（必要な場合）
+      if (node.name && !child.name) {
+        child.name = node.name;
+      } else if (node.name && child.name) {
+        // 両方に名前がある場合は結合
+        child.name = `${node.name} ${child.name}`;
+      }
+      return child;
+    }
+  }
+
+  // 意味のある階層かどうかを判定
+  const isSignificantNode = [
+    "main",
+    "article",
+    "section",
+    "navigation",
+    "banner",
+    "contentinfo",
+    "region",
+    "form",
+    "search",
+  ].includes(node.type);
+
+  // 子要素がすべてgenericの場合、または意味のある階層の下にgenericがある場合、親にマージ
+  if (
+    processedChildren.length > 0 &&
+    (processedChildren.every((child) => child.type === "generic") ||
+      (isSignificantNode &&
+        processedChildren.some((child) => child.type === "generic")))
+  ) {
+    // genericの子を持つノードの場合、子ノードの子をすべて自分の子にする
+    const newChildren: AriaNode[] = [];
+
+    for (const child of processedChildren) {
+      if (child.type === "generic") {
+        // genericノードの子を直接追加
+        if (child.children && child.children.length > 0) {
+          newChildren.push(...child.children);
+        }
+      } else {
+        // generic以外のノードはそのまま追加
+        newChildren.push(child);
+      }
+    }
+
+    if (newChildren.length > 0) {
+      return { ...node, children: newChildren };
+    }
+  }
+
+  // 同じタイプの連続するノードをマージする
+  const mergedChildren: AriaNode[] = [];
+  let currentGroup: AriaNode | null = null;
+
+  // 要件3: 同じ属性のノードを配列化するための処理
+  const groupByType: Record<string, AriaNode[]> = {};
+
+  for (const child of processedChildren) {
+    // 特定のタイプのノードをグループ化
+    if (["article", "section", "listitem", "img"].includes(child.type)) {
+      if (!groupByType[child.type]) {
+        groupByType[child.type] = [];
+      }
+      groupByType[child.type].push(child);
+      continue;
+    }
+
+    // 現在のグループがない、または現在のグループと異なるタイプの場合
+    if (!currentGroup || currentGroup.type !== child.type) {
+      // 新しいグループを開始
+      currentGroup = { ...child };
+      mergedChildren.push(currentGroup);
+      continue;
+    }
+
+    // 同じタイプのノードを見つけた場合、マージする
+    // 名前をマージ
+    if (child.name) {
+      currentGroup.name = currentGroup.name
+        ? `${currentGroup.name} ${child.name}`
+        : child.name;
+    }
+
+    // 子ノードをマージ
+    if (child.children && child.children.length > 0) {
+      if (!currentGroup.children) {
+        currentGroup.children = [];
+      }
+      currentGroup.children.push(...child.children);
+    }
+  }
+
+  // グループ化したノードを追加
+  for (const type in groupByType) {
+    if (groupByType[type].length > 1) {
+      // 同じタイプのノードが複数ある場合、親ノードを作成してそれらを子として追加
+      const parentNode: AriaNode = {
+        type: type as AriaNodeType,
+        role: type,
+        originalElement: node.originalElement,
+        children: groupByType[type],
+      };
+      mergedChildren.push(parentNode);
+    } else if (groupByType[type].length === 1) {
+      // 1つしかない場合はそのまま追加
+      mergedChildren.push(groupByType[type][0]);
+    }
+  }
+
+  // 入れ子構造を解消する
+  for (let i = 0; i < mergedChildren.length; i++) {
+    const child = mergedChildren[i];
+
+    // 子を一つしか持たないノードの入れ子をたたむ
+    if (child.children && child.children.length === 1) {
+      const grandchild = child.children[0];
+
+      // 親と子が同じタイプの場合、または親がtextで子が意味のあるノードの場合、マージする
+      if (
+        child.type === grandchild.type ||
+        (child.type === "text" &&
+          ["main", "article", "section"].includes(grandchild.type))
+      ) {
+        // 孫ノードの名前を親ノードにマージ
+        if (grandchild.name) {
+          child.name = child.name
+            ? `${child.name} ${grandchild.name}`
+            : grandchild.name;
+        }
+
+        // 孫ノードの子を親ノードに移動
+        if (grandchild.children && grandchild.children.length > 0) {
+          child.children = grandchild.children;
+          // 再度このノードを処理するために、インデックスを戻す
+          i--;
+          continue;
+        } else {
+          delete child.children;
+        }
+      }
+    }
+
+    // 子ノードが複数あり、その中に親と同じタイプのノードがある場合
+    if (child.children && child.children.length > 1) {
+      const sameTypeChildren = child.children.filter(
+        (c) => c.type === child.type
+      );
+
+      if (sameTypeChildren.length > 0) {
+        // 同じタイプの子ノードの内容を親にマージし、それらを削除
+        const otherChildren = child.children.filter(
+          (c) => c.type !== child.type
+        );
+        const newChildren: AriaNode[] = [];
+
+        // 同じタイプの子ノードの名前をマージ
+        for (const sameChild of sameTypeChildren) {
+          if (sameChild.name) {
+            child.name = child.name
+              ? `${child.name} ${sameChild.name}`
+              : sameChild.name;
+          }
+
+          // 同じタイプの子ノードの子を新しい子リストに追加
+          if (sameChild.children && sameChild.children.length > 0) {
+            newChildren.push(...sameChild.children);
+          }
+        }
+
+        // 異なるタイプの子ノードを新しい子リストに追加
+        newChildren.push(...otherChildren);
+
+        // 新しい子リストを設定
+        child.children = newChildren;
+
+        // 再度このノードを処理するために、インデックスを戻す
+        i--;
+        continue;
+      }
+    }
+  }
 
   // 圧縮した子ノードを設定
   const result = { ...node };
-  if (compressedChildren.length > 0) {
-    result.children = compressedChildren;
+  if (mergedChildren.length > 0) {
+    result.children = mergedChildren;
   } else {
     delete result.children;
   }
@@ -441,74 +670,161 @@ function countNodes(node: AriaNode): number {
 }
 
 /**
- * AriaTreeをYAML形式の文字列に変換する（Playwrightのスナップショット形式に近い）
+ * AriaTreeをYAML形式の文字列に変換する（Playwrightのスナップショット形式に準拠）
  */
 export function ariaTreeToString(tree: AriaTree): string {
   const nodeToString = (node: AriaNode, indent: number = 0): string => {
     const indentStr = "  ".repeat(indent);
     let result = "";
 
-    // ノードのタイプと名前を出力
+    // 空のノードはスキップ
+    if (
+      // 名前がなく、子ノードもない汎用ノード
+      (!node.name && !node.children && node.type === "generic") ||
+      // 名前が空文字列
+      node.name === "" ||
+      // 空のリスト（子ノードがない、または空の子ノードしかない）
+      (node.type === "list" &&
+        (!node.children ||
+          node.children.length === 0 ||
+          node.children.every(
+            (child) =>
+              !child.name && (!child.children || child.children.length === 0)
+          )))
+    ) {
+      return "";
+    }
+
+    // ノードのタイプを出力
     result += `${indentStr}- ${node.type}`;
 
-    // 名前があれば追加
+    // リンクの場合、href属性を取得、画像の場合はsrc属性とalt属性を取得
+    let href = "";
+    let src = "";
+    let alt = "";
+    if (node.originalElement) {
+      if (node.type === "link") {
+        href = node.originalElement.attributes.href || "";
+      } else if (node.type === "img") {
+        src = node.originalElement.attributes.src || "";
+        alt = node.originalElement.attributes.alt || "";
+      }
+    }
+
+    // 名前があれば追加（Playwrightの2つの形式に対応）
     if (node.name) {
       // 名前に正規表現パターンが含まれているかチェック
       if (node.name.startsWith("/") && node.name.endsWith("/")) {
+        // 正規表現パターンはそのまま表示
         result += ` ${node.name}`;
+      } else if (
+        // テキストノードやパラグラフなど、一部のノードタイプはコロン形式で表示
+        ["text", "paragraph", "listitem", "textbox"].includes(node.type)
+      ) {
+        // コロン形式（role: name）
+        result += `: ${node.name}`;
       } else {
+        // 引用符形式（role "name"）
         result += ` "${node.name}"`;
       }
     }
 
-    // 見出しレベルがあれば追加
+    // リンクのhrefや画像のsrcとaltを表示
+    if (href) {
+      result += ` [href="${href}"]`;
+    }
+    if (src) {
+      result += ` [src="${src}"]`;
+    }
+    if (alt) {
+      result += ` [alt="${alt}"]`;
+    }
+
+    // 属性を追加
+    const attributes: string[] = [];
+
+    // 見出しレベル
     if (node.level) {
-      result += ` [level=${node.level}]`;
+      attributes.push(`level=${node.level}`);
     }
 
-    // チェック状態があれば追加
+    // チェック状態
     if (node.checked !== undefined) {
-      result += ` [checked=${node.checked}]`;
+      attributes.push(`checked=${node.checked}`);
     }
 
-    // 選択状態があれば追加
+    // 選択状態
     if (node.selected !== undefined) {
-      result += ` [selected=${node.selected}]`;
+      attributes.push(`selected=${node.selected}`);
     }
 
-    // 展開状態があれば追加
+    // 展開状態
     if (node.expanded !== undefined) {
-      result += ` [expanded=${node.expanded}]`;
+      attributes.push(`expanded=${node.expanded}`);
     }
 
-    // 無効状態があれば追加
+    // 無効状態
     if (node.disabled) {
-      result += " [disabled]";
+      attributes.push("disabled");
     }
 
-    // 必須項目であれば追加
+    // 必須項目
     if (node.required) {
-      result += " [required]";
+      attributes.push("required");
     }
 
-    // 値の範囲があれば追加
+    // 値の範囲
     if (node.valuemin !== undefined || node.valuemax !== undefined) {
       const min = node.valuemin !== undefined ? node.valuemin : "";
       const max = node.valuemax !== undefined ? node.valuemax : "";
-      result += ` [range=${min}-${max}]`;
+      attributes.push(`range=${min}-${max}`);
     }
 
-    // 値のテキスト表現があれば追加
+    // 値のテキスト表現
     if (node.valuetext) {
-      result += ` [value="${node.valuetext}"]`;
+      attributes.push(`value="${node.valuetext}"`);
+    }
+
+    // 属性があれば追加
+    if (attributes.length > 0) {
+      result += ` [${attributes.join(", ")}]`;
     }
 
     result += "\n";
 
     // 子ノードを再帰的に処理
     if (node.children && node.children.length > 0) {
+      // 子が1つだけで、親と同じタイプの場合は特別な形式で表示
+      if (
+        node.children.length === 1 &&
+        node.children[0].type === node.type &&
+        node.type !== "generic"
+      ) {
+        const child = node.children[0];
+        // 親の名前と子の名前を結合
+        const combinedName =
+          node.name && child.name
+            ? `${node.name} ${child.name}`
+            : node.name || child.name || "";
+
+        // 一時的に名前を変更して出力
+        const tempNode = { ...node, name: combinedName };
+        if (child.children && child.children.length > 0) {
+          tempNode.children = child.children;
+        } else {
+          delete tempNode.children;
+        }
+
+        // 再帰的に処理
+        return nodeToString(tempNode, indent);
+      }
+
+      // 通常の子ノード処理
       for (const child of node.children) {
-        result += nodeToString(child, indent + 1);
+        const childString = nodeToString(child, indent + 1);
+        if (childString) {
+          result += childString;
+        }
       }
     }
 
