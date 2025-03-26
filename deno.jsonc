@@ -1,0 +1,12 @@
+{
+  "name": "@mizchi/readability",
+  "version": "0.3.1",
+  "nodeModulesDir": "auto",
+  "exports": {
+    ".": "src/index.ts",
+  },
+  "imports": {
+    "htmlparser2": "npm:htmlparser2@6.1.0",
+    "html-to-md": "npm:html-to-md@0.8.6",
+  },
+}
