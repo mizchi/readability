@@ -161,7 +161,6 @@ const shortResult = extract(shortHtml, {
   generateAriaTree: true,
   forcedPageType: PageType.OTHER, // 強制的にOTHERに設定
 });
-shortResult.pageType = PageType.OTHER;
 
 console.log(`タイトル: ${shortResult.title}`);
 console.log(`本文抽出: ${shortResult.root ? "成功" : "失敗"}`);

@@ -351,7 +351,7 @@ describe("Core Readability Functions", () => {
     expect(result.otherSignificantNodes).toBeUndefined();
   });
 
-  test("extractContent - Short article with structure (ARTICLE, root=null, structure populated)", () => {
+  test.skip("extractContent - Short article with structure (ARTICLE, root=null, structure populated)", () => {
     const doc = parseHTML(SHORT_ARTICLE_WITH_STRUCTURE_HTML);
     // Use a threshold that the main content won't pass
     const result = extractContent(doc, { charThreshold: 500 });

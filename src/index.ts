@@ -43,3 +43,6 @@ export { toMarkdown } from "./markdown.ts";
 
 // AriaSnapshot関連の関数をエクスポート
 export { buildAriaTree, ariaTreeToString } from "./aria.ts";
+
+// ページタイプ分類関連の関数をエクスポート
+export { classify } from "./classify.ts";

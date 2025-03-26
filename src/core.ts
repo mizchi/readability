@@ -540,58 +540,6 @@ function getArticleByline(doc: VDocument): string | null {
 }
 
 /**
- * Get the article excerpt
- */
-function getArticleExcerpt(
-  doc: VDocument,
-  content: VElement | null
-): string | null {
-  // Get excerpt from meta tags (lowercase)
-  const metaTags = getElementsByTagName(doc.documentElement, "meta");
-  for (const meta of metaTags) {
-    const name = meta.attributes.name?.toLowerCase();
-    const property = meta.attributes.property?.toLowerCase();
-    const contentAttr = meta.attributes.content; // Renamed to avoid conflict
-
-    if (!contentAttr) continue;
-
-    if (name === "description" || property === "og:description") {
-      return contentAttr;
-    }
-  }
-
-  // Get excerpt from the first paragraph of the content (lowercase 'p')
-  if (content) {
-    const paragraphs = getElementsByTagName(content, "p");
-    if (paragraphs.length > 0) {
-      return getInnerText(paragraphs[0]);
-    }
-  }
-
-  return null;
-}
-
-/**
- * Get the site name
- */
-function getSiteName(doc: VDocument): string | null {
-  // Get site name from meta tags (lowercase)
-  const metaTags = getElementsByTagName(doc.documentElement, "meta");
-  for (const meta of metaTags) {
-    const property = meta.attributes.property?.toLowerCase();
-    const content = meta.attributes.content;
-
-    if (!content) continue;
-
-    if (property === "og:site_name") {
-      return content;
-    }
-  }
-
-  return null;
-}
-
-/**
  * ページタイプを判定する関数
  *
  * 判定基準:
@@ -726,8 +674,6 @@ export function extractContent(
   // Get metadata
   const title = getArticleTitle(doc);
   const byline = getArticleByline(doc);
-  const excerpt = getArticleExcerpt(doc, articleContent); // excerpt は抽出された本文から取る
-  const siteName = getSiteName(doc);
 
   // 構造要素の検出 (pageType が ARTICLE だが articleContent が null の場合)
   let structuralElements:
@@ -799,8 +745,14 @@ export function extract(
   // Execute preprocessing
   preprocessDocument(doc);
 
+  // pageType が未指定の場合は ARTICLE をデフォルトとして設定
+  const optionsWithPageType = {
+    ...options,
+    forcedPageType: options.forcedPageType || PageType.ARTICLE,
+  };
+
   // Extract content
-  return extractContent(doc, options);
+  return extractContent(doc, optionsWithPageType);
 }
 
 /**
@@ -844,6 +796,7 @@ export function createExtractor(opts: {
 
     // Extract content using the main logic, passing other options
     // generateAriaTreeオプションとforcedPageTypeオプションを追加
+    // forcedPageType が未指定の場合は ARTICLE をデフォルトとして設定
     return extractContent(doc, {
       ...options,
       generateAriaTree:
@@ -853,7 +806,7 @@ export function createExtractor(opts: {
       forcedPageType:
         options.forcedPageType !== undefined
           ? options.forcedPageType
-          : forcedPageType,
+          : forcedPageType || PageType.ARTICLE,
     });
   };
 }
