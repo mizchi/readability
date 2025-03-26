@@ -34,7 +34,7 @@ importers:
         specifier: 20.0.2
         version: 20.0.2
       prettier:
-        specifier: ^3.3.2
+        specifier: ^3.5.3
         version: 3.5.3
       release-it:
         specifier: 17.0.1
