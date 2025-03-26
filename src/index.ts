@@ -11,6 +11,7 @@ export type {
   VDocument,
   VElement,
   VText as VTextNode,
+  PageType as ArticleType, // Export ArticleType enum
 } from "./types.ts";
 
 // Export only public functions

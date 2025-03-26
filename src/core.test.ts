@@ -1,7 +1,7 @@
 import { test, expect, describe } from "vitest";
 import { parseHTML } from "./parser";
 import { extractContent, isProbablyContent } from "./core";
-import type { VElement, VText } from "./types";
+import { PageType, type VElement, type VText } from "./types"; // Import ArticleType
 
 // Basic test case
 const BASIC_HTML = `
@@ -18,6 +18,16 @@ const BASIC_HTML = `
       In actual articles, it is common to have several such long paragraphs.
       Text length is an important factor in the scoring algorithm.</p>
     </div>
+  </body>
+</html>
+`;
+
+// HTML with very short text, unlikely to be an article
+const SHORT_TEXT_HTML = `
+<html>
+  <body>
+    <h1>Too Short</h1>
+    <p>This is way too short to be an article.</p>
   </body>
 </html>
 `;
@@ -196,13 +206,17 @@ describe("Core Readability Functions", () => {
 
   test("extractContent - Basic HTML", () => {
     const doc = parseHTML(BASIC_HTML);
-    const result = extractContent(doc);
+    // Use a lower threshold for this test case as the sample text is short
+    const result = extractContent(doc, { charThreshold: 100 });
 
     // Check if content is extracted
     expect(result.root).not.toBeNull();
 
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
+
+    // Check article type
+    expect(result.pageType).toBe(PageType.ARTICLE);
 
     // Check if extracted content includes test article text
     if (result.root) {
@@ -225,13 +239,17 @@ describe("Core Readability Functions", () => {
 
   test("extractContent - Semantic tags", () => {
     const doc = parseHTML(SEMANTIC_HTML);
-    const result = extractContent(doc);
+    // Use a lower threshold for this test case as the sample text is short
+    const result = extractContent(doc, { charThreshold: 100 });
 
     // Check if content is extracted
     expect(result.root).not.toBeNull();
 
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
+
+    // Check article type
+    expect(result.pageType).toBe(PageType.ARTICLE);
 
     // Check if extracted content includes text within the article tag
     if (result.root) {
@@ -256,6 +274,9 @@ describe("Core Readability Functions", () => {
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
 
+    // Check article type
+    expect(result.pageType).toBe(PageType.ARTICLE);
+
     // Check if extracted content includes main content text
     if (result.root) {
       // Check if the element with class 'content' or its parent is selected
@@ -268,5 +289,18 @@ describe("Core Readability Functions", () => {
 
       expect(contentOrParentOfContent).toBe(true);
     }
+  });
+
+  test("extractContent - Short text (should be OTHER)", () => {
+    const doc = parseHTML(SHORT_TEXT_HTML);
+    // Override default threshold for this test if needed, or rely on default
+    const result = extractContent(doc, { charThreshold: 500 }); // Use default or adjust
+
+    // Check article type - should be OTHER because content is too short
+    expect(result.pageType).toBe(PageType.OTHER);
+
+    // Check if content is null due to threshold
+    expect(result.root).toBeNull();
+    expect(result.nodeCount).toBe(0);
   });
 });

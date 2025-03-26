@@ -4,12 +4,13 @@
  * Core implementation of the content extraction algorithm
  */
 
-import type {
-  VDocument,
-  VElement,
-  ReadabilityArticle,
-  ReadabilityOptions,
-  Parser,
+import {
+  type VDocument, // Keep type imports for interfaces/types
+  type VElement,
+  type ReadabilityArticle,
+  type ReadabilityOptions,
+  type Parser,
+  PageType, // Import ArticleType as a value
 } from "./types.ts";
 import { isVElement } from "./types.ts"; // Import isVElement as a value
 import {
@@ -411,17 +412,19 @@ export function extractContent(
     process.env &&
     process.env.NODE_ENV === "test";
 
-  const content = isTestEnvironment
-    ? mainContent
-    : textLength >= charThreshold
-      ? mainContent
-      : null;
+  // Set content based on threshold check, regardless of environment
+  const content = textLength >= charThreshold ? mainContent : null;
+
+  // Determine article type based on whether the extracted text meets the threshold, regardless of environment
+  const articleType =
+    textLength >= charThreshold ? PageType.ARTICLE : PageType.OTHER;
 
   return {
     title,
     byline,
     root: content,
     nodeCount: content ? countNodes(content) : 0,
+    pageType: articleType, // Include the determined article type
   };
 }
 

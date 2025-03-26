@@ -13,3 +13,5 @@ src   - 現在の実装
 - pnpm
 - TypeScript
 - vitest
+
+vitest を実行する時は `pnpm vitest --run` でじ
