@@ -7,8 +7,8 @@ import {
   buildAriaTree,
   compressAriaTree,
   ariaTreeToString,
-} from "./aria";
-import type { VElement, AriaNode, VDocument, AriaTree } from "./types";
+} from "../src/nav/aria";
+import type { VElement, AriaNode, VDocument, AriaTree } from "../src/types";
 
 describe("ARIA Snapshot Utilities", () => {
   test("getAriaRole - 明示的なロールを取得", () => {

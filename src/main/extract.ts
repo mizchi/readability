@@ -1,5 +1,5 @@
 /**
- * Readability v3 - Core Implementation
+ * Readability v3 - Main Extractor
  *
  * Core implementation of the content extraction algorithm
  */
@@ -13,8 +13,8 @@ import {
   type AriaTree,
   type AriaNode, // AriaNode 型をインポート
   PageType, // Import ArticleType as a value
-} from "./types.ts";
-import { isVElement } from "./types.ts"; // Import isVElement as a value
+} from "../types.ts";
+import { isVElement } from "../types.ts"; // Import isVElement as a value
 import {
   getElementsByTagName,
   isProbablyVisible,
@@ -23,12 +23,12 @@ import {
   getInnerText, // getInnerText を import
   getLinkDensity, // getLinkDensity を import
   getTextDensity, // getTextDensity を import
-} from "./dom.ts";
+} from "../dom.ts";
 import {
   buildAriaTree, // aria treeを構築する関数
   buildAriaNode, // aria nodeを構築する関数
   ariaTreeToString, // aria treeを文字列に変換する関数
-} from "./aria.ts";
+} from "../nav/aria.ts";
 // aria.ts 内の countNodes 関数を直接使用するため、同じ関数を定義
 function countAriaNodes(node: AriaNode): number {
   let count = 1; // 自身をカウント
@@ -44,9 +44,9 @@ import {
   DEFAULT_TAGS_TO_SCORE,
   DEFAULT_N_TOP_CANDIDATES,
   DEFAULT_CHAR_THRESHOLD,
-} from "./constants.ts";
-import { parseHTML, serializeToHTML } from "./parser.ts";
-import { countNodes } from "./format.ts";
+} from "../constants.ts";
+import { parseHTML, serializeToHTML } from "../parsers/parser.ts";
+import { countNodes } from "../format/format.ts";
 import { preprocessDocument } from "./preprocess.ts";
 
 /**

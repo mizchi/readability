@@ -6,7 +6,7 @@
  */
 
 // Re-export the default parser implementation
-export { parseHTML, serializeToHTML } from "./parsers/htmlparser2.ts";
+export { parseHTML, serializeToHTML } from "./htmlparser2.ts";
 
 // Potentially, other parser implementations could be added here or in separate files
 // under the 'parsers' directory and exported selectively if needed.

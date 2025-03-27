@@ -1,9 +1,9 @@
 // src/markdown.test.ts
 import { describe, test, expect } from "vitest";
-import { parseHTML } from "./parser";
+import { parseHTML } from "../parsers/parser";
 import { toMarkdown } from "./markdown";
-import { isVElement } from "./types"; // Import the type guard
-import type { VElement, VDocument } from "./types"; // Import VDocument
+import { isVElement } from "../types"; // Import the type guard
+import type { VElement, VDocument } from "../types"; // Import VDocument
 
 describe("toMarkdown function", () => {
   test("should convert basic HTML to Markdown", () => {

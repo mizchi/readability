@@ -1,6 +1,6 @@
 // const { extract, ariaTreeToString } = require("../src/index");
 import { extract, ariaTreeToString } from "../src/index.ts";
-import { toMarkdown } from "../src/markdown.ts";
+import { toMarkdown } from "../src/format/markdown.ts";
 import { getContentByPageType, PageType } from "../src/types.ts";
 
 import fs from "fs";

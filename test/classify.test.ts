@@ -5,11 +5,15 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { extract, classifyPageType } from "./index.ts";
-import { PageType, VDocument, VElement } from "./types.ts";
-import { parseHTML } from "./parser.ts";
-import { getInnerText, getLinkDensity, getElementsByTagName } from "./dom.ts";
-import { DEFAULT_CHAR_THRESHOLD } from "./constants.ts";
+import { extract, classifyPageType } from "../src/index.ts";
+import { PageType, VDocument, VElement } from "../src/types.ts";
+import { parseHTML } from "../src/parsers/parser.ts";
+import {
+  getInnerText,
+  getLinkDensity,
+  getElementsByTagName,
+} from "../src/dom.ts";
+import { DEFAULT_CHAR_THRESHOLD } from "../src/constants.ts";
 
 // テスト対象のURL
 const OTHER_URLS = [

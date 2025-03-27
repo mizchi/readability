@@ -1,5 +1,5 @@
 // src/markdown.ts
-import type { VElement, VNode, VText } from "./types";
+import type { VElement, VNode, VText } from "../types";
 
 /**
  * Markdown 特殊文字をエスケープする

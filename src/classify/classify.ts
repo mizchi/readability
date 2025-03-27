@@ -4,9 +4,9 @@
  * ページタイプを分類するための関数を提供します
  */
 
-import { PageType, VDocument, VElement } from "./types.ts";
-import { getInnerText, getLinkDensity, getElementsByTagName } from "./dom.ts";
-import { DEFAULT_CHAR_THRESHOLD } from "./constants.ts";
+import { PageType, VDocument, VElement } from "../types.ts";
+import { getInnerText, getLinkDensity, getElementsByTagName } from "../dom.ts";
+import { DEFAULT_CHAR_THRESHOLD } from "../constants.ts";
 
 /**
  * URLパターンに基づいてページタイプを判定する関数

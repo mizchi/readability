@@ -4,7 +4,7 @@
  * Provides functions to generate HTML from VElement and stringify it.
  */
 
-import type { VElement, VText, VNode } from "./types";
+import type { VElement, VText, VNode } from "../types";
 
 /**
  * Generate HTML string from VElement, omitting span tags and class attributes.

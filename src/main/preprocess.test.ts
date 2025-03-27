@@ -1,9 +1,9 @@
 import { describe, test, expect } from "vitest";
 import { preprocessDocument } from "./preprocess";
-import { parseHTML } from "./parser"; // Using the default parser to create VDocument
-import { getElementsByTagName } from "./dom";
-import { toHTML } from "./format"; // Import toHTML for comparison
-import type { VDocument, VElement, VText } from "./types"; // Add VElement and VText
+import { parseHTML } from "../parsers/parser"; // Using the default parser to create VDocument
+import { getElementsByTagName } from "../dom";
+import { toHTML } from "../format/format"; // Import toHTML for comparison
+import type { VDocument, VElement, VText } from "../types"; // Add VElement and VText
 
 describe("preprocessDocument function", () => {
   test("should remove script tags", () => {

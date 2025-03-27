@@ -19,7 +19,7 @@ export type {
 } from "./types.ts";
 
 // Export only public functions
-export { parseHTML, serializeToHTML } from "./parser.ts";
+export { parseHTML, serializeToHTML } from "./parsers/parser.ts";
 
 export {
   extract,
@@ -28,9 +28,9 @@ export {
   findMainCandidates,
   createExtractor,
   classifyPageType, // classifyPageType 関数をエクスポート
-} from "./core.ts";
+} from "./main/extract.ts";
 
-export { preprocessDocument } from "./preprocess.ts";
+export { preprocessDocument } from "./main/preprocess.ts";
 
 export {
   toHTML,
@@ -38,12 +38,12 @@ export {
   formatDocument,
   extractTextContent,
   countNodes,
-} from "./format.ts";
+} from "./format/format.ts";
 
-export { toMarkdown } from "./markdown.ts";
+export { toMarkdown } from "./format/markdown.ts";
 
 // AriaSnapshot関連の関数をエクスポート
-export { buildAriaTree, ariaTreeToString } from "./aria.ts";
+export { buildAriaTree, ariaTreeToString } from "./nav/aria.ts";
 
 // ページタイプ分類関連の関数をエクスポート
-export { classify } from "./classify.ts";
+export { classify } from "./classify/classify.ts";

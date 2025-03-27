@@ -4,8 +4,8 @@
  * Performs preprocessing before HTML parsing
  */
 
-import type { VDocument, VElement } from "./types.ts";
-import { getElementsByTagName } from "./dom.ts";
+import type { VDocument, VElement } from "../types.ts";
+import { getElementsByTagName } from "../dom.ts";
 
 // List of semantic tags to remove (now lowercase)
 const TAGS_TO_REMOVE = [

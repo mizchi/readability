@@ -1,7 +1,7 @@
 import { test, expect, describe } from "vitest";
-import { parseHTML } from "./parser";
-import { extractContent, isProbablyContent } from "./core";
-import { PageType, type VElement, type VText } from "./types"; // Import ArticleType
+import { parseHTML } from "../parsers/parser";
+import { extractContent, isProbablyContent } from "./extract";
+import { PageType, type VElement, type VText } from "../types"; // Import ArticleType
 
 // Basic test case
 const BASIC_HTML = `

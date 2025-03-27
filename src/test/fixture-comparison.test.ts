@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { extract } from "../index";
-import { toHTML } from "../format"; // extractTextContent は不要になったため削除
+import { toHTML } from "../format/format"; // extractTextContent は不要になったため削除
 
 // __dirnameを取得するための設定（ESモジュール対応）
 const __filename = fileURLToPath(import.meta.url);

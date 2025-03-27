@@ -12,8 +12,8 @@ import type {
   AriaNodeType,
   AriaTree,
   VDocument,
-} from "./types.ts";
-import { getAttribute, isProbablyVisible, getInnerText } from "./dom.ts";
+} from "../types.ts";
+import { getAttribute, isProbablyVisible, getInnerText } from "../dom.ts";
 
 /**
  * 要素のARIAロールを取得する
@@ -675,7 +675,7 @@ import {
   countLinks,
   assignWeightsToTree,
   filterNodesByWeight,
-} from "./nav/links.ts";
+} from "./links.ts";
 
 /**
  * AriaTreeをYAML形式の文字列に変換する（Playwrightのスナップショット形式に準拠）

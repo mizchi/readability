@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { toHTML } from "./format";
-import { createElement, createTextNode } from "./dom";
-import type { VElement } from "./types";
+import { toHTML } from "../src/format/format";
+import { createElement, createTextNode } from "../src/dom";
+import type { VElement } from "../src/types";
 
 describe("toHTML function", () => {
   test("should remove span tags but keep their content", () => {

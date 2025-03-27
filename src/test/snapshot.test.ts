@@ -9,7 +9,7 @@
 import html2md from "html-to-md";
 import { test, expect, describe } from "vitest";
 import { extract } from "../index.ts";
-import { toHTML } from "../format.ts";
+import { toHTML } from "../format/format.ts";
 import { TEST_URLS } from "./urls.ts";
 import fs from "fs";
 import path from "path";
