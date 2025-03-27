@@ -120,6 +120,56 @@ function greet() {
     expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 
+  test("should convert markdown code blocks with extra backticks", () => {
+    const html = `
+      <pre><code class="language-markdown"># タイトル
+
+これは **マークダウン** です。
+\`\`\`javascript
+function example() {
+  return true;
+}
+\`\`\`
+</code></pre>
+    `;
+    const parsed = parseHTML(html);
+    const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
+    const expectedMarkdown = `\`\`\`\`markdown
+# タイトル
+
+これは **マークダウン** です。
+\`\`\`javascript
+function example() {
+  return true;
+}
+\`\`\`
+\`\`\`\``;
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
+  });
+
+  test("should convert md code blocks with extra backticks", () => {
+    const html = `
+      <pre><code class="language-md"># タイトル
+
+これは **マークダウン** です。
+\`\`\`
+コードブロック
+\`\`\`
+</code></pre>
+    `;
+    const parsed = parseHTML(html);
+    const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
+    const expectedMarkdown = `\`\`\`\`md
+# タイトル
+
+これは **マークダウン** です。
+\`\`\`
+コードブロック
+\`\`\`
+\`\`\`\``;
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
+  });
+
   test("should convert blockquotes", () => {
     const html = `<blockquote>This is a quote.</blockquote>`;
     const parsed = parseHTML(html);

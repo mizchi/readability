@@ -233,8 +233,14 @@ function convertNodeToMarkdown(
         }
         // Remove only leading/trailing blank lines/whitespace, keep internal structure
         const cleanedCodeContent = rawCodeContent.replace(/^\s*\n|\s+$/g, "");
-        // Ensure newline before closing ```, no trailing newline after ```
-        return `\`\`\`${lang}\n${cleanedCodeContent}\n\`\`\``;
+
+        // markdownの場合は、入れ子の```をエスケープするために````を使用
+        if (lang === "markdown" || lang === "md") {
+          return `\`\`\`\`${lang}\n${cleanedCodeContent}\n\`\`\`\``;
+        } else {
+          // 通常のコードブロック
+          return `\`\`\`${lang}\n${cleanedCodeContent}\n\`\`\``;
+        }
       }
       case "blockquote": {
         // Content is already joined with potential spaces. Trim the whole block.
