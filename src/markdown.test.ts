@@ -389,4 +389,60 @@ Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
   });
 
   // TODO: Add tests for footnotes
+
+  test("should handle code blocks with decorative spans", () => {
+    const html = `
+      <pre><code class="language-javascript">function <span class="keyword">greet</span>() {
+  console.<span class="method">log</span>(<span class="string">"Hello"</span>);
+}</code></pre>
+    `;
+    const parsed = parseHTML(html);
+    const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
+    const expectedMarkdown = `\`\`\`javascript
+function greet() {
+  console.log("Hello");
+}
+\`\`\``;
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
+  });
+
+  test("should handle complex syntax highlighted code blocks", () => {
+    const html = `
+      <pre class="language-ts" data-has-button="true"><code class="language-ts code-line" data-line="49"><span class="token keyword">import</span> <span class="token punctuation">{</span> toHTML<span class="token punctuation">,</span> extract <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@mizchi/readability"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> html2md <span class="token keyword">from</span> <span class="token string">"html-to-md"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> url <span class="token operator">=</span> <span class="token string">"https://zenn.dev/mizchi/articles/ts-using-sampling-logger"</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> html <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span> <span class="token operator">=&gt;</span> res<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> extracted <span class="token operator">=</span> <span class="token function">extract</span><span class="token punctuation">(</span>html<span class="token punctuation">,</span> <span class="token punctuation">{</span> charThreshold<span class="token operator">:</span> <span class="token number">100</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 結果を表示</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">\`</span><span class="token string">Title: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">\${</span>extracted<span class="token punctuation">.</span>title<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">\`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">\`</span><span class="token string">Author: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">\${</span>extracted<span class="token punctuation">.</span>byline<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">\`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>extracted<span class="token punctuation">.</span>root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  process<span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">const</span> htmlContent <span class="token operator">=</span> <span class="token function">toHTML</span><span class="token punctuation">(</span>extracted<span class="token punctuation">.</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> md <span class="token operator">=</span> <span class="token function">html2md</span><span class="token punctuation">(</span>htmlContent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>md<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+    `;
+    const parsed = parseHTML(html);
+    const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
+    const expectedMarkdown = `\`\`\`ts
+import { toHTML, extract } from "@mizchi/readability";
+import html2md from "html-to-md";
+
+const url = "https://zenn.dev/mizchi/articles/ts-using-sampling-logger";
+const html = await fetch(url).then((res) => res.text());
+const extracted = extract(html, { charThreshold: 100 });
+// 結果を表示
+console.log(\`Title: \${extracted.title}\`);
+console.log(\`Author: \${extracted.byline}\`);
+if (!extracted.root) {
+  process.exit(1);
+}
+const htmlContent = toHTML(extracted.root);
+const md = html2md(htmlContent);
+console.log(md);
+\`\`\``;
+    expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
+  });
 });

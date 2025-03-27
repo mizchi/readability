@@ -205,13 +205,32 @@ function convertNodeToMarkdown(
         const codeChild = element.children.find(
           (c): c is VElement => c.nodeType === "element" && c.tagName === "code"
         );
-        // Get raw text content directly from text nodes
-        const rawCodeContent = (codeChild || element).children
-          .filter((c): c is VText => c.nodeType === "text")
-          .map((c) => c.textContent)
-          .join("");
-        const lang =
-          codeChild?.attributes.class?.replace(/^language-/, "") || "";
+
+        // 再帰的にすべてのテキストコンテンツを取得するヘルパー関数
+        function getAllTextContent(node: VNode): string {
+          if (node.nodeType === "text") {
+            return node.textContent;
+          }
+
+          if (node.nodeType === "element") {
+            // 装飾用のspanなどの要素内のテキストも再帰的に取得
+            return (node as VElement).children
+              .map((child) => getAllTextContent(child))
+              .join("");
+          }
+
+          return "";
+        }
+
+        // コードブロック内のすべてのテキストを再帰的に取得
+        const rawCodeContent = getAllTextContent(codeChild || element);
+        // 言語クラスを抽出（language-xxxの形式から言語部分のみを取得）
+        let lang = "";
+        const classAttr = codeChild?.attributes.class || "";
+        const langMatch = classAttr.match(/language-([a-zA-Z0-9_-]+)/);
+        if (langMatch && langMatch[1]) {
+          lang = langMatch[1];
+        }
         // Remove only leading/trailing blank lines/whitespace, keep internal structure
         const cleanedCodeContent = rawCodeContent.replace(/^\s*\n|\s+$/g, "");
         // Ensure newline before closing ```, no trailing newline after ```
