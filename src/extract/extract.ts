@@ -833,12 +833,6 @@ export function extract(
   // Generate AriaTree (optional)
   let ariaTree: AriaTree | undefined = undefined;
   ariaTree = buildAriaTree(doc);
-  // Keep debug output
-  if (process.env.NODE_ENV === "development") {
-    console.log("Generated AriaTree:");
-    console.log(toReadableAriaTree(doc)); // Use toReadableAriaTree directly
-  }
-
   // --- Start: Added logic for snapshot test ---
   // Classify page type
   const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;

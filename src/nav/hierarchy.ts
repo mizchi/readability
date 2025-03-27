@@ -32,9 +32,9 @@ export function analyzeLinkHierarchy(
 
   // Check if metadata and URL exist
   if (!metadata?.url) {
-    console.warn(
-      "Cannot analyze link hierarchy: Current page URL is not available in metadata."
-    );
+    // console.warn(
+    //   "Cannot analyze link hierarchy: Current page URL is not available in metadata."
+    // );
     return analysis; // Return empty analysis if base URL is missing
   }
   const currentUrlStr = metadata.url;
@@ -43,10 +43,10 @@ export function analyzeLinkHierarchy(
   try {
     currentUrl = new URL(currentUrlStr);
   } catch (e) {
-    console.warn(
-      `Cannot analyze link hierarchy: Invalid current page URL: ${currentUrlStr}`,
-      e
-    );
+    // console.warn(
+    //   `Cannot analyze link hierarchy: Invalid current page URL: ${currentUrlStr}`,
+    //   e
+    // );
     return analysis; // Return empty analysis if URL is invalid
   }
 
