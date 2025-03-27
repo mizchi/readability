@@ -68,7 +68,7 @@ export class Crawler {
     this.maxDepth = options.maxDepth ?? 5;
     this.maxSteps = options.maxSteps ?? 100; // Use maxSteps option
     this.concurrentRequests = options.concurrentRequests ?? 3;
-    this.delayMs = options.delayMs ?? 200;
+    this.delayMs = options.delayMs ?? 1000;
     this.epochSize = options.epochSize ?? 10;
     this.outputDir = options.outputDir ?? "./crawler_output";
     this.queueLogPath = path.join(this.outputDir, "_meta", "queue.jsonl"); // ログパス初期化 (_meta に変更)
@@ -80,103 +80,30 @@ export class Crawler {
     const allowedDomain = new URL(startUrl).hostname;
     this.filter = createUrlFilter(allowedDomain);
 
-    // --- 状態復元の試行 (同期的に行う) ---
-    const metaDir = path.join(this.outputDir, "_meta"); // _meta に変更
-    const visitedPath = path.join(metaDir, "visited.json");
-    const graphPath = path.join(metaDir, "link_graph.json");
-    const failedPath = path.join(metaDir, "failed.json");
+    // --- 状態復元の呼び出し ---
+    // Note: コンストラクタは async にできないため、IIFE などを使うか、
+    //       呼び出し元 (main.ts) でロードメソッドを呼び出す必要がある。
+    //       ここでは main.ts で呼び出す前提とし、コンストラクタ内の呼び出しはコメントアウト。
+    // await this.loadEpochData();
+    // await this.loadQueueState();
 
-    let restoredState = false; // 状態復元フラグ
-    let restoredQueue = false; // キュー復元フラグ
-    const queueStatePath = path.join(metaDir, "queue_state.json"); // キュー状態ファイルパス
-
-    try {
-      // --- 状態復元 (visited, graph, failed) ---
-      if (
-        fs.existsSync(visitedPath) &&
-        fs.existsSync(graphPath) &&
-        fs.existsSync(failedPath)
-      ) {
-        const visitedData = fs.readFileSync(visitedPath, "utf-8");
-        const graphData = fs.readFileSync(graphPath, "utf-8");
-        const failedData = fs.readFileSync(failedPath, "utf-8");
-
-        const visitedUrls: string[] = JSON.parse(visitedData);
-        const graphObj: { [key: string]: string[] } = JSON.parse(graphData);
-        const failedUrls: string[] = JSON.parse(failedData);
-
-        this.visited = new Set(visitedUrls);
-        this.linkGraph = new Map();
-        for (const fromUrl in graphObj) {
-          this.linkGraph.set(fromUrl, new Set(graphObj[fromUrl]));
-        }
-        this.failedUrls = new Set(failedUrls);
-
-        // totalSteps はセッションごとに 0 から開始するため、復元時の初期化は不要
-        // this.totalSteps = this.visited.size; // Removed initialization based on visited size
-
-        console.log(
-          `[Restore State] Successfully restored state (visited, graph, failed) from ${metaDir}. Visited: ${this.visited.size}, Failed: ${this.failedUrls.size}`
-        );
-        restoredState = true;
-      } else {
-        console.log(
-          `[Restore State] No previous state (visited, graph, failed) found in ${metaDir}.`
-        );
-      }
-
-      // --- キューの復元 ---
-      if (fs.existsSync(queueStatePath)) {
-        const queueData = fs.readFileSync(queueStatePath, "utf-8");
-        const queueItems: ActionQueueItem[] = JSON.parse(queueData); // ★★★ CrawlQueueItem -> ActionQueueItem
-        // 保存されていたキューアイテムをそのまま復元する
-        // (キュー内のURLは visited に含まれているのが正常な状態)
-        this.queue = queueItems;
-        // 復元したキューアイテムを queuedUrls にも追加
-        this.queue.forEach((item) => this.queuedUrls.add(item.url));
-        console.log(
-          `[Restore Queue] Successfully restored ${this.queue.length} items from ${queueStatePath}. Added to queuedUrls.`
-        );
-        restoredQueue = true;
-      } else {
-        console.log(
-          `[Restore Queue] No queue state file found at ${queueStatePath}.`
-        );
-      }
-    } catch (error: any) {
-      console.warn(
-        `[Restore Error] Error reading state or queue files:`,
-        error.message
-      );
-      // エラーが発生した場合も、できるだけ処理を続ける (一部復元できている可能性もある)
-      // 完全に新規で始める場合は、ここで this.visited や this.queue をクリアする
-      // this.visited = new Set();
-      // this.queue = [];
-      // restoredState = false;
-      // restoredQueue = false;
-    }
-
-    // 状態もキューも復元できなかった場合のみ、開始URLをキューに追加
-    if (!restoredState && !restoredQueue) {
-      console.log("[Initial Queue] Adding start URL to the queue.");
-      this.addToQueue(this.startUrl, 0, 1000, this.startUrl);
-    } else if (this.queue.length === 0 && this.visited.size === 0) {
-      // 状態ファイルはあったがキューが空 or 復元失敗し、visited も空の場合、開始URLを追加
-      console.log(
-        "[Initial Queue] State files found but queue is empty and no URLs visited. Adding start URL."
-      );
-      this.addToQueue(this.startUrl, 0, 1000, this.startUrl);
-    }
+    // 状態復元後にキューが空で、かつ visited も空の場合のみ開始URLを追加
+    // (loadEpochData/loadQueueState が同期的に実行される前提の仮実装)
+    // if (this.queue.length === 0 && this.visited.size === 0) {
+    //   console.log("[Initial Queue] No state restored or queue empty. Adding start URL.");
+    //   this.addToQueue(this.startUrl, 0, this.startUrl);
+    // }
     // --- 状態復元ここまで ---
   }
 
   // addToQueue は main.ts からほぼそのまま移動
+  // addToQueue のシグネチャから score を削除し、isNew を返すように変更
   private addToQueue(
     relativeOrAbsoluteUrl: string,
     currentDepth: number,
-    score: number,
+    // score: number, // 削除
     baseUrl: string
-  ): { added: boolean; normalizedUrl: string | null } {
+  ): { added: boolean; normalizedUrl: string | null; isNew: boolean } {
     let absoluteUrl: URL;
     try {
       absoluteUrl = new URL(relativeOrAbsoluteUrl, baseUrl);
@@ -184,7 +111,7 @@ export class Crawler {
       console.warn(
         `[addToQueue Invalid URL] Url: ${relativeOrAbsoluteUrl}, Base: ${baseUrl}`
       );
-      return { added: false, normalizedUrl: null };
+      return { added: false, normalizedUrl: null, isNew: false };
     }
 
     // 正規化 (main.ts と同様)
@@ -212,53 +139,85 @@ export class Crawler {
       normalizedUrl = normalizedUrl.slice(0, -1);
     }
 
-    // 新しいキューアイテムを作成
+    // フィルター実行 (先に実行して不要な処理をスキップ)
+    if (!this.filter(normalizedUrl) || currentDepth > this.maxDepth) {
+      return { added: false, normalizedUrl, isNew: false };
+    }
+
+    // 既にキューにあるかチェック
+    const existingItemIndex = this.queue.findIndex(
+      (item) => item.url === normalizedUrl
+    );
+
+    if (existingItemIndex !== -1) {
+      // 既にキューにあれば count をインクリメント
+      this.queue[existingItemIndex].count++;
+      // console.log(`[Queue Increment] Count: ${this.queue[existingItemIndex].count}, URL: ${normalizedUrl}`);
+      return { added: false, normalizedUrl, isNew: false }; // キューには追加しないが、カウントは増やした
+    }
+
+    // 訪問済みかチェック (キューになくても訪問済みなら追加しない)
+    if (this.visited.has(normalizedUrl)) {
+      return { added: false, normalizedUrl, isNew: false };
+    }
+
+    // queuedUrls にも存在するかチェック (getNextActions で取り出されたがまだ step が完了していない場合)
+    if (this.queuedUrls.has(normalizedUrl)) {
+      // このケースは通常発生しにくいが、念のためカウントアップだけ行うか検討
+      // 今回はシンプルにするため、何もしない (重複追加は避ける)
+      return { added: false, normalizedUrl, isNew: false };
+    }
+
+    // 新しいキューアイテムを作成 (count は初期値 1)
     const newItem: ActionQueueItem = {
       type: "fetch",
-      url: normalizedUrl, // ★★★ Use normalizedUrl defined above
-      score,
+      url: normalizedUrl,
+      count: 1, // 初期カウントは 1
       depth: currentDepth,
-      // init は現時点では不要
     };
 
-    // フィルター実行
-    if (
-      this.queuedUrls.has(normalizedUrl) || // ★★★ Check against queuedUrls instead of visited
-      !this.filter(normalizedUrl) ||
-      currentDepth > this.maxDepth
-    ) {
-      // console.log(`[Queue Skip] Already queued or filtered: ${normalizedUrl}`);
-      return { added: false, normalizedUrl }; // 追加しなくても正規化URLは返す
-    }
+    // フィルター実行は上に移動済み
 
     this.queue.push(newItem); // ★★★ newItem を追加
     this.queuedUrls.add(normalizedUrl); // ★★★ Add to queuedUrls instead of visited
     this.sessionAddedUrlsCount++; // ★★★ Increment session added count
     // console.log(`[Queue Add] Depth: ${currentDepth}, URL: ${normalizedUrl}`);
-    return { added: true, normalizedUrl };
+    return { added: true, normalizedUrl, isNew: true }; // 新規追加
+  }
+
+  /**
+   * キューを指定された優先度ルールでソートする。
+   * 1. count (被リンク数) の降順
+   * 2. count が同じ場合は depth (深度) の昇順
+   */
+  private _sortQueue(): void {
+    this.queue.sort((a, b) => {
+      // 1. count の降順
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      // 2. depth の昇順
+      return a.depth - b.depth;
+    });
   }
 
   /**
    * 次に実行すべきアクション(URL)のリストを取得する。
-   * @returns 次に処理する CrawlQueueItem の配列
+   * @returns 次に処理する ActionQueueItem の配列
    */
   public getNextActions(): ActionQueueItem[] {
-    // ★★★ CrawlQueueItem -> ActionQueueItem
     if (this.queue.length === 0 || this.totalSteps >= this.maxSteps) {
-      // Check against totalSteps and maxSteps
       return [];
     }
-    // スコアに基づいてソート (score が大きい方が先頭)
-    this.queue.sort((a, b) => b.score - a.score); // 降順ソート
+    // ソート処理を呼び出す
+    this._sortQueue();
 
-    // concurrentRequests 分だけ取り出す
     const count = Math.min(
       this.queue.length,
       this.concurrentRequests,
-      this.maxSteps - this.totalSteps // 残りステップ数を考慮
+      this.maxSteps - this.totalSteps
     );
     const actions = this.queue.splice(0, count);
-    // キューから取り出したので queuedUrls から削除
     actions.forEach((action) => this.queuedUrls.delete(action.url));
     return actions;
   }
@@ -344,32 +303,33 @@ export class Crawler {
           let addedCount = 0;
           for (const linkInfo of links) {
             if (linkInfo.href) {
-              const score = linkInfo.element.readability?.contentScore ?? 0;
+              // score は使わない
+              // const score = linkInfo.element.readability?.contentScore ?? 0;
               const urlWithoutFragment = linkInfo.href.split("#")[0];
 
-              const { added, normalizedUrl } = this.addToQueue(
+              // addToQueue の呼び出しから score を削除し、isNew を受け取る
+              const { added, normalizedUrl, isNew } = this.addToQueue(
                 urlWithoutFragment,
                 item.depth + 1,
-                score,
+                // score, // 削除
                 item.url // baseUrl は現在のページの URL
               );
 
-              if (added && normalizedUrl) {
-                addedCount++;
-                // リンクグラフに記録 (from: 現在のURL, to: 正規化されたリンク先URL)
+              // リンクグラフの記録ロジックは isNew フラグに関わらず実行する
+              // (カウントアップした場合もリンク元としては記録したい)
+              if (normalizedUrl) {
+                // normalizedUrl が null でないことを確認
                 const fromUrl = item.url;
                 if (!this.linkGraph.has(fromUrl)) {
                   this.linkGraph.set(fromUrl, new Set());
                 }
+                // 訪問済みかどうかに関わらず、リンク関係は記録
                 this.linkGraph.get(fromUrl)!.add(normalizedUrl);
-              } else if (normalizedUrl && this.visited.has(normalizedUrl)) {
-                // 既に追加済み or フィルターされたが、リンク自体は存在する場合もグラフに追加
-                const fromUrl = item.url;
-                if (!this.linkGraph.has(fromUrl)) {
-                  this.linkGraph.set(fromUrl, new Set());
-                }
-                // 既に訪問済みでもリンク関係は記録
-                this.linkGraph.get(fromUrl)!.add(normalizedUrl);
+
+                // added フラグはログ出力などに使える (今回はコメントアウト)
+                // if (added) {
+                //     addedCount++;
+                // }
               }
             }
           }
@@ -402,7 +362,8 @@ export class Crawler {
   /**
    * 現在のリンクグラフと訪問済みリストをファイルに書き出す (上書き)。
    */
-  private async writeEpochData(): Promise<void> {
+  public async writeEpochData(): Promise<void> {
+    // public に変更
     // this.epochCount++; // 上書きするため不要
     console.log(
       `\n[Meta Save] Writing metadata (overwrite). Total steps: ${this.totalSteps}` // Update log message
@@ -430,14 +391,7 @@ export class Crawler {
       ); // 非同期 writeFile は fsPromises から
       console.log(`  Visited list saved to ${visitedPath}`);
 
-      // 失敗リストも保存
-      const failedArray = Array.from(this.failedUrls).sort();
-      const failedPath = path.join(metaDir, `failed.json`);
-      await fsPromises.writeFile(
-        failedPath,
-        JSON.stringify(failedArray, null, 2)
-      ); // 非同期 writeFile は fsPromises から
-      console.log(`  Failed list saved to ${failedPath}`);
+      // 失敗リストの保存は writeEpochData から削除 (requeueFailedUrls で管理)
     } catch (error) {
       console.error(`[Meta Write Error] Failed to write metadata:`, error);
     }
@@ -486,16 +440,110 @@ export class Crawler {
     const queueStatePath = path.join(metaDir, "queue_state.json");
     try {
       await fsPromises.mkdir(metaDir, { recursive: true });
-      // キューをスコアでソートしてから保存 (任意だが、再開時の優先度確認に役立つ)
-      const sortedQueue = [...this.queue].sort((a, b) => b.score - a.score);
+      // ソート処理を呼び出す
+      this._sortQueue();
+      // ソート済みのキューを保存
       await fsPromises.writeFile(
         queueStatePath,
-        JSON.stringify(sortedQueue, null, 2)
+        JSON.stringify(this.queue, null, 2) // sortedQueue ではなく直接 this.queue を使う
       );
       console.log(`  Queue state saved to ${queueStatePath}`);
     } catch (error) {
       console.error(`[Queue Save Error] Failed to write queue state:`, error);
     }
+  }
+
+  /**
+   * エポックデータ (visited, graph, failed) をファイルから読み込む。
+   * @returns 状態が復元されたかどうか
+   */
+  public async loadEpochData(): Promise<boolean> {
+    const metaDir = path.join(this.outputDir, "_meta");
+    const visitedPath = path.join(metaDir, "visited.json");
+    const graphPath = path.join(metaDir, "link_graph.json");
+    const failedPath = path.join(metaDir, "failed.json");
+    let restoredState = false;
+
+    try {
+      // fs.existsSync は同期的なので、先にチェック
+      const filesExist =
+        fs.existsSync(visitedPath) &&
+        fs.existsSync(graphPath) &&
+        fs.existsSync(failedPath);
+
+      if (filesExist) {
+        const [visitedData, graphData, failedData] = await Promise.all([
+          fsPromises.readFile(visitedPath, "utf-8"),
+          fsPromises.readFile(graphPath, "utf-8"),
+          fsPromises.readFile(failedPath, "utf-8"),
+        ]);
+
+        const visitedUrls: string[] = JSON.parse(visitedData);
+        const graphObj: { [key: string]: string[] } = JSON.parse(graphData);
+        const failedUrls: string[] = JSON.parse(failedData);
+
+        this.visited = new Set(visitedUrls);
+        this.linkGraph = new Map();
+        for (const fromUrl in graphObj) {
+          this.linkGraph.set(fromUrl, new Set(graphObj[fromUrl]));
+        }
+        this.failedUrls = new Set(failedUrls);
+
+        console.log(
+          `[Restore State] Successfully restored state (visited, graph, failed) from ${metaDir}. Visited: ${this.visited.size}, Failed: ${this.failedUrls.size}`
+        );
+        restoredState = true;
+      } else {
+        console.log(
+          `[Restore State] No previous state (visited, graph, failed) found in ${metaDir}.`
+        );
+      }
+    } catch (error: any) {
+      console.warn(`[Restore Error] Error reading state files:`, error.message);
+      // エラー時も処理を続ける
+    }
+    return restoredState;
+  }
+
+  /**
+   * キューの状態をファイルから読み込む。
+   * @returns キューが復元されたかどうか
+   */
+  public async loadQueueState(): Promise<boolean> {
+    const metaDir = path.join(this.outputDir, "_meta");
+    const queueStatePath = path.join(metaDir, "queue_state.json");
+    let restoredQueue = false;
+
+    try {
+      // fs.existsSync は同期的なので、先にチェック
+      const queueFileExists = fs.existsSync(queueStatePath);
+
+      if (queueFileExists) {
+        const queueData = await fsPromises.readFile(queueStatePath, "utf-8");
+        const queueItems: ActionQueueItem[] = JSON.parse(queueData);
+        this.queue = queueItems;
+        this.queuedUrls.clear(); // queuedUrls もクリアしてから再構築
+        this.queue.forEach((item) => this.queuedUrls.add(item.url));
+        console.log(
+          `[Restore Queue] Successfully restored ${this.queue.length} items from ${queueStatePath}. Added to queuedUrls.`
+        );
+        restoredQueue = true;
+      } else {
+        console.log(
+          `[Restore Queue] No queue state file found at ${queueStatePath}.`
+        );
+      }
+    } catch (error: any) {
+      console.warn(
+        `[Restore Error] Error reading queue state file:`,
+        error.message
+      );
+      // エラー時も処理を続ける
+    }
+
+    // 初期キュー追加ロジックは main.ts に移動
+
+    return restoredQueue;
   }
 
   // 外部からグラフや訪問済みリストを取得するためのゲッター
@@ -505,6 +553,83 @@ export class Crawler {
 
   public getVisitedUrls(): Set<string> {
     return this.visited;
+  }
+
+  /**
+   * 失敗したURLのセットを取得する。
+   * @returns 失敗したURLの Set
+   */
+  public getFailedUrls(): Set<string> {
+    return this.failedUrls;
+  }
+
+  /**
+   * 失敗したURLを再度キューに追加し、失敗リストをクリアする。
+   */
+  public async requeueFailedUrls(): Promise<void> {
+    const urlsToRequeue = Array.from(this.failedUrls);
+    if (urlsToRequeue.length === 0) {
+      console.log("[Requeue Failed] No failed URLs to requeue.");
+      return;
+    }
+
+    console.log(
+      `[Requeue Failed] Attempting to requeue ${urlsToRequeue.length} failed URLs...`
+    );
+    let requeuedCount = 0;
+    for (const url of urlsToRequeue) {
+      // depth 0, baseUrl は url 自身として追加を試みる
+      // 既に visited や queuedUrls に含まれていないか再チェック
+      if (!this.visited.has(url) && !this.queuedUrls.has(url)) {
+        const { added } = this.addToQueue(url, 0, url);
+        if (added) {
+          requeuedCount++;
+          // console.log(`  Requeued: ${url}`);
+        } else {
+          // addToQueue でフィルターされた等の理由で追加されなかった場合
+          // console.log(`  Skipped (filtered or other reason): ${url}`);
+        }
+      } else {
+        // console.log(`  Skipped (already visited or queued): ${url}`);
+      }
+    }
+
+    if (requeuedCount > 0) {
+      console.log(
+        `[Requeue Failed] Successfully requeued ${requeuedCount} URLs.`
+      );
+      this.failedUrls.clear(); // 再キューイング成功後、失敗リストをクリア
+      console.log("[Requeue Failed] Cleared the failed URL list.");
+
+      // 状態を保存 (キューと空になった失敗リスト)
+      await this.saveQueueState();
+      await this.writeFailedUrlsToFile(); // ★★★ 失敗リストをファイルに書き込む
+    } else {
+      console.log(
+        "[Requeue Failed] No URLs were actually requeued (might be already visited/queued or filtered). Failed list remains unchanged."
+      );
+      // 失敗リストに変更がない場合、ファイルへの書き込みは不要
+    }
+  }
+
+  /**
+   * 現在の失敗リストを failed.json に書き込む (上書き)。
+   * requeueFailedUrls から呼び出されることを想定。
+   */
+  private async writeFailedUrlsToFile(): Promise<void> {
+    const metaDir = path.join(this.outputDir, "_meta");
+    const failedPath = path.join(metaDir, "failed.json");
+    console.log(`[Meta Save] Writing failed URL list to ${failedPath}`);
+    try {
+      await fsPromises.mkdir(metaDir, { recursive: true });
+      const failedArray = Array.from(this.failedUrls).sort();
+      await fsPromises.writeFile(
+        failedPath,
+        JSON.stringify(failedArray, null, 2)
+      );
+    } catch (error) {
+      console.error(`[Meta Write Error] Failed to write failed URLs:`, error);
+    }
   }
 
   // このセッションで追加されたURL数を取得するゲッター
@@ -533,9 +658,10 @@ export class Crawler {
    */
   public peekQueue(count: number): ActionQueueItem[] {
     // ★★★ CrawlQueueItem -> ActionQueueItem
-    // Sort by score to show the highest priority items
-    const sortedQueue = [...this.queue].sort((a, b) => b.score - a.score);
-    return sortedQueue.slice(0, count);
+    // ソート処理を呼び出す
+    this._sortQueue();
+    // ソート済みのキューの先頭からコピーを返す
+    return this.queue.slice(0, count);
   }
 
   public isFinished(): boolean {

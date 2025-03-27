@@ -9,7 +9,8 @@
 export type ActionQueueItem = {
   type: "fetch"; // アクションの種類 (将来的に他のタイプを追加可能)
   url: string;
-  score: number; // 優先度スコア
+  // score: number; // 優先度スコア (PageRank用だったので削除)
+  count: number; // 被リンク数カウンタ
   depth: number; // クロール深度
   init?: unknown; // 初期化パラメータ (オプション)
 };

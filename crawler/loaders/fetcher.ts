@@ -65,7 +65,7 @@ export class FetcherLoader implements ILoader {
     const timeSinceLastFetch = now - this.lastFetchTime;
     if (this.interval > 0 && timeSinceLastFetch < this.interval) {
       const waitTime = this.interval - timeSinceLastFetch;
-      // console.log(`[Waiting] ${waitTime}ms before next fetch...`);
+      console.log(`[Waiting] ${waitTime}ms before next fetch...`);
       await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
   }
