@@ -6,24 +6,24 @@
 
 // Export only public type definitions
 export type {
-  ExtractedSnapshot as ReadabilityArticle,
-  ReadabilityOptions,
+  ExtractedSnapshot,
+  ReadabilityOptions, // Keep original name for now, used by extract
   VDocument,
   VElement,
-  VText as VTextNode,
-  PageType as ArticleType, // Export ArticleType enum
+  VText,
+  // PageType, // Removed from type-only export
   // AriaSnapshot関連の型をエクスポート
   AriaNode,
   AriaNodeType,
   AriaTree,
 } from "./types.ts";
+export { PageType } from "./types.ts"; // Export PageType enum as value
 
 // Export only public functions
 export { parseHTML, serializeToHTML } from "./parsers/parser.ts";
 
 export {
   extract,
-  // extractContent, // 削除
   extractAriaTree, // extractAriaTree 関数をエクスポート
   findMainCandidates,
   createExtractor,
@@ -47,3 +47,10 @@ export { buildAriaTree, ariaTreeToString } from "./nav/aria.ts";
 
 // ページタイプ分類関連の関数をエクスポート
 export { classify } from "./classify/classify.ts";
+
+// Export the readable function and related types from the new module
+export {
+  readable,
+  type ReadableOptions,
+  type ReadableResult,
+} from "./readable.ts";

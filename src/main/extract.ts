@@ -499,9 +499,10 @@ export function isProbablyContent(element: VElement): boolean {
 }
 
 /**
- * Get the article title
+ * Get the article title (Exported)
  */
-function getArticleTitle(doc: VDocument): string | null {
+export function getArticleTitle(doc: VDocument): string | null {
+  // Add export
   // 1. Get from <title> tag (lowercase)
   const titleElements = getElementsByTagName(doc.documentElement, "title");
   if (titleElements.length > 0) {
@@ -563,9 +564,10 @@ function getArticleByline(doc: VDocument): string | null {
 }
 
 /**
- * Get the article language
+ * Get the article language (Exported)
  */
-function getArticleLang(doc: VDocument): string | null {
+export function getArticleLang(doc: VDocument): string | null {
+  // Add export
   // 1. Get from <html lang="..."> attribute
   const htmlElement = doc.documentElement;
   if (htmlElement && htmlElement.attributes.lang) {
@@ -575,9 +577,10 @@ function getArticleLang(doc: VDocument): string | null {
 }
 
 /**
- * Get the site name
+ * Get the site name (Exported)
  */
-function getArticleSiteName(doc: VDocument): string | null {
+export function getArticleSiteName(doc: VDocument): string | null {
+  // Add export
   const metaTags = getElementsByTagName(doc.documentElement, "meta");
 
   // 1. Look for og:site_name
@@ -602,9 +605,10 @@ function getArticleSiteName(doc: VDocument): string | null {
 }
 
 /**
- * Extract links from the document
+ * Extract links from the document (Exported)
  */
-function extractLinks(doc: VDocument): LinkInfo[] {
+export function extractLinks(doc: VDocument): LinkInfo[] {
+  // Add export
   const links: LinkInfo[] = [];
   const linkElements = getElementsByTagName(doc.body, "a");
 
