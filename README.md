@@ -3,14 +3,11 @@
 WIP
 
 - [x] Main Conetnt Extraction
-- [x] NO DOM API(for Cloudflare)
+- [x] Pure JS Impl (NO DOM API for Cloudflare)
 - [ ] Pass original tests
-- [ ] List View
-- [ ] AI Automation for MCP
 - [ ] Custom Parser (now only supports `htmlparser2`)
-- [ ] Puppeteer/Lightpanda Integration
-- [ ] Accessibilty Analyze
-- [ ] Markdown Serializer
+- [x] Accessibilty
+- [x] Markdown Serializer
 
 ## How to use
 
@@ -18,22 +15,30 @@ WIP
 npm install --save @mizchi/readability htmlparser2 html-to-md
 ```
 
+### Extract Main Content
+
 ```ts
-import { toHTML, extract } from "@mizchi/readability";
-import html2md from "html-to-md";
+import { extract, toMarkdown } from "@mizchi/readability";
 
 const url = "https://zenn.dev/mizchi/articles/ts-using-sampling-logger";
 const html = await fetch(url).then((res) => res.text());
-const extracted = extract(html, { charThreshold: 100 });
-// 結果を表示
-console.log(`Title: ${extracted.title}`);
-console.log(`Author: ${extracted.byline}`);
-if (!extracted.root) {
-  process.exit(1);
-}
-const htmlContent = toHTML(extracted.root);
-const md = html2md(htmlContent);
-console.log(md);
+const extracted = extract(html, {
+  charThreshold: 100,
+});
+
+const parsed = toMarkdown(extracted.root);
+console.log(parsed);
+```
+
+### Aria there
+
+```ts
+import { extractAriaTree, ariaTreeToString } from "@mizchi/readability";
+console.log("----- Aria Tree -----");
+const html = await fetch("https://zenn.dev").then((res) => res.text());
+const tree = extractAriaTree(html);
+const str = ariaTreeToString(tree);
+console.log(str);
 ```
 
 ---
