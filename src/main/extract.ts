@@ -14,6 +14,7 @@ import {
   type AriaNode, // AriaNode 型をインポート
   type LinkInfo, // LinkInfo 型をインポート
   type CandidateInfo, // CandidateInfo 型をインポート
+  type PageMetadata, // PageMetadata 型をインポート
   PageType, // Import ArticleType as a value
 } from "../types.ts";
 import { isVElement } from "../types.ts"; // Import isVElement as a value
@@ -863,17 +864,24 @@ export function extract(
   // --- End: Added logic for snapshot test ---
 
   // Return the result including tentative root and pageType
+  const metadata: PageMetadata = {
+    title: title || "", // Ensure title is string
+    lang: lang || undefined,
+    siteName: siteName || undefined,
+    url: doc.documentURI || "",
+  };
   return {
-    title,
-    byline,
-    lang,
-    siteName,
+    // title, // Moved to metadata
+    // byline, // Removed, handled by classifier
+    // lang, // Moved to metadata
+    // siteName, // Moved to metadata
     root, // Include the determined root
     nodeCount, // Include the calculated nodeCount
-    pageType, // Include the determined pageType
+    // pageType, // Removed, handled by classifier
     mainCandidates,
     links,
     ariaTree,
+    metadata, // Include the collected metadata
   };
 }
 

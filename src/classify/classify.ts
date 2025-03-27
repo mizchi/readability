@@ -4,10 +4,19 @@
  * ページタイプを分類するための関数を提供します
  */
 
-import { PageType, VDocument, VElement } from "../types.ts";
+import {
+  PageType,
+  VDocument,
+  VElement,
+  ExtractedSnapshot,
+  Classified,
+  ArticleClassified,
+  OtherClassified,
+  Classifier,
+  isVElement,
+} from "../types.ts";
 import { getInnerText, getLinkDensity, getElementsByTagName } from "../dom.ts";
 import { DEFAULT_CHAR_THRESHOLD } from "../constants.ts";
-
 /**
  * URLパターンに基づいてページタイプを判定する関数
  *
@@ -409,3 +418,158 @@ export function analyzeContentCharacteristics(
   reasons.push("記事の特徴を十分に満たしていません");
   return { pageType: PageType.OTHER, reasons };
 }
+
+/**
+ * ExtractedSnapshot を入力として受け取り、ページタイプを分類し、
+ * 可能性の高い順にソートされた Classified オブジェクトの配列を返す Classifier 実装。
+ */
+export const classifySnapshot: Classifier = (
+  snapshot: ExtractedSnapshot
+): Array<Classified> => {
+  // 1. snapshotから情報を取り出す
+  const { root, ariaTree, links, metadata, mainCandidates } = snapshot;
+  const url = metadata.url;
+
+  // 候補がない、またはrootがない場合は OTHER とする
+  if (!root || !mainCandidates || mainCandidates.length === 0) {
+    const otherResult: OtherClassified = {
+      pageType: PageType.OTHER,
+      possibility: 1.0, // 確実にOTHER
+      ariaTree: ariaTree,
+      links: links,
+      mainCandidates: mainCandidates || [],
+    };
+    return [otherResult];
+  }
+
+  // 2. 既存のロジックを参考に記事である可能性をスコアリング
+  const topCandidate = mainCandidates[0].element;
+  let articlePossibility = 0.0;
+  const reasons: string[] = []; // デバッグ/分析用の理由付け
+
+  // 2.1 セマンティックタグ
+  const isSemanticTag =
+    topCandidate.tagName === "main" ||
+    topCandidate.tagName === "article" ||
+    topCandidate.className?.toLowerCase().includes("content") ||
+    topCandidate.id?.toLowerCase().includes("content") ||
+    topCandidate.children.some(
+      (child) =>
+        isVElement(child) &&
+        (child.tagName === "main" || child.tagName === "article")
+    );
+  if (isSemanticTag) {
+    articlePossibility += 0.2;
+    reasons.push("Semantic tag found");
+  }
+
+  // 2.2 テキスト長とリンク密度 (最有力候補)
+  const textLength = getInnerText(topCandidate).length;
+  const linkDensity = getLinkDensity(topCandidate);
+  if (textLength >= DEFAULT_CHAR_THRESHOLD) {
+    articlePossibility += 0.3;
+    reasons.push(`Sufficient text length (${textLength})`);
+  } else if (textLength < DEFAULT_CHAR_THRESHOLD / 2) {
+    articlePossibility -= 0.1; // 短すぎると減点
+    reasons.push(`Insufficient text length (${textLength})`);
+  }
+  if (linkDensity <= 0.3) {
+    articlePossibility += 0.2;
+    reasons.push(`Low link density (${linkDensity.toFixed(2)})`);
+  } else if (linkDensity > 0.6) {
+    articlePossibility -= 0.2; // リンク密度が高すぎると減点
+    reasons.push(`High link density (${linkDensity.toFixed(2)})`);
+  }
+
+  // 2.3 見出し要素 (root全体でカウント)
+  const h1Elements = getElementsByTagName(root, "h1");
+  const h2Elements = getElementsByTagName(root, "h2");
+  const h3Elements = getElementsByTagName(root, "h3");
+  const headingCount =
+    h1Elements.length + h2Elements.length + h3Elements.length;
+  if (headingCount >= 1 && headingCount <= 10) {
+    articlePossibility += 0.1;
+    reasons.push(`Appropriate heading count (${headingCount})`);
+  } else if (headingCount === 0 || headingCount > 15) {
+    articlePossibility -= 0.1; // 見出しがないか多すぎると減点
+    reasons.push(`Inappropriate heading count (${headingCount})`);
+  }
+
+  // 2.4 リスト要素 (root全体でカウント) - インデックスページの特徴
+  const articleElements = getElementsByTagName(root, "article");
+  // li は汎用的すぎるので card/item/entry クラスを持つ要素をカウント
+  const cardElements = root.children.filter(
+    (child) =>
+      isVElement(child) &&
+      (child.className?.toLowerCase().includes("card") ||
+        child.className?.toLowerCase().includes("item") ||
+        child.className?.toLowerCase().includes("entry"))
+  );
+  const listElementCount = articleElements.length + cardElements.length;
+  if (listElementCount > 10) {
+    articlePossibility -= 0.2; // リスト要素が多いと減点
+    reasons.push(`Many list-like elements found (${listElementCount})`);
+  }
+
+  // 2.5 候補のスコア差 (平衡性) - インデックスページの特徴
+  if (mainCandidates.length >= 2) {
+    const topScore = mainCandidates[0].score || 0;
+    const secondScore = mainCandidates[1].score || 0;
+    // topScoreが0の場合のゼロ除算を避ける
+    const scoreRatio = topScore > 0 ? secondScore / topScore : 0;
+    if (scoreRatio > 0.8) {
+      articlePossibility -= 0.1; // 候補が平衡していると減点
+      reasons.push(
+        `Candidates scores are balanced (ratio: ${scoreRatio.toFixed(2)})`
+      );
+    }
+  }
+
+  // 2.6 URLパターンによる加点/減点
+  const urlPageType = getExpectedPageTypeByUrl(url);
+  if (urlPageType === PageType.ARTICLE) {
+    articlePossibility += 0.1;
+    reasons.push("URL pattern suggests ARTICLE");
+  } else {
+    // URLがOTHERを示唆しても、内容が記事なら減点はしない方が良いかもしれない
+    // articlePossibility -= 0.1;
+    reasons.push("URL pattern suggests OTHER");
+  }
+
+  // 可能性を 0.0 ~ 1.0 の範囲に収める
+  articlePossibility = Math.max(0.0, Math.min(1.0, articlePossibility));
+
+  // console.log("Classification Score:", articlePossibility.toFixed(2), "Reasons:", reasons); // デバッグ用
+
+  // 3. 結果オブジェクトを作成
+  const results: Classified[] = [];
+
+  // ArticleClassified を作成
+  const articleResult: ArticleClassified = {
+    pageType: PageType.ARTICLE,
+    possibility: articlePossibility,
+    title: metadata.title,
+    byline: "", // TODO: byline抽出ロジックが必要
+    lang: metadata.lang || "unknown",
+    siteName: metadata.siteName || "unknown",
+    content: topCandidate, // 最有力候補をcontentとする
+    // header/footer は snapshot には直接ないので、別途抽出するか、ここでは undefined
+  };
+  results.push(articleResult);
+
+  // OtherClassified を作成
+  const otherPossibility = 1.0 - articlePossibility;
+  const otherResult: OtherClassified = {
+    pageType: PageType.OTHER,
+    possibility: otherPossibility,
+    ariaTree: ariaTree, // OTHERの場合はAriaTreeを含める
+    links: links,
+    mainCandidates: mainCandidates,
+  };
+  results.push(otherResult);
+
+  // 4. possibility で降順ソート
+  results.sort((a, b) => b.possibility - a.possibility);
+
+  return results;
+};

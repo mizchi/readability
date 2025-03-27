@@ -31,8 +31,8 @@ const SNAPSHOT_DIR = path.join(__dirname, "snapshots");
  * @returns 抽出された記事情報
  */
 async function fetchAndExtractHTML(url: string): Promise<{
-  title: string | null;
-  byline: string | null;
+  title: string; // metadata.title は string
+  // byline: string | null; // byline は削除
   html: string;
   markdown: string;
 }> {
@@ -78,8 +78,8 @@ async function fetchAndExtractHTML(url: string): Promise<{
     const markdown = html2md(htmlContent);
 
     return {
-      title: article.title,
-      byline: article.byline,
+      title: article.metadata.title, // title は metadata から取得
+      // byline: article.byline, // byline は削除
       html: htmlContent,
       markdown,
     };

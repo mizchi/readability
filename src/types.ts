@@ -143,78 +143,61 @@ export interface CandidateInfo {
   score: number;
 }
 
+export type PageMetadata = {
+  title: string;
+  lang?: string;
+  siteName?: string;
+  url: string;
+};
+
 // Extracted snapshot result
 export interface ExtractedSnapshot {
-  title: string | null;
-  byline: string | null;
-  lang: string | null; // メタデータ: 言語
-  siteName: string | null; // メタデータ: サイト名
+  // title: string | null;
+  // byline: string | null;
+  // lang: string | null; // メタデータ: 言語
+  // siteName: string | null; // メタデータ: サイト名
   root: VElement | null; // Parsed HTML root element (can be null if parsing fails or content is empty)
   nodeCount: number;
-  pageType: PageType;
+  // pageType: PageType;
   // 構造要素 (pageTypeがARTICLEだがrootがnullの場合などに設定される)
-  header?: VElement | null;
-  footer?: VElement | null;
-  otherSignificantNodes?: VElement[];
+  // header?: VElement | null;
+  // footer?: VElement | null;
+  // otherSignificantNodes?: VElement[];
   // Ariaツリー (オプションで生成・保持)
-  ariaTree?: AriaTree;
+  ariaTree?: AriaTree; // generateAriaTree オプションに応じて undefined になる可能性がある
   // 抽出されたリンク情報
-  links?: LinkInfo[];
+  links: LinkInfo[];
+  metadata: PageMetadata;
   // メイン候補情報
   mainCandidates?: CandidateInfo[];
 }
 
-// 新しいインターフェース定義（pageTypeに応じたデータ構造）
+export type ArticleClassified = {
+  pageType: PageType.ARTICLE;
+  possibility: number;
 
-// Article type result (pageType === ARTICLE)
-export interface ArticleContent {
-  title: string | null;
-  byline: string | null;
-  lang: string | null;
-  siteName: string | null;
-  root: VElement | null; // メインコンテンツのルート要素
-}
+  title: string;
+  byline: string;
+  lang: string;
+  siteName: string;
+  content: VElement;
+  header?: VElement;
+  footer?: VElement;
+};
+export type OtherClassified = {
+  pageType: PageType.OTHER;
+  possibility: number;
+  // compacted aria tree
+  ariaTree?: AriaTree; // snapshot.ariaTree が undefined の場合があるためオプショナルに
+  links: LinkInfo[];
+  mainCandidates: CandidateInfo[];
+};
 
-// Other type result (pageType === OTHER)
-export interface OtherContent {
-  title: string | null;
-  lang: string | null;
-  siteName: string | null;
-  header?: VElement | null;
-  footer?: VElement | null;
-  otherSignificantNodes?: VElement[];
-  ariaTree?: AriaTree; // 圧縮済みのAriaTree (現状維持、必要なら変更)
-  links?: LinkInfo[]; // OTHERタイプでもリンク情報は有用な場合がある
-}
+export type Classified = ArticleClassified | OtherClassified;
 
-// pageTypeに応じたデータを取得する関数
-export function getContentByPageType(
-  result: ExtractedSnapshot
-): ArticleContent | OtherContent {
-  if (result.pageType === PageType.ARTICLE) {
-    // ARTICLEの場合
-    return {
-      title: result.title,
-      byline: result.byline,
-      lang: result.lang,
-      siteName: result.siteName,
-      root: result.root,
-    };
-  } else {
-    // OTHERの場合
-    return {
-      title: result.title,
-      lang: result.lang,
-      siteName: result.siteName,
-      header: result.header,
-      footer: result.footer,
-      otherSignificantNodes: result.otherSignificantNodes,
-      ariaTree: result.ariaTree,
-      links: result.links,
-    };
-  }
-}
+export type Classifier = (snapshot: ExtractedSnapshot) => Array<Classified>; // sorted by possibility;
 
+// 不要になった ArticleContent, OtherContent, getContentByPageType を削除
 // Readability options
 export interface ReadabilityOptions {
   charThreshold?: number;

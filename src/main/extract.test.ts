@@ -258,8 +258,7 @@ describe("Core Readability Functions", () => {
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
 
-    // Check article type
-    expect(result.pageType).toBe(PageType.ARTICLE);
+    // Check article type (moved to classify.test.ts)
 
     // Check if extracted content includes test article text
     if (result.root) {
@@ -291,8 +290,7 @@ describe("Core Readability Functions", () => {
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
 
-    // Check article type
-    expect(result.pageType).toBe(PageType.ARTICLE);
+    // Check article type (moved to classify.test.ts)
 
     // Check if extracted content includes text within the article tag
     if (result.root) {
@@ -317,8 +315,7 @@ describe("Core Readability Functions", () => {
     // Check if node count is calculated
     expect(result.nodeCount).toBeGreaterThan(0);
 
-    // Check article type
-    expect(result.pageType).toBe(PageType.ARTICLE);
+    // Check article type (moved to classify.test.ts)
 
     // Check if extracted content includes main content text
     if (result.root) {
@@ -339,16 +336,15 @@ describe("Core Readability Functions", () => {
     // Override default threshold for this test if needed, or rely on default
     const result = extract(SHORT_TEXT_HTML, { charThreshold: 500 }); // extract を使用し、HTML文字列を渡す
 
-    // Check article type - should be OTHER because content is too short
-    expect(result.pageType).toBe(PageType.OTHER);
+    // Check article type (moved to classify.test.ts)
 
     // Check if content is null due to threshold
     expect(result.root).toBeNull();
     expect(result.nodeCount).toBe(0);
     // Structural elements should not be populated for OTHER type
-    expect(result.header).toBeUndefined();
-    expect(result.footer).toBeUndefined();
-    expect(result.otherSignificantNodes).toBeUndefined();
+    // expect(result.header).toBeUndefined(); // header は削除された (コメントアウト済み)
+    // expect(result.footer).toBeUndefined(); // footer は削除された (コメントアウト済み)
+    // expect(result.otherSignificantNodes).toBeUndefined(); // otherSignificantNodes は削除された (コメントアウト済み)
   });
 
   test.skip("extract - Short article with structure (ARTICLE, root=null, structure populated)", () => {
@@ -360,8 +356,7 @@ describe("Core Readability Functions", () => {
 
     // Check article type - should be ARTICLE because a candidate was found and deemed probable
     // Note: The current extract logic might classify this as OTHER due to the root being null after isProbablyContent check.
-    // This test might need adjustment based on the final classification logic.
-    expect(result.pageType).toBe(PageType.ARTICLE); // This assertion might fail now
+    // This test might need adjustment based on the final classification logic. (moved to classify.test.ts)
 
     // Check if content is null due to threshold
     expect(result.root).toBeNull();
@@ -390,8 +385,7 @@ describe("Core Readability Functions", () => {
     // 関数名を変更
     const result = extract(NO_MAIN_CONTENT_HTML, { charThreshold: 500 }); // extract を使用し、HTML文字列を渡す
 
-    // Check article type - should be OTHER as no strong candidate likely found
-    expect(result.pageType).toBe(PageType.OTHER);
+    // Check article type (moved to classify.test.ts)
 
     // Check if content is null
     expect(result.root).toBeNull();
