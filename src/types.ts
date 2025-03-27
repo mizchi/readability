@@ -8,7 +8,7 @@ export type VNodeType = "element" | "text";
 
 // Basic node interface
 export interface VNodeBase {
-  parent?: VElement;
+  parent?: WeakRef<VElement>;
   readability?: {
     contentScore: number;
   };
@@ -120,7 +120,7 @@ export interface AriaNode {
   valuemax?: number; // 最大値
   valuetext?: string; // 値のテキスト表現
   children?: AriaNode[]; // 子ノード
-  originalElement?: VElement; // 元のDOM要素への参照
+  originalElement?: WeakRef<VElement>; // 元のDOM要素への参照 (WeakRef)
 }
 
 // Ariaツリー全体の構造
@@ -143,13 +143,13 @@ export interface CandidateInfo {
   score: number;
 }
 
-// Readability result
-export interface ReadabilityArticle {
+// Extracted snapshot result
+export interface ExtractedSnapshot {
   title: string | null;
   byline: string | null;
   lang: string | null; // メタデータ: 言語
   siteName: string | null; // メタデータ: サイト名
-  root: VElement | null; // メインコンテンツのルート要素 (閾値以上の場合)
+  root: VElement | null; // Parsed HTML root element (can be null if parsing fails or content is empty)
   nodeCount: number;
   pageType: PageType;
   // 構造要素 (pageTypeがARTICLEだがrootがnullの場合などに設定される)
@@ -189,7 +189,7 @@ export interface OtherContent {
 
 // pageTypeに応じたデータを取得する関数
 export function getContentByPageType(
-  result: ReadabilityArticle
+  result: ExtractedSnapshot
 ): ArticleContent | OtherContent {
   if (result.pageType === PageType.ARTICLE) {
     // ARTICLEの場合

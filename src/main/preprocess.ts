@@ -78,10 +78,11 @@ function removeUnwantedTags(doc: VDocument): void {
 
     // Remove elements from their parent
     for (const element of elements) {
-      if (element.parent) {
-        const index = element.parent.children.indexOf(element);
+      const parent = element.parent?.deref();
+      if (parent) {
+        const index = parent.children.indexOf(element);
         if (index !== -1) {
-          element.parent.children.splice(index, 1);
+          parent.children.splice(index, 1);
         }
       }
     }
@@ -97,10 +98,11 @@ function removeAds(doc: VDocument): void {
 
   // Remove elements that seem to be ads
   for (const element of allElements) {
-    if (isLikelyAd(element) && element.parent) {
-      const index = element.parent.children.indexOf(element);
+    const parent = element.parent?.deref();
+    if (isLikelyAd(element) && parent) {
+      const index = parent.children.indexOf(element);
       if (index !== -1) {
-        element.parent.children.splice(index, 1);
+        parent.children.splice(index, 1);
       }
     }
   }

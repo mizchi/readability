@@ -29,7 +29,7 @@ export function parseHTML(
 
   // Setup document structure
   document.documentElement.children = [document.body];
-  document.body.parent = document.documentElement;
+  document.body.parent = new WeakRef(document.documentElement); // Use WeakRef
 
   // Currently processing element
   let currentElement: VElement = document.body;
@@ -41,7 +41,7 @@ export function parseHTML(
         tagName: name.toLowerCase(), // Use lowercase
         attributes: {},
         children: [],
-        parent: currentElement,
+        parent: new WeakRef(currentElement), // Use WeakRef
       };
 
       // Set attributes
@@ -64,7 +64,7 @@ export function parseHTML(
       const textNode: VText = {
         nodeType: "text",
         textContent: text,
-        parent: currentElement,
+        parent: new WeakRef(currentElement), // Use WeakRef
       };
 
       // Add to parent element
@@ -72,8 +72,17 @@ export function parseHTML(
     },
     onclosetag() {
       // Return to parent element
-      if (currentElement.parent) {
-        currentElement = currentElement.parent;
+      const parentRef = currentElement.parent;
+      if (parentRef) {
+        const parentElement = parentRef.deref();
+        if (parentElement) {
+          currentElement = parentElement;
+        } else {
+          // Parent might have been garbage collected, handle appropriately
+          // For now, we might just stop traversing up or throw an error
+          console.warn("Parent element not found, possibly garbage collected.");
+          // Or potentially set currentElement to the root or handle differently
+        }
       }
     },
   });

@@ -206,7 +206,7 @@ export function buildAriaNode(element: VElement): AriaNode {
   const node: AriaNode = {
     type,
     role,
-    originalElement: element,
+    originalElement: new WeakRef(element), // Use WeakRef
   };
 
   // 名前があれば追加
@@ -733,12 +733,13 @@ export function ariaTreeToString(
     let href = "";
     let src = "";
     let alt = "";
-    if (node.originalElement) {
+    const originalElement = node.originalElement?.deref();
+    if (originalElement) {
       if (node.type === "link") {
-        href = node.originalElement.attributes.href || "";
+        href = originalElement.attributes.href || "";
       } else if (node.type === "img") {
-        src = node.originalElement.attributes.src || "";
-        alt = node.originalElement.attributes.alt || "";
+        src = originalElement.attributes.src || "";
+        alt = originalElement.attributes.alt || "";
       }
     }
 

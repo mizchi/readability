@@ -6,7 +6,7 @@
 
 // Export only public type definitions
 export type {
-  ReadabilityArticle,
+  ExtractedSnapshot as ReadabilityArticle,
   ReadabilityOptions,
   VDocument,
   VElement,

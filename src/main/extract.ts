@@ -7,7 +7,7 @@
 import {
   type VDocument, // Keep type imports for interfaces/types
   type VElement,
-  type ReadabilityArticle,
+  type ExtractedSnapshot,
   type ReadabilityOptions,
   type Parser,
   type AriaTree,
@@ -124,7 +124,10 @@ function findStructuralElements(doc: VDocument): {
         className?.includes("masthead")
       ) {
         // より上位の要素を優先 (body直下など)
-        if (!header || (el.parent === body && header.parent !== body)) {
+        if (
+          !header ||
+          (el.parent?.deref() === body && header.parent?.deref() !== body)
+        ) {
           header = el;
         }
       }
@@ -161,7 +164,7 @@ function findStructuralElements(doc: VDocument): {
               isInsideHeader = true;
               break;
             }
-            current = current.parent;
+            current = current.parent?.deref();
           }
           if (!isInsideHeader) {
             footer = el;
@@ -200,7 +203,7 @@ function findStructuralElements(doc: VDocument): {
         isInsideHeaderOrFooter = true;
         break;
       }
-      current = current.parent;
+      current = current.parent?.deref();
     }
 
     if (!isInsideHeaderOrFooter && !otherSignificantNodes.includes(node)) {
@@ -406,17 +409,22 @@ export function findMainCandidates(
 
       // Check parent node score - the parent might be a better candidate
       let currentCandidate = candidate;
-      let parentOfCandidate = currentCandidate.parent;
-      while (parentOfCandidate && parentOfCandidate.tagName !== "BODY") {
+      let parentRef = currentCandidate.parent;
+      while (parentRef) {
+        const parentElement = parentRef.deref();
+        if (!parentElement || parentElement.tagName === "BODY") {
+          break; // 親が存在しないか、BODYまで到達したら終了
+        }
+
         if (
-          parentOfCandidate.readability &&
+          parentElement.readability &&
           currentCandidate.readability &&
-          parentOfCandidate.readability.contentScore >
+          parentElement.readability.contentScore >
             currentCandidate.readability.contentScore
         ) {
-          currentCandidate = parentOfCandidate;
+          currentCandidate = parentElement;
         }
-        parentOfCandidate = parentOfCandidate.parent;
+        parentRef = parentElement.parent; // 次の親の WeakRef を取得
       }
 
       // Avoid adding duplicates if parent check resulted in the same element
@@ -713,6 +721,7 @@ export function classifyPageType(
 /**
  * HTMLからAriaTreeを抽出する
  *
+ *
  * @param html HTML文字列
  * @param options オプション
  * @returns AriaTree
@@ -751,7 +760,7 @@ export function extractAriaTree(
       body: parsedResult,
     };
     doc.documentElement.children = [doc.body];
-    doc.body.parent = doc.documentElement;
+    doc.body.parent = new WeakRef(doc.documentElement); // Use WeakRef
   } else {
     doc = parsedResult;
   }
@@ -780,7 +789,7 @@ export function extractAriaTree(
 export function extract(
   html: string,
   options: ReadabilityOptions = {}
-): ReadabilityArticle {
+): ExtractedSnapshot {
   // Parse HTML to create virtual DOM
   const parser = options.parser || parseHTML;
   const parsedResult = parser(html);
@@ -792,7 +801,7 @@ export function extract(
       body: parsedResult,
     };
     doc.documentElement.children = [doc.body];
-    doc.body.parent = doc.documentElement;
+    doc.body.parent = new WeakRef(doc.documentElement); // Use WeakRef
   } else {
     doc = parsedResult;
   }
@@ -880,7 +889,7 @@ export function createExtractor(opts: {
 }): (
   html: string,
   options?: Omit<ReadabilityOptions, "parser"> // Allow overriding options later
-) => ReadabilityArticle {
+) => ExtractedSnapshot {
   const {
     parser,
     generateAriaTree: defaultGenerateAriaTree, // Rename for clarity
@@ -890,7 +899,7 @@ export function createExtractor(opts: {
   return (
     html: string,
     options: Omit<ReadabilityOptions, "parser"> = {}
-  ): ReadabilityArticle => {
+  ): ExtractedSnapshot => {
     // Call the refactored extract function with the configured parser and merged options
     return extract(html, {
       ...options, // Pass through options provided to the returned function

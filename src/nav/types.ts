@@ -64,7 +64,7 @@ export interface AriaNode {
   valuemax?: number; // 最大値
   valuetext?: string; // 値のテキスト表現
   children?: AriaNode[]; // 子ノード
-  originalElement?: VElement; // 元のDOM要素への参照
+  originalElement?: WeakRef<VElement>; // 元のDOM要素への参照 (WeakRef)
 }
 
 // Ariaツリー全体の構造

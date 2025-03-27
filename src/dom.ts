@@ -75,15 +75,16 @@ export function getNextNode(
   }
 
   // Look for sibling nodes
-  const siblings = node.parent?.children || [];
+  const siblings = node.parent?.deref()?.children || [];
   const index = siblings.indexOf(node);
   if (index !== -1 && index < siblings.length - 1) {
     return siblings[index + 1];
   }
 
   // Look for parent's siblings
-  if (node.parent) {
-    return getNextNode(node.parent, true);
+  const parent = node.parent?.deref();
+  if (parent) {
+    return getNextNode(parent, true);
   }
 
   return null;
@@ -135,9 +136,12 @@ export function hasAncestorTag(
 ): boolean {
   tagName = tagName.toLowerCase(); // Use lowercase
   let depth = 0;
-  let currentNode = node.parent;
+  let currentRef = node.parent;
 
-  while (currentNode) {
+  while (currentRef) {
+    const currentNode = currentRef.deref();
+    if (!currentNode) break; // Parent might have been garbage collected
+
     if (maxDepth > 0 && depth > maxDepth) {
       return false;
     }
@@ -146,7 +150,7 @@ export function hasAncestorTag(
       return true;
     }
 
-    currentNode = currentNode.parent;
+    currentRef = currentNode.parent;
     depth++;
   }
 
@@ -255,12 +259,14 @@ export function getNodeAncestors(
   maxDepth: number = 3
 ): VElement[] {
   const ancestors: VElement[] = [];
-  let currentNode = node.parent;
+  let currentRef = node.parent;
   let depth = 0;
 
-  while (currentNode && (maxDepth <= 0 || depth < maxDepth)) {
+  while (currentRef && (maxDepth <= 0 || depth < maxDepth)) {
+    const currentNode = currentRef.deref();
+    if (!currentNode) break; // Parent might have been garbage collected
     ancestors.push(currentNode);
-    currentNode = currentNode.parent;
+    currentRef = currentNode.parent;
     depth++;
   }
 
