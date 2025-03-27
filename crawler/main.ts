@@ -3,14 +3,21 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { URL } from "node:url"; // URL パースに必要
 import minimist from "minimist"; // コマンドライン引数解析
-import { CacheLoader } from "./loader.ts";
+// import { CacheLoader } from "./loader.ts"; // 不要
 import { Crawler } from "./crawler.ts";
-import type { ILoader } from "./types.ts";
+// import type { ILoader } from "./types.ts"; // 不要
+// Markdown生成用に CachingLoader 等をインポート
+import { FetcherLoader } from "./loaders/fetcher.ts";
+import { FileSystemKVBackend } from "./loaders/kv_backend.ts";
+import { CachingLoader } from "./loaders/caching_loader.ts";
 import { calculatePageRank } from "./pagerank.ts";
 import { readable, PageType, type LinkInfo } from "../src/index.ts"; // LinkInfo もインポート
+import type { ActionQueueItem } from "./types.ts"; // ★★★ CrawlQueueItem -> ActionQueueItem
 
 // --- 定数 ---
-const ENTRY_POINT = "https://cnn.co.jp";
+// const ENTRY_POINT = "https://cnn.co.jp";
+// const ENTRY_POINT = "https://zenn.dev";
+const ENTRY_POINT = "https://docs.anthropic.com/en/docs/welcome";
 // const OUTPUT_DIR = "./crawler_output"; // デフォルト値は args パース後に設定
 
 // --- メイン処理 ---
@@ -23,7 +30,7 @@ async function main() {
   // const loader: ILoader = new CacheLoader(1000); // Crawler 内部で生成するため不要
   const crawler = new Crawler(ENTRY_POINT, {
     // loader 引数を削除
-    maxRequests: 50,
+    maxSteps: 10, // Use maxSteps option
     maxDepth: 3,
     concurrentRequests: 2,
     epochSize: 10,
@@ -31,7 +38,7 @@ async function main() {
   });
 
   console.log(
-    `[Crawler Start] Entry: ${ENTRY_POINT}, Max Depth: ${crawler["maxDepth"]}, Max Requests: ${crawler["maxRequests"]}, Concurrency: ${crawler["concurrentRequests"]}, Epoch Size: ${crawler["epochSize"]}`
+    `[Crawler Start] Entry: ${ENTRY_POINT}, Max Depth: ${crawler["maxDepth"]}, Max Steps: ${crawler.getMaxSteps()}, Concurrency: ${crawler["concurrentRequests"]}, Epoch Size: ${crawler["epochSize"]}` // Use getMaxSteps()
   );
 
   try {
@@ -47,8 +54,27 @@ async function main() {
 
     const visitedCount = crawler.getVisitedUrls().size;
     console.log(
-      `\n[Crawler Finished] Total requests: ${crawler["totalRequestCount"]}. Visited ${visitedCount} unique URLs.`
+      `\n[Crawler Finished] Total steps: ${crawler.getTotalSteps()}. Visited ${visitedCount} unique URLs.` // Use getTotalSteps()
     );
+
+    // Check if the queue is empty and notify
+    if (
+      crawler.getQueueLength() === 0 &&
+      crawler.getTotalSteps() < crawler.getMaxSteps()
+    ) {
+      console.log(
+        "[Crawler Info] Queue is empty. All reachable URLs processed within depth/step limits."
+      );
+    } else if (crawler.getTotalSteps() >= crawler.getMaxSteps()) {
+      console.log(
+        `[Crawler Info] Reached max steps (${crawler.getMaxSteps()}). There might be more URLs in the queue.`
+      );
+    } else if (crawler.getQueueLength() > 0) {
+      // This case might happen if the loop breaks unexpectedly, though unlikely with current logic
+      console.log(
+        `[Crawler Info] Finished with ${crawler.getQueueLength()} URLs remaining in the queue (reason unclear).`
+      );
+    }
 
     // PageRank 計算と表示・保存
     if (visitedCount > 0) {
@@ -93,15 +119,16 @@ async function main() {
         console.log(`  Generating Markdown for ${visitedUrls.length} pages...`);
 
         // Markdown 生成用に別途 Loader を用意 (同じキャッシュディレクトリを指定)
-        // const pagesByDomain = new Map<string, Map<string, { title: string; mdPath: string }>>(); // ドメインごとのページ情報 (移動済み)
-        const outputLoader = new CacheLoader(
-          0,
+        const outputFetcher = new FetcherLoader({ interval: 0 }); // Markdown生成時はインターバル不要
+        const outputBackend = new FileSystemKVBackend(
           path.join(OUTPUT_DIR, "_meta", "cache")
-        ); // キャッシュディレクトリを更新 (_meta に変更)
+        );
+        const outputLoader = new CachingLoader(outputFetcher, outputBackend);
         for (const url of visitedUrls) {
           try {
-            const loadResult = await outputLoader.get(url); // outputLoader を使用
-            const html = loadResult.content; // content を取り出す
+            // CachingLoader の get は CachedLoadResult | null を返す
+            const loadResult = await outputLoader.get(url);
+            const html = loadResult?.content; // Optional chaining を使用
             if (!html) {
               // console.warn(`    [Markdown Skip] No cache found for ${url}`);
               continue;
@@ -303,6 +330,31 @@ async function main() {
     }
   } catch (error) {
     console.error("[Crawler Error]", error);
+  } finally {
+    // --- 終了処理 ---
+    // 1. キューの状態を保存
+    await crawler.saveQueueState(); // ★★★ キュー保存処理を追加 ★★★
+
+    // 2. 実行結果とキューの最終状態を表示 (保存後に行う)
+    const finalQueueLength = crawler.getQueueLength();
+    const addedCount = crawler.getSessionAddedUrlsCount(); // ★★★ 追加された数を取得
+    console.log(
+      `\n[Crawl Summary] Added ${addedCount} URLs to the queue during this session.`
+    );
+    console.log(`[Final Queue Status] ${finalQueueLength} items remaining.`);
+    if (finalQueueLength > 0) {
+      const nextActions = crawler.peekQueue(3); // メモリ上の最新状態を見る
+      console.log("  Next 3 actions (by score):");
+      nextActions.forEach((action: ActionQueueItem, index: number) => {
+        // ★★★ CrawlQueueItem -> ActionQueueItem
+        // ★★★ 型注釈を追加
+        console.log(
+          `    ${index + 1}. Score: ${action.score.toFixed(2)}, URL: ${action.url}` // action の型を CrawlQueueItem と仮定
+        );
+      });
+    } else {
+      console.log("  Queue is empty.");
+    }
   }
 }
 
