@@ -10,3 +10,8 @@ node_modules
 *.xpi
 
 dist
+# .crawler_cache # 削除
+out/meta
+out/cache
+**/_meta/
+out

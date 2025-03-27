@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@types/minimist':
+        specifier: ^1.2.5
+        version: 1.2.5
       htmlparser2:
         specifier: ^10.0.0
         version: 10.0.0
+      minimist:
+        specifier: ^1.2.8
+        version: 1.2.8
     devDependencies:
       '@types/jsdom':
         specifier: ^21.1.7
@@ -519,6 +525,9 @@ packages:
 
   '@types/jsdom@21.1.7':
     resolution: {integrity: sha512-yOriVnggzrnQ3a9OKOCxaVuSug3w3/SbOj5i7VwXWZEyUNl3bLF9V3MfxGbZKuwqJOQyRfqXyROBB1CoZLFWzA==}
+
+  '@types/minimist@1.2.5':
+    resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
 
   '@types/node@22.13.13':
     resolution: {integrity: sha512-ClsL5nMwKaBRwPcCvH8E7+nU4GxHVx1axNvMZTFHMEfNI7oahimt26P5zjVCRrjiIWj6YFXfE1v3dEp94wLcGQ==}
@@ -3167,6 +3176,8 @@ snapshots:
       '@types/node': 22.13.13
       '@types/tough-cookie': 4.0.5
       parse5: 7.2.1
+
+  '@types/minimist@1.2.5': {}
 
   '@types/node@22.13.13':
     dependencies:

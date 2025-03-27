@@ -6,7 +6,7 @@ import dts from "vite-plugin-dts";
 export default defineConfig({
   plugins: [
     dts({
-      include: "src/**/*.ts",
+      include: ["src/**/*.ts"],
       exclude: ["src/**/*.test.ts", "v3/test/**", "v3/examples/**"],
     }),
   ],
@@ -30,7 +30,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     // test ディレクトリ以下の .js ファイルをテスト対象に含める
-    include: ["src/**/*.test.ts", "test/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "test/**/*.test.ts", "crawler/**/*.test.ts"], // crawler ディレクトリの .test.ts ファイルを対象にする
     // テスト対象から除外するファイル
     exclude: [
       "**/node_modules/**",

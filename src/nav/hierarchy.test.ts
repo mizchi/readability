@@ -30,6 +30,7 @@ describe("analyzeLinkHierarchy", () => {
       sibling: [],
       child: [],
       external: [],
+      scores: new Map(),
     });
     expect(
       analyzeLinkHierarchy(links, { title: "No URL" } as PageMetadata)
@@ -38,6 +39,7 @@ describe("analyzeLinkHierarchy", () => {
       sibling: [],
       child: [],
       external: [],
+      scores: new Map(),
     });
   });
 
@@ -47,12 +49,14 @@ describe("analyzeLinkHierarchy", () => {
       sibling: [],
       child: [],
       external: [],
+      scores: new Map(),
     });
     expect(analyzeLinkHierarchy([], metadata)).toEqual({
       parent: [],
       sibling: [],
       child: [],
       external: [],
+      scores: new Map(),
     });
   });
 
@@ -114,6 +118,7 @@ describe("analyzeLinkHierarchy", () => {
         links[10], // //anotherdomain.net/resource
         links[11], // mailto:test@example.com
       ],
+      scores: new Map(),
     };
 
     const result = analyzeLinkHierarchy(links, metadata);
@@ -121,11 +126,20 @@ describe("analyzeLinkHierarchy", () => {
     // Sort arrays for comparison as order might differ slightly based on Map iteration
     Object.keys(expected).forEach((key) => {
       const k = key as keyof LinkHierarchyAnalysis;
-      result[k].sort((a, b) => (a.href || "").localeCompare(b.href || ""));
-      expected[k].sort((a, b) => (a.href || "").localeCompare(b.href || ""));
+      if (k !== "scores") {
+        (result[k] as LinkInfo[]).sort((a, b) =>
+          (a.href || "").localeCompare(b.href || "")
+        );
+        (expected[k] as LinkInfo[]).sort((a, b) =>
+          (a.href || "").localeCompare(b.href || "")
+        );
+      }
     });
 
-    expect(result).toEqual(expected);
+    // scoresは比較対象から除外
+    const { scores: _, ...resultWithoutScores } = result;
+    const { scores: __, ...expectedWithoutScores } = expected;
+    expect(resultWithoutScores).toEqual(expectedWithoutScores);
   });
 
   it("should handle URLs with trailing slashes consistently", () => {

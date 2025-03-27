@@ -4,13 +4,24 @@
  * Utility functions for generating ARIA snapshots
  */
 
-import type {
-  VElement,
-  VNode,
-  VText,
-  AriaNode,
-  AriaNodeType,
-} from "../types.ts";
+import type { VElement, VNode, VText, AriaNodeType } from "../types.ts";
+
+export interface AriaNode {
+  type: AriaNodeType;
+  role: string;
+  originalElement: WeakRef<VElement>;
+  name?: string;
+  level?: number;
+  checked?: boolean;
+  selected?: boolean;
+  expanded?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  valuemin?: number;
+  valuemax?: number;
+  valuetext?: string;
+  children?: AriaNode[];
+}
 import { getAttribute, isProbablyVisible, getInnerText } from "../dom.ts";
 
 /**
