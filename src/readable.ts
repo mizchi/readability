@@ -24,7 +24,7 @@ import {
 } from "./main/extract.ts";
 import { toMarkdown as internalToMarkdown } from "./format/markdown.ts";
 import { countNodes as internalCountNodes } from "./format/format.ts";
-import { buildAriaTree as internalBuildAriaTree } from "./nav/aria.ts";
+import { buildAriaTree as internalBuildAriaTree } from "./nav/readableAria.ts";
 
 /** Options for the readable function */
 export interface ReadableOptions extends InternalReadabilityOptions {

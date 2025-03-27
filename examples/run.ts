@@ -1,7 +1,7 @@
 // import { toHTML, extract } from "@mizchi/readability";
 import {
   extract,
-  ariaTreeToString,
+  toReadableAriaTree,
   toMarkdown,
   extractAriaTree,
 } from "../src/index.ts";
@@ -22,9 +22,9 @@ console.log(parsed);
   console.log("----- Aria Tree -----");
   const html = await fetch("https://zenn.dev").then((res) => res.text());
   const tree = extractAriaTree(html);
-  // console.log(tree);
-  const str = ariaTreeToString(tree);
-  console.log(str);
+  console.log(tree);
+  // const str = toReadableAriaTree(doc); // Cannot use toReadableAriaTree here as 'doc' is not available
+  // console.log(str); // 'str' is no longer defined
 }
 
 // if (extracted.pageType === "article") {

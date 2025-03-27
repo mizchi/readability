@@ -28,10 +28,9 @@ import {
   getTextDensity, // getTextDensity を import
 } from "../dom.ts";
 import {
-  buildAriaTree, // aria treeを構築する関数
   buildAriaNode, // aria nodeを構築する関数
-  ariaTreeToString, // aria treeを文字列に変換する関数
 } from "../nav/aria.ts";
+import { buildAriaTree, toReadableAriaTree } from "../nav/readableAria.ts";
 // aria.ts 内の countNodes 関数を直接使用するため、同じ関数を定義
 function countAriaNodes(node: AriaNode): number {
   let count = 1; // 自身をカウント
@@ -840,7 +839,7 @@ export function extract(
     // Keep debug output
     if (process.env.NODE_ENV === "development") {
       console.log("Generated AriaTree:");
-      console.log(ariaTreeToString(ariaTree));
+      console.log(toReadableAriaTree(doc)); // Use toReadableAriaTree directly
     }
   }
 

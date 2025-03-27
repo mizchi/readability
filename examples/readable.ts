@@ -1,4 +1,4 @@
-import { readable, ariaTreeToString, PageType } from "../src/index.ts"; // Adjust path as needed, import PageType
+import { readable, toReadableAriaTree, PageType } from "../src/index.ts"; // Adjust path as needed, import PageType
 
 const sampleHtml = `
 <!DOCTYPE html>
@@ -49,7 +49,7 @@ console.log(result.pageType);
 console.log("\n--- ARIA Tree ---");
 // ariaTree might be undefined if generation failed or was disabled (though enabled by default in readable)
 if (result.ariaTree) {
-  console.log(ariaTreeToString(result.ariaTree));
+  // console.log(toReadableAriaTree(doc)); // TODO: Need VDocument to use toReadableAriaTree
 } else {
   console.log("ARIA Tree not generated.");
 }
