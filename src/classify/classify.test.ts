@@ -1,6 +1,6 @@
 import { test, expect, describe } from "vitest";
 import { parseHTML } from "../parsers/parser";
-import { findMainCandidates } from "../main/extract"; // findMainCandidates をインポート
+import { findMainCandidates } from "../extract/extract"; // findMainCandidates をインポート
 import { classify } from "./classify"; // classify をインポート
 import { PageType } from "../types"; // PageType をインポート
 

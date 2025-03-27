@@ -28,9 +28,9 @@ export {
   findMainCandidates,
   createExtractor,
   classifyPageType, // classifyPageType 関数をエクスポート
-} from "./main/extract.ts";
+} from "./extract/extract.ts";
 
-export { preprocessDocument } from "./main/preprocess.ts";
+export { preprocessDocument } from "./extract/preprocess.ts";
 
 export {
   toHTML,
@@ -49,8 +49,4 @@ export { toReadableAriaTree, ariaTreeToString } from "./nav/readableAria.ts";
 export { classify } from "./classify/classify.ts";
 
 // Export the readable function and related types from the new module
-export {
-  readable,
-  type ReadableOptions,
-  type ReadableResult,
-} from "./readable.ts";
+export { readable, type ReadableOptions } from "./readable.ts";

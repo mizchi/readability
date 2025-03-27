@@ -203,8 +203,35 @@ export interface ReadabilityOptions {
   charThreshold?: number;
   nbTopCandidates?: number;
   parser?: Parser; // Optional custom HTML parser
-  generateAriaTree?: boolean; // aria treeを生成するかどうか
+  // generateAriaTree?: boolean; // Removed, Aria tree is always generated internally now
   forcedPageType?: PageType; // 強制的に設定するページタイプ
+  url?: string; // Optional URL for context (e.g., link analysis)
+}
+
+// --- Readable Class Interface and Options ---
+
+// Filter options for getAriaTree
+export interface AriaTreeFilterOptions {
+  includeRoles?: AriaNodeType[];
+  excludeRoles?: AriaNodeType[];
+  includeNames?: (string | RegExp)[];
+  excludeNames?: (string | RegExp)[];
+  // Add other filter criteria as needed
+}
+
+// Options for getAriaTree method
+export interface GetAriaTreeOptions {
+  compact?: boolean;
+  filter?: AriaTreeFilterOptions;
+}
+
+// Interface for the Readable class public API
+export interface IReadable {
+  readonly snapshot: ExtractedSnapshot;
+  toMarkdown(): string;
+  getAriaTree(options?: GetAriaTreeOptions): AriaTree | undefined; // Use GetAriaTreeOptions
+  serialize(): string;
+  inferPageType(): PageType;
 }
 
 // Enum for classifying article types
