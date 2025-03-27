@@ -23,7 +23,7 @@ export { parseHTML, serializeToHTML } from "./parsers/parser.ts";
 
 export {
   extract,
-  extractContent,
+  // extractContent, // 削除
   extractAriaTree, // extractAriaTree 関数をエクスポート
   findMainCandidates,
   createExtractor,

@@ -4,6 +4,7 @@ Mozzila/Readablity のコアロジックを切り出して再実装している�
 _original - 元の実装
 _v2   - original 実装に準拠度高めに実装しようとしたが、破棄
 src   - 現在の実装
+examples ～
 ```
 
 完全な再現性はないが、モダンブラウザ向けに再実装している。
@@ -16,4 +17,9 @@ src   - 現在の実装
 
 vitest を実行する時は `pnpm vitest --run` で実行する。
 
-examples 以下のスクリプトは `pnpm tsx examples/xxx.ts` で実行する。この時、ESM を使う。
+## examples/*
+
+src/index.ts から公開インターフェースだけ import して、ライブラリの端的な仕様例を示す。
+
+`pnpm tsx examples/xxx.ts` で実行する。この時、ESM を使う。
+

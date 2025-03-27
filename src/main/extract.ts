@@ -12,6 +12,8 @@ import {
   type Parser,
   type AriaTree,
   type AriaNode, // AriaNode 型をインポート
+  type LinkInfo, // LinkInfo 型をインポート
+  type CandidateInfo, // CandidateInfo 型をインポート
   PageType, // Import ArticleType as a value
 } from "../types.ts";
 import { isVElement } from "../types.ts"; // Import isVElement as a value
@@ -552,6 +554,71 @@ function getArticleByline(doc: VDocument): string | null {
 }
 
 /**
+ * Get the article language
+ */
+function getArticleLang(doc: VDocument): string | null {
+  // 1. Get from <html lang="..."> attribute
+  const htmlElement = doc.documentElement;
+  if (htmlElement && htmlElement.attributes.lang) {
+    return htmlElement.attributes.lang;
+  }
+  return null;
+}
+
+/**
+ * Get the site name
+ */
+function getArticleSiteName(doc: VDocument): string | null {
+  const metaTags = getElementsByTagName(doc.documentElement, "meta");
+
+  // 1. Look for og:site_name
+  for (const meta of metaTags) {
+    const property = meta.attributes.property?.toLowerCase();
+    const content = meta.attributes.content;
+    if (property === "og:site_name" && content) {
+      return content;
+    }
+  }
+
+  // 2. Look for application-name
+  for (const meta of metaTags) {
+    const name = meta.attributes.name?.toLowerCase();
+    const content = meta.attributes.content;
+    if (name === "application-name" && content) {
+      return content;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Extract links from the document
+ */
+function extractLinks(doc: VDocument): LinkInfo[] {
+  const links: LinkInfo[] = [];
+  const linkElements = getElementsByTagName(doc.body, "a");
+
+  for (const element of linkElements) {
+    const href = element.attributes.href || null;
+    const text = getInnerText(element).trim();
+    // スコアリングは後続のステップで行うため、初期値は 0
+    const score = 0;
+
+    // href がない、または JavaScript リンクなどは除外しても良いかもしれない
+    if (href && !href.toLowerCase().startsWith("javascript:")) {
+      links.push({
+        element,
+        href,
+        text,
+        score,
+      });
+    }
+  }
+  return links;
+}
+
+/**
  * ページタイプを判定する関数
  *
  * 判定基準:
@@ -644,130 +711,6 @@ export function classifyPageType(
 }
 
 /**
- * Main function for content extraction
- */
-export function extractContent(
-  doc: VDocument,
-  options: ReadabilityOptions = {}
-): ReadabilityArticle {
-  const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;
-  const nbTopCandidates = options.nbTopCandidates || DEFAULT_N_TOP_CANDIDATES;
-  const generateAriaTree =
-    options.generateAriaTree !== undefined ? options.generateAriaTree : true;
-
-  // Preprocess: Remove unwanted tags before finding candidates
-  // preprocessDocument(doc); // preprocess は extract 関数で行う
-
-  // Find content candidates
-  const candidates = findMainCandidates(doc, nbTopCandidates);
-  let topCandidate: VElement | null = null;
-  let articleContent: VElement | null = null;
-
-  // ページタイプを強制的に設定するか、自動判定する
-  let pageType: PageType =
-    options.forcedPageType || classifyPageType(doc, candidates, charThreshold);
-
-  // 候補が存在する場合、最適なものを選択
-  if (candidates.length > 0) {
-    topCandidate = candidates[0]; // 最高スコアの候補
-
-    // 候補が実際に意味のあるコンテンツかどうかを判断
-    const textLength = getInnerText(topCandidate).length;
-    const linkDensity = getLinkDensity(topCandidate);
-
-    // ページタイプが ARTICLE の場合、本文を抽出
-    if (pageType === PageType.ARTICLE) {
-      if (textLength >= charThreshold && linkDensity <= 0.5) {
-        articleContent = topCandidate;
-      }
-    }
-  }
-
-  // Get metadata
-  const title = getArticleTitle(doc);
-  const byline = getArticleByline(doc);
-
-  // 構造要素の検出 (pageType が ARTICLE だが articleContent が null の場合)
-  let structuralElements:
-    | {
-        header: VElement | null;
-        footer: VElement | null;
-        otherSignificantNodes: VElement[];
-      }
-    | undefined = undefined;
-
-  if (pageType === PageType.ARTICLE && !articleContent) {
-    structuralElements = findStructuralElements(doc);
-  }
-
-  // AriaTreeの生成
-  // 本文抽出に失敗した場合、または明示的に要求された場合にAriaTreeを生成
-  let ariaTree: AriaTree | undefined = undefined;
-  if (generateAriaTree && (!articleContent || options.generateAriaTree)) {
-    ariaTree = buildAriaTree(doc);
-
-    // デバッグ用にaria treeの文字列表現をコンソールに出力
-    if (process.env.NODE_ENV === "development") {
-      console.log("Generated AriaTree:");
-      console.log(ariaTreeToString(ariaTree));
-    }
-  }
-
-  return {
-    title,
-    byline,
-    root: articleContent, // 閾値を超えた場合のみ設定
-    nodeCount: articleContent ? countNodes(articleContent) : 0,
-    pageType: pageType,
-    // 構造要素を追加
-    header: structuralElements?.header,
-    footer: structuralElements?.footer,
-    otherSignificantNodes: structuralElements?.otherSignificantNodes,
-    // AriaTreeを追加
-    ariaTree,
-  };
-}
-
-/**
- * Extract article from HTML
- */
-export function extract(
-  html: string,
-  options: ReadabilityOptions = {}
-): ReadabilityArticle {
-  // Parse HTML to create virtual DOM
-  // Use custom parser if provided, otherwise use default
-  const parser = options.parser || parseHTML; // Assuming parseHTML is the default from ./parser.ts
-  const parsedResult = parser(html);
-  let doc: VDocument;
-
-  // Wrap VElement result in a VDocument if necessary (lowercase 'html')
-  if (isVElement(parsedResult)) {
-    doc = {
-      documentElement: createElement("html"),
-      body: parsedResult,
-      // baseURI and documentURI might need adjustment based on context if parsing fragments
-    };
-    doc.documentElement.children = [doc.body];
-    doc.body.parent = doc.documentElement;
-  } else {
-    doc = parsedResult;
-  }
-
-  // Execute preprocessing
-  preprocessDocument(doc);
-
-  // pageType が未指定の場合は ARTICLE をデフォルトとして設定
-  const optionsWithPageType = {
-    ...options,
-    forcedPageType: options.forcedPageType || PageType.ARTICLE,
-  };
-
-  // Extract content
-  return extractContent(doc, optionsWithPageType);
-}
-
-/**
  * HTMLからAriaTreeを抽出する
  *
  * @param html HTML文字列
@@ -794,10 +737,7 @@ export function extractAriaTree(
   // デフォルトでは圧縮する
   const compress = options.compress !== undefined ? options.compress : true;
   // デフォルトではナビゲーション要素を削除する
-  const preserveNavigation =
-    options.preserveNavigation !== undefined
-      ? options.preserveNavigation
-      : false;
+  // const preserveNavigation = options.preserveNavigation !== undefined ? options.preserveNavigation : false; // preprocessDocument に preserveNavigation オプションがないためコメントアウト
 
   // Parse HTML to create virtual DOM
   const parser = options.parser || parseHTML;
@@ -816,8 +756,8 @@ export function extractAriaTree(
     doc = parsedResult;
   }
 
-  // Execute preprocessing with preserveNavigation option
-  preprocessDocument(doc);
+  // Execute preprocessing
+  preprocessDocument(doc); // Pass doc directly
 
   if (compress) {
     // 圧縮された ARIA ツリーを構築して返す
@@ -835,57 +775,135 @@ export function extractAriaTree(
 }
 
 /**
+ * Extract article from HTML (Refactored)
+ */
+export function extract(
+  html: string,
+  options: ReadabilityOptions = {}
+): ReadabilityArticle {
+  // Parse HTML to create virtual DOM
+  const parser = options.parser || parseHTML;
+  const parsedResult = parser(html);
+  let doc: VDocument;
+
+  if (isVElement(parsedResult)) {
+    doc = {
+      documentElement: createElement("html"),
+      body: parsedResult,
+    };
+    doc.documentElement.children = [doc.body];
+    doc.body.parent = doc.documentElement;
+  } else {
+    doc = parsedResult;
+  }
+
+  // Execute preprocessing
+  preprocessDocument(doc);
+
+  // Extract metadata
+  const title = getArticleTitle(doc);
+  const byline = getArticleByline(doc);
+  const lang = getArticleLang(doc);
+  const siteName = getArticleSiteName(doc);
+
+  // Find main candidates
+  const nbTopCandidates = options.nbTopCandidates || DEFAULT_N_TOP_CANDIDATES;
+  const candidates = findMainCandidates(doc, nbTopCandidates); // Store candidates
+  const mainCandidates: CandidateInfo[] = candidates.map((el) => ({
+    element: el,
+    score: el.readability?.contentScore || 0,
+  }));
+
+  // Extract links
+  const links = extractLinks(doc);
+
+  // Generate AriaTree (optional)
+  const generateAriaTree =
+    options.generateAriaTree !== undefined ? options.generateAriaTree : true;
+  let ariaTree: AriaTree | undefined = undefined;
+  if (generateAriaTree) {
+    ariaTree = buildAriaTree(doc);
+    // Keep debug output
+    if (process.env.NODE_ENV === "development") {
+      console.log("Generated AriaTree:");
+      console.log(ariaTreeToString(ariaTree));
+    }
+  }
+
+  // --- Start: Added logic for snapshot test ---
+  // Classify page type
+  const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;
+  let pageType =
+    options.forcedPageType || classifyPageType(doc, candidates, charThreshold); // Use stored candidates
+
+  // Determine root based on classification
+  let root: VElement | null = null;
+  if (pageType === PageType.ARTICLE && mainCandidates.length > 0) {
+    const topCandidateElement = mainCandidates[0].element;
+    // Add isProbablyContent check for more reliable root selection
+    if (isProbablyContent(topCandidateElement)) {
+      root = topCandidateElement;
+    } else {
+      // Fallback to OTHER if the top candidate doesn't seem like content
+      pageType = PageType.OTHER;
+    }
+  }
+
+  // Calculate nodeCount if root is determined
+  const nodeCount = root ? countNodes(root) : 0;
+  // --- End: Added logic for snapshot test ---
+
+  // Return the result including tentative root and pageType
+  return {
+    title,
+    byline,
+    lang,
+    siteName,
+    root, // Include the determined root
+    nodeCount, // Include the calculated nodeCount
+    pageType, // Include the determined pageType
+    mainCandidates,
+    links,
+    ariaTree,
+  };
+}
+
+/**
  * Creates an extractor function with a specific parser configured.
  * @param opts - Options containing the parser to use.
  * @returns An extract function that uses the configured parser.
  */
 export function createExtractor(opts: {
   parser: Parser;
-  generateAriaTree?: boolean; // AriaTreeを生成するかどうかのオプションを追加
-  forcedPageType?: PageType; // 強制的に設定するページタイプを追加
+  generateAriaTree?: boolean; // Default generateAriaTree option
+  forcedPageType?: PageType; // Default forcedPageType option
 }): (
   html: string,
-  options?: Omit<ReadabilityOptions, "parser">
+  options?: Omit<ReadabilityOptions, "parser"> // Allow overriding options later
 ) => ReadabilityArticle {
-  const { parser, generateAriaTree, forcedPageType } = opts;
+  const {
+    parser,
+    generateAriaTree: defaultGenerateAriaTree, // Rename for clarity
+    forcedPageType: defaultForcedPageType, // Rename for clarity
+  } = opts;
 
   return (
     html: string,
     options: Omit<ReadabilityOptions, "parser"> = {}
   ): ReadabilityArticle => {
-    // Parse HTML using the configured parser
-    const parsedResult = parser(html);
-    let doc: VDocument;
-
-    // Wrap VElement result in a VDocument if necessary (lowercase 'html')
-    if (isVElement(parsedResult)) {
-      doc = {
-        documentElement: createElement("html"),
-        body: parsedResult,
-        // baseURI and documentURI might need adjustment based on context if parsing fragments
-      };
-      doc.documentElement.children = [doc.body];
-      doc.body.parent = doc.documentElement;
-    } else {
-      doc = parsedResult;
-    }
-
-    // Execute preprocessing
-    preprocessDocument(doc);
-
-    // Extract content using the main logic, passing other options
-    // generateAriaTreeオプションとforcedPageTypeオプションを追加
-    // forcedPageType が未指定の場合は ARTICLE をデフォルトとして設定
-    return extractContent(doc, {
-      ...options,
+    // Call the refactored extract function with the configured parser and merged options
+    return extract(html, {
+      ...options, // Pass through options provided to the returned function
+      parser: parser, // Use the pre-configured parser
+      // Prioritize options passed to the returned function, then defaults from createExtractor
       generateAriaTree:
         options.generateAriaTree !== undefined
           ? options.generateAriaTree
-          : generateAriaTree,
+          : defaultGenerateAriaTree,
       forcedPageType:
         options.forcedPageType !== undefined
           ? options.forcedPageType
-          : forcedPageType || PageType.ARTICLE,
+          : defaultForcedPageType, // No default ARTICLE here, extract handles defaults if needed
     });
   };
 }

@@ -129,10 +129,26 @@ export interface AriaTree {
   nodeCount: number;
 }
 
+// リンク情報の型定義
+export interface LinkInfo {
+  element: VElement;
+  score: number; // 必要に応じて重み付けスコアを追加
+  text: string;
+  href: string | null;
+}
+
+// 候補情報の型定義
+export interface CandidateInfo {
+  element: VElement;
+  score: number;
+}
+
 // Readability result
 export interface ReadabilityArticle {
   title: string | null;
   byline: string | null;
+  lang: string | null; // メタデータ: 言語
+  siteName: string | null; // メタデータ: サイト名
   root: VElement | null; // メインコンテンツのルート要素 (閾値以上の場合)
   nodeCount: number;
   pageType: PageType;
@@ -140,8 +156,12 @@ export interface ReadabilityArticle {
   header?: VElement | null;
   footer?: VElement | null;
   otherSignificantNodes?: VElement[];
-  // 本文抽出に失敗した場合のフォールバックとしてのAriaツリー
+  // Ariaツリー (オプションで生成・保持)
   ariaTree?: AriaTree;
+  // 抽出されたリンク情報
+  links?: LinkInfo[];
+  // メイン候補情報
+  mainCandidates?: CandidateInfo[];
 }
 
 // 新しいインターフェース定義（pageTypeに応じたデータ構造）
@@ -150,16 +170,21 @@ export interface ReadabilityArticle {
 export interface ArticleContent {
   title: string | null;
   byline: string | null;
+  lang: string | null;
+  siteName: string | null;
   root: VElement | null; // メインコンテンツのルート要素
 }
 
 // Other type result (pageType === OTHER)
 export interface OtherContent {
   title: string | null;
+  lang: string | null;
+  siteName: string | null;
   header?: VElement | null;
   footer?: VElement | null;
   otherSignificantNodes?: VElement[];
-  ariaTree?: AriaTree; // 圧縮済みのAriaTree
+  ariaTree?: AriaTree; // 圧縮済みのAriaTree (現状維持、必要なら変更)
+  links?: LinkInfo[]; // OTHERタイプでもリンク情報は有用な場合がある
 }
 
 // pageTypeに応じたデータを取得する関数
@@ -167,20 +192,25 @@ export function getContentByPageType(
   result: ReadabilityArticle
 ): ArticleContent | OtherContent {
   if (result.pageType === PageType.ARTICLE) {
-    // ARTICLEの場合、title, byline, rootを返す
+    // ARTICLEの場合
     return {
       title: result.title,
       byline: result.byline,
+      lang: result.lang,
+      siteName: result.siteName,
       root: result.root,
     };
   } else {
-    // OTHERの場合、ariaTree, otherSignificantNodes, header, footerを返す
+    // OTHERの場合
     return {
       title: result.title,
+      lang: result.lang,
+      siteName: result.siteName,
       header: result.header,
       footer: result.footer,
       otherSignificantNodes: result.otherSignificantNodes,
       ariaTree: result.ariaTree,
+      links: result.links,
     };
   }
 }

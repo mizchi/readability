@@ -1,6 +1,6 @@
 import { test, expect, describe } from "vitest";
 import { parseHTML } from "../parsers/parser";
-import { extractContent, isProbablyContent } from "./extract";
+import { extract, isProbablyContent } from "./extract"; // extractContent を extract に変更
 import { PageType, type VElement, type VText } from "../types"; // Import ArticleType
 
 // Basic test case
@@ -247,10 +247,10 @@ describe("Core Readability Functions", () => {
     }
   });
 
-  test("extractContent - Basic HTML", () => {
-    const doc = parseHTML(BASIC_HTML);
+  test("extract - Basic HTML", () => {
+    // 関数名を変更
     // Use a lower threshold for this test case as the sample text is short
-    const result = extractContent(doc, { charThreshold: 100 });
+    const result = extract(BASIC_HTML, { charThreshold: 100 }); // extract を使用し、HTML文字列を渡す
 
     // Check if content is extracted
     expect(result.root).not.toBeNull();
@@ -280,10 +280,10 @@ describe("Core Readability Functions", () => {
     }
   });
 
-  test("extractContent - Semantic tags", () => {
-    const doc = parseHTML(SEMANTIC_HTML);
+  test("extract - Semantic tags", () => {
+    // 関数名を変更
     // Use a lower threshold for this test case as the sample text is short
-    const result = extractContent(doc, { charThreshold: 100 });
+    const result = extract(SEMANTIC_HTML, { charThreshold: 100 }); // extract を使用し、HTML文字列を渡す
 
     // Check if content is extracted
     expect(result.root).not.toBeNull();
@@ -307,9 +307,9 @@ describe("Core Readability Functions", () => {
     }
   });
 
-  test("extractContent - Complex HTML", () => {
-    const doc = parseHTML(COMPLEX_HTML);
-    const result = extractContent(doc);
+  test("extract - Complex HTML", () => {
+    // 関数名を変更
+    const result = extract(COMPLEX_HTML); // extract を使用し、HTML文字列を渡す
 
     // Check if content is extracted
     expect(result.root).not.toBeNull();
@@ -334,10 +334,10 @@ describe("Core Readability Functions", () => {
     }
   });
 
-  test("extractContent - Short text (should be OTHER)", () => {
-    const doc = parseHTML(SHORT_TEXT_HTML);
+  test("extract - Short text (should be OTHER)", () => {
+    // 関数名を変更
     // Override default threshold for this test if needed, or rely on default
-    const result = extractContent(doc, { charThreshold: 500 }); // Use default or adjust
+    const result = extract(SHORT_TEXT_HTML, { charThreshold: 500 }); // extract を使用し、HTML文字列を渡す
 
     // Check article type - should be OTHER because content is too short
     expect(result.pageType).toBe(PageType.OTHER);
@@ -351,40 +351,44 @@ describe("Core Readability Functions", () => {
     expect(result.otherSignificantNodes).toBeUndefined();
   });
 
-  test.skip("extractContent - Short article with structure (ARTICLE, root=null, structure populated)", () => {
-    const doc = parseHTML(SHORT_ARTICLE_WITH_STRUCTURE_HTML);
+  test.skip("extract - Short article with structure (ARTICLE, root=null, structure populated)", () => {
+    // 関数名を変更
     // Use a threshold that the main content won't pass
-    const result = extractContent(doc, { charThreshold: 500 });
+    const result = extract(SHORT_ARTICLE_WITH_STRUCTURE_HTML, {
+      charThreshold: 500,
+    }); // extract を使用し、HTML文字列を渡す
 
     // Check article type - should be ARTICLE because a candidate was found and deemed probable
-    expect(result.pageType).toBe(PageType.ARTICLE);
+    // Note: The current extract logic might classify this as OTHER due to the root being null after isProbablyContent check.
+    // This test might need adjustment based on the final classification logic.
+    expect(result.pageType).toBe(PageType.ARTICLE); // This assertion might fail now
 
     // Check if content is null due to threshold
     expect(result.root).toBeNull();
     expect(result.nodeCount).toBe(0);
 
-    // Check if structural elements are populated
-    expect(result.header).not.toBeNull();
-    expect(result.header?.tagName).toBe("header");
-    expect(result.header?.id).toBe("page-header");
-
-    expect(result.footer).not.toBeNull();
-    expect(result.footer?.tagName).toBe("footer");
-    expect(result.footer?.id).toBe("page-footer");
-
-    expect(result.otherSignificantNodes).not.toBeUndefined();
-    expect(result.otherSignificantNodes?.length).toBeGreaterThan(0);
-    // Check if <main> or <article> was detected as significant
-    const significantTagNames = result.otherSignificantNodes?.map(
-      (n) => n.tagName
-    );
-    expect(significantTagNames).toContain("main");
-    expect(significantTagNames).toContain("article");
+    // Check if structural elements are populated - These are no longer part of the extract result
+    // expect(result.header).not.toBeNull();
+    // expect(result.header?.tagName).toBe("header");
+    // expect(result.header?.id).toBe("page-header");
+    //
+    // expect(result.footer).not.toBeNull();
+    // expect(result.footer?.tagName).toBe("footer");
+    // expect(result.footer?.id).toBe("page-footer");
+    //
+    // expect(result.otherSignificantNodes).not.toBeUndefined();
+    // expect(result.otherSignificantNodes?.length).toBeGreaterThan(0);
+    // // Check if <main> or <article> was detected as significant
+    // const significantTagNames = result.otherSignificantNodes?.map(
+    //   (n: VElement) => n.tagName // Add type annotation for 'n'
+    // );
+    // expect(significantTagNames).toContain("main");
+    // expect(significantTagNames).toContain("article");
   });
 
-  test("extractContent - No real main content (OTHER, root=null)", () => {
-    const doc = parseHTML(NO_MAIN_CONTENT_HTML);
-    const result = extractContent(doc, { charThreshold: 500 });
+  test("extract - No real main content (OTHER, root=null)", () => {
+    // 関数名を変更
+    const result = extract(NO_MAIN_CONTENT_HTML, { charThreshold: 500 }); // extract を使用し、HTML文字列を渡す
 
     // Check article type - should be OTHER as no strong candidate likely found
     expect(result.pageType).toBe(PageType.OTHER);
@@ -396,9 +400,9 @@ describe("Core Readability Functions", () => {
     // Structural elements might be found by findStructuralElements, but pageType is OTHER
     // Depending on strictness, we might expect them to be undefined if pageType is OTHER.
     // Let's assume for now they are *not* populated if the final type is OTHER.
-    expect(result.header).toBeUndefined();
-    expect(result.footer).toBeUndefined();
-    expect(result.otherSignificantNodes).toBeUndefined();
+    // expect(result.header).toBeUndefined(); // No longer part of extract result
+    // expect(result.footer).toBeUndefined(); // No longer part of extract result
+    // expect(result.otherSignificantNodes).toBeUndefined(); // No longer part of extract result
 
     // Alternative check: If findStructuralElements *is* called even for OTHER (less likely based on current core.ts logic)
     // then we might check if header/footer *were* found, e.g.:
