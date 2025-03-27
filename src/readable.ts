@@ -12,8 +12,14 @@ import type {
   LinkInfo, // Import LinkInfo
   IReadable, // Import IReadable interface
   GetAriaTreeOptions, // Import GetAriaTreeOptions
+  // LinkHierarchyAnalysis is now imported from hierarchy.ts
+  // LinkInfo is already imported above
 } from "./types.ts";
 import { PageType, isVElement } from "./types.ts"; // Import PageType enum and isVElement guard
+import {
+  analyzeLinkHierarchy,
+  LinkHierarchyAnalysis,
+} from "./nav/hierarchy.ts"; // Import link hierarchy analysis
 import { parseHTML as internalParseHTML } from "./parsers/parser.ts";
 import { preprocessDocument as internalPreprocessDocument } from "./extract/preprocess.ts";
 import {
@@ -254,7 +260,17 @@ export class Readable implements IReadable {
   public inferPageType(): PageType {
     return this.pageType;
   }
-}
+
+  /**
+   * Analyzes the hierarchy of links relative to the current page URL.
+   * Categorizes links into parent, sibling, child, and external.
+   *
+   * @returns An object containing categorized links.
+   */
+  public getLinkHierarchy(): LinkHierarchyAnalysis {
+    return analyzeLinkHierarchy(this.snapshot.links, this.snapshot.metadata);
+  }
+} // This closes the Readable class properly
 
 /**
  * Public function to create a Readable instance from HTML content.

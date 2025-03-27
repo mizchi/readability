@@ -3,6 +3,9 @@
  * Type definitions for DOM-independent implementation
  */
 
+// Import LinkHierarchyAnalysis from hierarchy.ts
+import type { LinkHierarchyAnalysis } from "./nav/hierarchy.ts";
+
 // Basic node type
 export type VNodeType = "element" | "text";
 
@@ -232,7 +235,12 @@ export interface IReadable {
   getAriaTree(options?: GetAriaTreeOptions): AriaTree | undefined; // Use GetAriaTreeOptions
   serialize(): string;
   inferPageType(): PageType;
+  getLinkHierarchy(): LinkHierarchyAnalysis; // Add analyzeLinkHierarchy method
 }
+
+// LinkHierarchyAnalysis is defined in src/nav/hierarchy.ts
+
+// LinkHierarchyAnalysis removed, will be defined in src/nav/hierarchy.ts
 
 // Enum for classifying article types
 export enum PageType {

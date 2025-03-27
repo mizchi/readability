@@ -16,7 +16,11 @@ export type {
   AriaNode,
   AriaNodeType,
   AriaTree,
+  // リンク階層分析関連の型をエクスポート
+  LinkInfo,
 } from "./types.ts";
+// リンク階層分析関連の型をエクスポート
+export type { LinkHierarchyAnalysis } from "./nav/hierarchy.ts";
 export { PageType } from "./types.ts"; // Export PageType enum as value
 
 // Export only public functions
@@ -44,6 +48,9 @@ export { toMarkdown } from "./format/markdown.ts";
 
 // AriaSnapshot関連の関数をエクスポート
 export { toReadableAriaTree, ariaTreeToString } from "./nav/readableAria.ts";
+
+// リンク階層分析関連の関数をエクスポート
+export { analyzeLinkHierarchy } from "./nav/hierarchy.ts";
 
 // ページタイプ分類関連の関数をエクスポート
 export { classify } from "./classify/classify.ts";

@@ -831,16 +831,12 @@ export function extract(
   const links = extractLinks(doc);
 
   // Generate AriaTree (optional)
-  const generateAriaTree =
-    options.generateAriaTree !== undefined ? options.generateAriaTree : true;
   let ariaTree: AriaTree | undefined = undefined;
-  if (generateAriaTree) {
-    ariaTree = buildAriaTree(doc);
-    // Keep debug output
-    if (process.env.NODE_ENV === "development") {
-      console.log("Generated AriaTree:");
-      console.log(toReadableAriaTree(doc)); // Use toReadableAriaTree directly
-    }
+  ariaTree = buildAriaTree(doc);
+  // Keep debug output
+  if (process.env.NODE_ENV === "development") {
+    console.log("Generated AriaTree:");
+    console.log(toReadableAriaTree(doc)); // Use toReadableAriaTree directly
   }
 
   // --- Start: Added logic for snapshot test ---
@@ -916,10 +912,6 @@ export function createExtractor(opts: {
       ...options, // Pass through options provided to the returned function
       parser: parser, // Use the pre-configured parser
       // Prioritize options passed to the returned function, then defaults from createExtractor
-      generateAriaTree:
-        options.generateAriaTree !== undefined
-          ? options.generateAriaTree
-          : defaultGenerateAriaTree,
       forcedPageType:
         options.forcedPageType !== undefined
           ? options.forcedPageType

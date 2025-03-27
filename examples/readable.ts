@@ -47,3 +47,10 @@ const ariaTree = result.getAriaTree({ compact: false }); // Use the getAriaTree(
 console.log(ariaTree);
 console.log("\n--- Extracted Markdown ---");
 console.log(result.toMarkdown()); // Use the toMarkdown() method
+
+console.log("\n--- Link Hierarchy Analysis ---");
+const linkHierarchy = result.getLinkHierarchy(); // Use the analyzeLinkHierarchy() method
+console.log("Parent links:", linkHierarchy.parent.length);
+console.log("Sibling links:", linkHierarchy.sibling.length);
+console.log("Child links:", linkHierarchy.child.length);
+console.log("External links:", linkHierarchy.external.length);
