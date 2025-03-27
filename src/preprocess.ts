@@ -59,19 +59,9 @@ const AD_PATTERNS = [
  * @param options オプション
  * @returns Processed document
  */
-export function preprocessDocument(
-  doc: VDocument,
-  options: {
-    /**
-     * ナビゲーション要素を保持するかどうか
-     * true: ナビゲーション要素を保持する
-     * false: ナビゲーション要素を削除する（デフォルト）
-     */
-    preserveNavigation?: boolean;
-  } = {}
-): VDocument {
+export function preprocessDocument(doc: VDocument): VDocument {
   // 1. Remove semantic tags and unnecessary tags
-  removeUnwantedTags(doc, options);
+  removeUnwantedTags(doc);
 
   // 2. Remove ad elements
   removeAds(doc);

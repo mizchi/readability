@@ -817,7 +817,7 @@ export function extractAriaTree(
   }
 
   // Execute preprocessing with preserveNavigation option
-  preprocessDocument(doc, { preserveNavigation });
+  preprocessDocument(doc);
 
   if (compress) {
     // 圧縮された ARIA ツリーを構築して返す
