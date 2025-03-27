@@ -1,7 +1,6 @@
 // import { toHTML, extract } from "@mizchi/readability";
-import { toHTML, extract, ariaTreeToString, toMarkdown } from "../src/index.ts";
-import { PageType } from "../src/types.ts";
-import html2md from "html-to-md";
+import { extract, ariaTreeToString } from "../src/index.ts";
+import { toMarkdown } from "../src/markdown.ts";
 import process from "node:process";
 
 const html = await fetch(
@@ -11,18 +10,10 @@ const extracted = extract(html, {
   charThreshold: 100,
   // forcedPageType: PageType.OTHER,
 });
-// 結果を表示
-// console.log(`Title: ${extracted.title}`);
-// console.log(`Author: ${extracted.byline}`);
-// console.log(`pageType: ${extracted.pageType}`);
-
 if (extracted.pageType === "article") {
-  // const htmlContent = toHTML(extracted.root);
-  const md = toMarkdown(extracted.root);
-  console.log(md);
-  // console.log(htmlContent);
-  // const md = html2md(htmlContent);
-  // console.log(md);
+  // HTMLの構造を確認
+  const parsed = toMarkdown(extracted.root);
+  console.log(parsed);
 } else if (extracted.pageType === "other") {
   console.log("This is not an article.");
   const ariaSnapshot = extracted.ariaTree;

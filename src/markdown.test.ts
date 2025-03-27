@@ -290,7 +290,7 @@ More Content`;
     const html = `<a href="http://example.com"><img src="image.png" alt="Alt text"></a>`;
     const parsed = parseHTML(html);
     const elementToConvert = isVElement(parsed) ? parsed : parsed.body;
-    const expectedMarkdown = `[![Alt text](image.png)](http://example.com)`;
+    const expectedMarkdown = `[Alt text](http://example.com)`;
     expect(toMarkdown(elementToConvert).trim()).toBe(expectedMarkdown);
   });
 

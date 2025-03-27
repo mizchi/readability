@@ -328,22 +328,39 @@ function convertNodeToMarkdown(
       }
       case "a":
         const href = element.attributes.href || "";
-        // Image link: Use raw childrenMarkdown
+        // リンク内のコンテンツから余分な改行を削除し、単一のスペースに置き換える
+        const linkContent = childrenMarkdown.replace(/\n+/g, " ").trim();
+
+        // 画像リンクの特別処理
         if (
           element.children.length === 1 &&
           element.children[0].nodeType === "element" &&
           element.children[0].tagName === "img"
         ) {
-          return `[${childrenMarkdown}](${href})`;
+          const imgElement = element.children[0] as VElement;
+          const alt = imgElement.attributes.alt || "";
+          const src = imgElement.attributes.src || "";
+
+          // alt属性が設定されている場合はaltを使用、未設定の場合はURLを使用
+          const displayText = alt.trim() ? alt : src;
+
+          return `[${displayText}](${href})`;
         }
-        // Regular link: Use raw childrenMarkdown (join handles spacing)
-        return `[${childrenMarkdown}](${href})`;
+        // Regular link: Use processed linkContent
+        return `[${linkContent}](${href})`;
       case "img":
         const alt = escapeMarkdown(element.attributes.alt || "");
         const src = element.attributes.src || "";
         const title = element.attributes.title
           ? ` "${escapeMarkdown(element.attributes.title)}"`
           : "";
+
+        // 親要素がaタグの場合は、altを返す（aタグの処理で使用される）
+        if (parentTagName === "a") {
+          return alt.trim() ? alt : src;
+        }
+
+        // 通常の画像の場合
         return `![${alt}](${src}${title})`;
 
       case "hr":

@@ -11,6 +11,7 @@ import {
   type ReadabilityOptions,
   type Parser,
   type AriaTree,
+  type AriaNode, // AriaNode 型をインポート
   PageType, // Import ArticleType as a value
 } from "./types.ts";
 import { isVElement } from "./types.ts"; // Import isVElement as a value
@@ -25,8 +26,19 @@ import {
 } from "./dom.ts";
 import {
   buildAriaTree, // aria treeを構築する関数
+  buildAriaNode, // aria nodeを構築する関数
   ariaTreeToString, // aria treeを文字列に変換する関数
 } from "./aria.ts";
+// aria.ts 内の countNodes 関数を直接使用するため、同じ関数を定義
+function countAriaNodes(node: AriaNode): number {
+  let count = 1; // 自身をカウント
+  if (node.children) {
+    for (const child of node.children) {
+      count += countAriaNodes(child);
+    }
+  }
+  return count;
+}
 import {
   REGEXPS,
   DEFAULT_TAGS_TO_SCORE,
@@ -753,6 +765,73 @@ export function extract(
 
   // Extract content
   return extractContent(doc, optionsWithPageType);
+}
+
+/**
+ * HTMLからAriaTreeを抽出する
+ *
+ * @param html HTML文字列
+ * @param options オプション
+ * @returns AriaTree
+ */
+export function extractAriaTree(
+  html: string,
+  options: Omit<ReadabilityOptions, "generateAriaTree"> & {
+    /**
+     * ARIA ツリーを圧縮するかどうか
+     * true: 圧縮する（デフォルト）
+     * false: 圧縮しない（生の ARIA ツリー）
+     */
+    compress?: boolean;
+    /**
+     * ナビゲーション要素を保持するかどうか
+     * true: ナビゲーション要素を保持する
+     * false: ナビゲーション要素を削除する（デフォルト）
+     */
+    preserveNavigation?: boolean;
+  } = {}
+): AriaTree {
+  // デフォルトでは圧縮する
+  const compress = options.compress !== undefined ? options.compress : true;
+  // デフォルトではナビゲーション要素を削除する
+  const preserveNavigation =
+    options.preserveNavigation !== undefined
+      ? options.preserveNavigation
+      : false;
+
+  // Parse HTML to create virtual DOM
+  const parser = options.parser || parseHTML;
+  const parsedResult = parser(html);
+  let doc: VDocument;
+
+  // Wrap VElement result in a VDocument if necessary
+  if (isVElement(parsedResult)) {
+    doc = {
+      documentElement: createElement("html"),
+      body: parsedResult,
+    };
+    doc.documentElement.children = [doc.body];
+    doc.body.parent = doc.documentElement;
+  } else {
+    doc = parsedResult;
+  }
+
+  // Execute preprocessing with preserveNavigation option
+  preprocessDocument(doc, { preserveNavigation });
+
+  if (compress) {
+    // 圧縮された ARIA ツリーを構築して返す
+    return buildAriaTree(doc);
+  } else {
+    // 圧縮されていない生の ARIA ツリーを構築して返す
+    const rootNode = buildAriaNode(doc.body);
+    const nodeCount = countAriaNodes(rootNode);
+
+    return {
+      root: rootNode,
+      nodeCount,
+    };
+  }
 }
 
 /**

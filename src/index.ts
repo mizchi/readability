@@ -24,6 +24,7 @@ export { parseHTML, serializeToHTML } from "./parser.ts";
 export {
   extract,
   extractContent,
+  extractAriaTree, // extractAriaTree 関数をエクスポート
   findMainCandidates,
   createExtractor,
   classifyPageType, // classifyPageType 関数をエクスポート

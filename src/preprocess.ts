@@ -56,11 +56,22 @@ const AD_PATTERNS = [
  * Remove noise elements from the document
  *
  * @param doc Document to process
+ * @param options オプション
  * @returns Processed document
  */
-export function preprocessDocument(doc: VDocument): VDocument {
+export function preprocessDocument(
+  doc: VDocument,
+  options: {
+    /**
+     * ナビゲーション要素を保持するかどうか
+     * true: ナビゲーション要素を保持する
+     * false: ナビゲーション要素を削除する（デフォルト）
+     */
+    preserveNavigation?: boolean;
+  } = {}
+): VDocument {
   // 1. Remove semantic tags and unnecessary tags
-  removeUnwantedTags(doc);
+  removeUnwantedTags(doc, options);
 
   // 2. Remove ad elements
   removeAds(doc);
