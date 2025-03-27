@@ -10,10 +10,21 @@ async function main() {
   const noCompressIndex = args.indexOf("--no-compress");
   const compress = noCompressIndex === -1;
 
+  // maxLinksオプションを抽出
+  const maxLinksIndex = args.indexOf("--max-links");
+  let maxLinks = 60; // デフォルト値
+  if (maxLinksIndex !== -1 && maxLinksIndex + 1 < args.length) {
+    const maxLinksValue = parseInt(args[maxLinksIndex + 1], 10);
+    if (!isNaN(maxLinksValue) && maxLinksValue > 0) {
+      maxLinks = maxLinksValue;
+    }
+  }
+
   // オプションを除いた最初の引数をURLとして使用
-  let url = "https://zenn.dev/mizchi";
+  // より大きなARIAツリーを持つWebサイトのデフォルトを設定
+  let url = "https://news.yahoo.co.jp/";
   for (const arg of args) {
-    if (!arg.startsWith("--")) {
+    if (!arg.startsWith("--") && arg !== args[maxLinksIndex + 1]) {
       url = arg;
       break;
     }
@@ -25,10 +36,11 @@ async function main() {
   console.log(`Extracting AriaTree (compress: ${compress})...`);
   const ariaTree = extractAriaTree(html, { compress });
 
-  console.log("AriaTree:");
-  console.log(ariaTreeToString(ariaTree));
-
   console.log(`Total nodes: ${ariaTree.nodeCount}`);
+  console.log(`Applying maxLinks: ${maxLinks}`);
+
+  console.log("AriaTree:");
+  console.log(ariaTreeToString(ariaTree, maxLinks));
 }
 
 main().catch(console.error);

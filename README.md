@@ -30,11 +30,10 @@ const parsed = toMarkdown(extracted.root);
 console.log(parsed);
 ```
 
-### Aria there
+### Aria Tree
 
 ```ts
 import { extractAriaTree, ariaTreeToString } from "@mizchi/readability";
-console.log("----- Aria Tree -----");
 const html = await fetch("https://zenn.dev").then((res) => res.text());
 const tree = extractAriaTree(html);
 const str = ariaTreeToString(tree);

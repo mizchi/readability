@@ -8,7 +8,7 @@ import {
   compressAriaTree,
   ariaTreeToString,
 } from "./aria";
-import type { VElement, AriaNode, VDocument } from "./types";
+import type { VElement, AriaNode, VDocument, AriaTree } from "./types";
 
 describe("ARIA Snapshot Utilities", () => {
   test("getAriaRole - 明示的なロールを取得", () => {
@@ -270,5 +270,186 @@ describe("ARIA Snapshot Utilities", () => {
     expect(treeString).toContain("[disabled]");
     expect(treeString).toContain("[checked=true]");
     expect(treeString).toContain("[required]");
+  });
+
+  test("ariaTreeToString - maxLinksパラメータが正しく機能するか", () => {
+    // リンクを含むツリーを作成
+    const tree: AriaTree = {
+      root: {
+        type: "main",
+        role: "main",
+        children: [
+          {
+            type: "navigation",
+            role: "navigation",
+            name: "メインナビゲーション",
+            children: [
+              {
+                type: "link",
+                role: "link",
+                name: "ホーム",
+                originalElement: {
+                  nodeType: "element" as const,
+                  tagName: "a",
+                  attributes: { href: "/" },
+                  children: [],
+                },
+              },
+              {
+                type: "link",
+                role: "link",
+                name: "ニュース",
+                originalElement: {
+                  nodeType: "element" as const,
+                  tagName: "a",
+                  attributes: { href: "/news" },
+                  children: [],
+                },
+              },
+              {
+                type: "link",
+                role: "link",
+                name: "お問い合わせ",
+                originalElement: {
+                  nodeType: "element" as const,
+                  tagName: "a",
+                  attributes: { href: "/contact" },
+                  children: [],
+                },
+              },
+            ],
+          },
+          {
+            type: "region",
+            role: "region",
+            name: "サイドバー",
+            children: [
+              {
+                type: "link",
+                role: "link",
+                name: "プロフィール",
+                originalElement: {
+                  nodeType: "element" as const,
+                  tagName: "a",
+                  attributes: { href: "/profile" },
+                  children: [],
+                },
+              },
+              {
+                type: "link",
+                role: "link",
+                name: "設定",
+                originalElement: {
+                  nodeType: "element" as const,
+                  tagName: "a",
+                  attributes: { href: "/settings" },
+                  children: [],
+                },
+              },
+            ],
+          },
+        ],
+      },
+      nodeCount: 8,
+    };
+
+    // デフォルトの最大リンク数（制限なし）
+    const defaultString = ariaTreeToString(tree);
+
+    // すべてのリンクが含まれていることを確認
+    expect(defaultString).toContain("ホーム");
+    expect(defaultString).toContain("ニュース");
+    expect(defaultString).toContain("お問い合わせ");
+    expect(defaultString).toContain("プロフィール");
+    expect(defaultString).toContain("設定");
+
+    // フィルタリングメッセージがないことを確認
+    expect(defaultString).not.toContain("注: 元のツリーには");
+
+    // 最大リンク数を2に制限
+    const limitedString = ariaTreeToString(tree, 2);
+
+    // フィルタリングメッセージが含まれていることを確認
+    expect(limitedString).toContain(
+      "注: 元のツリーには5個のリンクがありましたが、上限(2)に基づいてフィルタリングされています"
+    );
+
+    // リンク数が2つ以下であることを確認（正確な数は重みづけによって変わる可能性があるため、厳密には確認しない）
+    const linkCount = (limitedString.match(/\[href=/g) || []).length;
+    expect(linkCount).toBeLessThanOrEqual(2);
+  });
+
+  test("ariaTreeToString - 重要なリンクが優先的に表示されるか", () => {
+    // 深さの異なるリンクを含むツリーを作成
+    const tree: AriaTree = {
+      root: {
+        type: "main",
+        role: "main",
+        children: [
+          // 浅い階層のリンク（重要度高）
+          {
+            type: "link",
+            role: "link",
+            name: "重要なリンク1",
+            originalElement: {
+              nodeType: "element" as const,
+              tagName: "a",
+              attributes: { href: "/important1" },
+              children: [],
+            },
+          },
+          // 深い階層のリンク（重要度低）
+          {
+            type: "region",
+            role: "region",
+            children: [
+              {
+                type: "region",
+                role: "region",
+                children: [
+                  {
+                    type: "link",
+                    role: "link",
+                    name: "重要度の低いリンク",
+                    originalElement: {
+                      nodeType: "element" as const,
+                      tagName: "a",
+                      attributes: { href: "/less-important" },
+                      children: [],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          // 浅い階層のリンク（重要度高）
+          {
+            type: "link",
+            role: "link",
+            name: "重要なリンク2",
+            originalElement: {
+              nodeType: "element" as const,
+              tagName: "a",
+              attributes: { href: "/important2" },
+              children: [],
+            },
+          },
+        ],
+      },
+      nodeCount: 6,
+    };
+
+    // 最大リンク数を2に制限
+    const limitedString = ariaTreeToString(tree, 2);
+
+    // 重要なリンクが少なくとも1つ含まれていることを確認
+    expect(limitedString).toContain("重要なリンク1");
+
+    // 重要度の低いリンクが除外されていることを確認
+    expect(limitedString).not.toContain("重要度の低いリンク");
+
+    // リンク数が2つ以下であることを確認
+    const linkCount = (limitedString.match(/\[href=/g) || []).length;
+    expect(linkCount).toBeLessThanOrEqual(2);
   });
 });
