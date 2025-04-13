@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { toHTML, toMarkdown, extract } from "./dist/index"; // Adjust path as needed, import PageType, remove toReadableAriaTree
+import { toHTML, toMarkdown, extract } from "./dist/index.js"; // Adjust path as needed, import PageType, remove toReadableAriaTree
 import { parseArgs } from "node:util";
 import path from "node:path";
 import fs from "node:fs";
