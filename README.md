@@ -9,10 +9,16 @@ WIP
 - [x] Accessibilty
 - [x] Markdown Serializer
 
+## CLI
+
+```bash
+$ npx -y @mizchi/readability https://zenn.dev/mizchi/articles/pglite-vector-search
+```
+
 ## How to use
 
 ```bash
-npm install --save @mizchi/readability htmlparser2 html-to-md
+npm install --save @mizchi/readability
 ```
 
 ### Extract Main Content
