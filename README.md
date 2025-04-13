@@ -12,7 +12,16 @@ WIP
 ## CLI
 
 ```bash
-$ npx -y @mizchi/readability https://zenn.dev/mizchi/articles/pglite-vector-search
+$ npx install -g @mizchi/readability
+$ readability
+Usage: @mizchi/readable [options] <url>
+Options:
+  -t, --threshold <number>   Character threshold for extraction (default: 250)
+  -h, --help                 Show this help message
+  -f, --format <format>      Output format (md or html)
+  -o, --out <file>          Output file path (default: stdout)
+$ readability https://zenn.dev/mizchi/articles/pglite-vector-search
+...
 ```
 
 ## How to use
