@@ -1,6 +1,6 @@
 {
   "name": "@mizchi/readability",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "type": "module",
   "description": "A standalone version of the readability library used for Firefox Reader View.",
   "main": "dist/index.js",
@@ -13,9 +13,7 @@
     "generate-testcase": "node test/generate-testcase.js",
     "release": "echo wip # release-it"
   },
-  "bin": {
-    "readability": "cli.js"
-  },
+  "bin": "cli.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mizchi/readability"
