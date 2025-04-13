@@ -12,7 +12,7 @@ WIP
 ## CLI
 
 ```bash
-$ npx install -g @mizchi/readability
+$ npm install -g @mizchi/readability
 $ readability
 Usage: @mizchi/readable [options] <url>
 Options:
