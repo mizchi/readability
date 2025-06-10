@@ -14,7 +14,7 @@
     "release": "echo wip # release-it"
   },
   "bin": {
-    "@mizchi/readability": "./cli.js"
+    "readability": "./cli.js"
   },
   "repository": {
     "type": "git",
