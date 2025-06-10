@@ -24,7 +24,8 @@ Options:
   -t, --threshold <number>   Character threshold for extraction (default: 250)
   -h, --help                 Show this help message
   -f, --format <format>      Output format (md or html)
-  -o, --out <file>          Output file path (default: stdout)
+  -o, --out <file>           Output file path (default: stdout)
+  --mcp                      Start MCP server for Model Context Protocol
 `;
 
 if (
@@ -37,6 +38,12 @@ if (
 }
 
 async function main() {
+  // before parse
+  if (process.argv.includes("--mcp") || process.argv.includes("-v")) {
+    const mod = await import("./mcp.js");
+    await mod.startMcpServer();
+  }
+
   const parsed = parseArgs({
     args: process.argv.slice(2),
     options: {
