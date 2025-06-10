@@ -42,6 +42,7 @@ async function main() {
   if (process.argv.includes("--mcp") || process.argv.includes("-v")) {
     const mod = await import("./mcp.js");
     await mod.startMcpServer();
+    return;
   }
 
   const parsed = parseArgs({
