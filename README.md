@@ -14,7 +14,7 @@ WIP
 ```bash
 $ npm install -g @mizchi/readability
 $ readability
-Usage: @mizchi/readable [options] <url>
+Usage: @mizchi/readability [options] <url>
 Options:
   -t, --threshold <number>   Character threshold for extraction (default: 250)
   -h, --help                 Show this help message
