@@ -14,7 +14,8 @@
     "release": "echo wip # release-it"
   },
   "bin": {
-    "readability": "./cli.js"
+    "readability": "./cli.js",
+    "readability-mcp": "./mcp.js"
   },
   "repository": {
     "type": "git",
@@ -49,10 +50,13 @@
   },
   "files": [
     "cli.js",
+    "mcp.js",
     "src",
     "dist"
   ],
   "dependencies": {
-    "htmlparser2": "^10.0.0"
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "htmlparser2": "^10.0.0",
+    "zod": "^3.25.57"
   }
 }

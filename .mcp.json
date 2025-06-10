@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "readability": {
+      "command": "node",
+      "args": ["./mcp.js"]
+    }
+  }
+}
