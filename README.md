@@ -24,6 +24,25 @@ $ readability https://zenn.dev/mizchi/articles/pglite-vector-search
 ...
 ```
 
+## readability-mcp
+
+```json
+{
+  "mcpServers": {
+    "readability": {
+      "command": "npx",
+      "args": ["-y", "@mizchi/readability", "--mcp"]
+    }
+  }
+}
+```
+
+Prompt
+
+```
+Given a URL, use read_url_content_as_markdown and summary contents
+```
+
 ## How to use
 
 ```bash

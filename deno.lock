@@ -3,6 +3,7 @@
   "specifiers": {
     "npm:@mizchi/readability@0.3.1": "0.3.1_htmlparser2@10.0.0",
     "npm:@mizchi/readability@0.6.0": "0.6.0",
+    "npm:@mizchi/readability@0.6.1": "0.6.1",
     "npm:@modelcontextprotocol/sdk@^1.12.1": "1.12.1_express@5.1.0_zod@3.25.57",
     "npm:@types/jsdom@^21.1.7": "21.1.7",
     "npm:@types/node@*": "22.12.0",
@@ -278,6 +279,15 @@
     },
     "@mizchi/readability@0.6.0": {
       "integrity": "sha512-MA0aN1iYenL+c8qZRncohmQP2BUFzRN7Odh0B0Erk0SxZxAe8mroNKBS9SLadYUjvKQdYdvyPUaEKv6lVSgXIQ==",
+      "dependencies": [
+        "@modelcontextprotocol/sdk",
+        "htmlparser2@10.0.0",
+        "zod"
+      ],
+      "bin": true
+    },
+    "@mizchi/readability@0.6.1": {
+      "integrity": "sha512-mmoxSXmKM9PC33sa56S27rZYQckodD9Q4afeayJnLHDOwnWuWIgFqzBmzJRD+lcifAZKUUpvCWDCzSXaFSevAw==",
       "dependencies": [
         "@modelcontextprotocol/sdk",
         "htmlparser2@10.0.0",

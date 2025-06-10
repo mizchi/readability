@@ -55,9 +55,18 @@ async function main() {
         type: "string",
         short: "o",
       },
+      mcp: {
+        type: "boolean",
+        default: false,
+      },
     },
     allowPositionals: true,
   });
+  if (parsed.values.mcp) {
+    const mod = await import("./mcp.js");
+    await mod.startMcpServer();
+    return;
+  }
 
   const url = parsed.positionals[0];
   if (!url) {

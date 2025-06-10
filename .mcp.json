@@ -2,7 +2,7 @@
   "mcpServers": {
     "readability": {
       "command": "node",
-      "args": ["./mcp.js"]
+      "args": ["./cli.js", "--mcp"]
     }
   }
 }

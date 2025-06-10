@@ -96,19 +96,8 @@ Usage example:
 }));
 
 // Start the server
-async function main() {
+export async function startMcpServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.log("MCP server is running. Waiting for requests...");
-
-  // Handle graceful shutdown
-  process.on("SIGINT", async () => {
-    await server.close();
-    process.exit(0);
-  });
 }
-
-main().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
-});
