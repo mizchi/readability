@@ -97,5 +97,4 @@ Usage example:
 export async function startMcpServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log("MCP server is running. Waiting for requests...");
 }
