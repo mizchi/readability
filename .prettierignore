@@ -1,0 +1,6 @@
+dist/
+node_modules/
+*.dxt
+test/test-pages/
+coverage/
+.git/

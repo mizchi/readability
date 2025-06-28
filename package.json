@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsdown",
     "build:dxt": "node scripts/build-dxt.js",
-    "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
+    "lint": "prettier --check .",
     "test": "vitest --run src",
     "test:original": "vitest --run test",
     "generate-testcase": "node test/generate-testcase.js",
