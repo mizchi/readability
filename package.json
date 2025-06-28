@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && npm run build:mcp",
+    "build:mcp": "tsdown",
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
     "test": "vitest --run src crawler",
     "test:original": "vitest --run test",
@@ -40,6 +41,7 @@
     "prettier": "^3.5.3",
     "puppeteer-core": "^24.4.0",
     "release-it": "17.0.1",
+    "tsdown": "^0.12.9",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vite": "^6.2.3",
@@ -49,7 +51,7 @@
   },
   "files": [
     "cli.js",
-    "mcp.js",
+    "dist-mcp/mcp.js",
     "src",
     "dist"
   ],

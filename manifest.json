@@ -10,10 +10,10 @@
   "license": "Apache-2.0",
   "server": {
     "type": "node",
-    "entry_point": "cli.js",
+    "entry_point": "dist-mcp/mcp.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/cli.js", "--mcp"]
+      "args": ["${__dirname}/dist-mcp/mcp.js"]
     }
   },
   "tools": [

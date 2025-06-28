@@ -9,7 +9,7 @@ import {
   ariaTreeToString,
   analyzeLinkHierarchy,
   classifyPageType,
-} from "./dist/index.js";
+} from "./src/index";
 
 // Create MCP server instance
 const server = new McpServer({
@@ -32,7 +32,7 @@ server.tool(
       .default(100)
       .describe("Character threshold for content extraction"),
   },
-  async ({ url, options = {} }) => {
+  async ({ url, charThreshold }) => {
     try {
       // Fetch the HTML content
       const response = await fetch(url);
@@ -47,7 +47,7 @@ server.tool(
       // Extract content using the lower-level extract function
       const extracted = extract(html, {
         url: url,
-        charThreshold: options.charThreshold ?? 100,
+        charThreshold: charThreshold ?? 100,
       });
       // Convert to markdown
       const markdown = toMarkdown(extracted.root);
@@ -58,7 +58,7 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `Error processing URL: ${error.message}`,
+            text: `Error processing URL: ${(error as Error).message}`,
           },
         ],
       };
