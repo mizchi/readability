@@ -38,10 +38,7 @@ export function getAttribute(element: VElement, name: string): string | null {
 }
 
 // Get elements by tag name
-export function getElementsByTagName(
-  element: VElement,
-  tagName: string | string[]
-): VElement[] {
+export function getElementsByTagName(element: VElement, tagName: string | string[]): VElement[] {
   const tagNames = Array.isArray(tagName) ? tagName : [tagName];
   const lowerTagNames = tagNames.map((tag) => tag.toLowerCase()); // Use lowercase
   const result: VElement[] = [];
@@ -66,11 +63,7 @@ export function getNextNode(
   node: VElement | VText,
   ignoreSelfAndKids?: boolean
 ): VElement | VText | null {
-  if (
-    node.nodeType === "element" &&
-    !ignoreSelfAndKids &&
-    node.children.length > 0
-  ) {
+  if (node.nodeType === "element" && !ignoreSelfAndKids && node.children.length > 0) {
     return node.children[0];
   }
 
@@ -182,11 +175,7 @@ export function isPhrasingContent(node: VNode): boolean {
     }
 
     // Check specific tags in lowercase
-    if (
-      element.tagName === "a" ||
-      element.tagName === "del" ||
-      element.tagName === "ins"
-    ) {
+    if (element.tagName === "a" || element.tagName === "del" || element.tagName === "ins") {
       return everyNode(element.children, isPhrasingContent);
     }
   }
@@ -195,10 +184,7 @@ export function isPhrasingContent(node: VNode): boolean {
 }
 
 // Get inner text
-export function getInnerText(
-  element: VElement | VText,
-  normalizeSpaces: boolean = true
-): string {
+export function getInnerText(element: VElement | VText, normalizeSpaces: boolean = true): string {
   let text = "";
 
   if (element.nodeType === "text") {
@@ -247,17 +233,12 @@ export function getTextDensity(element: VElement): number {
   const textLength = text.length;
   if (textLength === 0) return 0;
 
-  const childElements = element.children.filter(
-    (child) => child.nodeType === "element"
-  );
+  const childElements = element.children.filter((child) => child.nodeType === "element");
   return textLength / (childElements.length || 1);
 }
 
 // Get ancestor elements
-export function getNodeAncestors(
-  node: VElement,
-  maxDepth: number = 3
-): VElement[] {
+export function getNodeAncestors(node: VElement, maxDepth: number = 3): VElement[] {
   const ancestors: VElement[] = [];
   let currentRef = node.parent;
   let depth = 0;

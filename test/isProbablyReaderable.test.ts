@@ -33,18 +33,11 @@ describe("isProbablyReaderable - test pages", () => {
 });
 
 describe("isProbablyReaderable", () => {
-  const makeDoc = (source: string): Document =>
-    new JSDOM(source).window.document;
+  const makeDoc = (source: string): Document => new JSDOM(source).window.document;
   const verySmallDoc = makeDoc('<html><p id="main">hello there</p></html>'); // content length: 11
-  const smallDoc = makeDoc(
-    `<html><p id="main">${"hello there ".repeat(11)}</p></html>`
-  ); // content length: 132
-  const largeDoc = makeDoc(
-    `<html><p id="main">${"hello there ".repeat(12)}</p></html>`
-  ); // content length: 144
-  const veryLargeDoc = makeDoc(
-    `<html><p id="main">${"hello there ".repeat(50)}</p></html>`
-  ); // content length: 600
+  const smallDoc = makeDoc(`<html><p id="main">${"hello there ".repeat(11)}</p></html>`); // content length: 132
+  const largeDoc = makeDoc(`<html><p id="main">${"hello there ".repeat(12)}</p></html>`); // content length: 144
+  const veryLargeDoc = makeDoc(`<html><p id="main">${"hello there ".repeat(50)}</p></html>`); // content length: 600
 
   // Define type for options used in isProbablyReaderable
   interface IsProbablyReaderableOptions {
@@ -65,14 +58,10 @@ describe("isProbablyReaderable", () => {
       minContentLength: 120,
       minScore: 0,
     };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
-      false
-    );
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(false);
     expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(true);
     expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true);
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
-      true
-    );
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(true);
   });
 
   it("should only declare largest document as readerable when higher minContentLength", () => {
@@ -80,14 +69,10 @@ describe("isProbablyReaderable", () => {
       minContentLength: 200,
       minScore: 0,
     };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
-      false
-    );
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(false);
     expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(false);
     expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(false);
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
-      true
-    );
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(true);
   });
 
   it("should declare small and large documents as readerable when lower minScore", () => {
@@ -95,14 +80,10 @@ describe("isProbablyReaderable", () => {
       minContentLength: 0,
       minScore: 4,
     };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
-      false
-    ); // score: ~3.3
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(false); // score: ~3.3
     expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(true); // score: ~11.4
     expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true); // score: ~11.9
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
-      true
-    ); // score: ~24.4
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(true); // score: ~24.4
   });
 
   it("should declare large documents as readerable when higher minScore", () => {
@@ -110,14 +91,10 @@ describe("isProbablyReaderable", () => {
       minContentLength: 0,
       minScore: 11.5,
     };
-    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(
-      false
-    ); // score: ~3.3
+    expect(isProbablyReaderable(verySmallDoc, options), "very small doc").toBe(false); // score: ~3.3
     expect(isProbablyReaderable(smallDoc, options), "small doc").toBe(false); // score: ~11.4
     expect(isProbablyReaderable(largeDoc, options), "large doc").toBe(true); // score: ~11.9
-    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(
-      true
-    ); // score: ~24.4
+    expect(isProbablyReaderable(veryLargeDoc, options), "very large doc").toBe(true); // score: ~24.4
   });
 
   it("should use node visibility checker provided as option - not visible", () => {

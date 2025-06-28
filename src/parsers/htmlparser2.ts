@@ -15,10 +15,7 @@ import type { VDocument, VElement, VText } from "../types.ts"; // Adjusted path
  * @param baseURI Base URI (used for resolving relative URLs)
  * @returns Virtual DOM document
  */
-export function parseHTML(
-  html: string,
-  baseURI: string = "about:blank"
-): VDocument {
+export function parseHTML(html: string, baseURI: string = "about:blank"): VDocument {
   // Initialize document structure
   const document: VDocument = {
     documentElement: createElement("html"),
@@ -137,9 +134,7 @@ export function serializeToHTML(element: VElement | VText): string {
   }
 
   // For tags containing children
-  const childrenHTML = element.children
-    .map((child) => serializeToHTML(child))
-    .join("");
+  const childrenHTML = element.children.map((child) => serializeToHTML(child)).join("");
 
   return `<${tagName}${attributeString}>${childrenHTML}</${tagName}>`;
 }

@@ -28,11 +28,7 @@ Options:
   --mcp                      Start MCP server for Model Context Protocol
 `;
 
-if (
-  process.argv.includes("--help") ||
-  process.argv.includes("-h") ||
-  process.argv.length === 2
-) {
+if (process.argv.includes("--help") || process.argv.includes("-h") || process.argv.length === 2) {
   console.log(helpText);
   process.exit(0);
 }
@@ -90,9 +86,7 @@ async function main() {
    * @type {string | undefined}
    */
   let output = undefined;
-  const threshold = parsed.values.threshold
-    ? Number(parsed.values.threshold)
-    : 250;
+  const threshold = parsed.values.threshold ? Number(parsed.values.threshold) : 250;
   if (parsed.values.format) {
     format = parsed.values.format;
   } else if (parsed.values.out) {

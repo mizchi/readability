@@ -226,14 +226,12 @@ describe("Core Readability Functions", () => {
 
     // Navigation element with high link density
     const navigation = doc.body.children.find(
-      (child): child is VElement =>
-        child.nodeType === "element" && child.className === "navigation"
+      (child): child is VElement => child.nodeType === "element" && child.className === "navigation"
     );
 
     // Normal content element
     const content = doc.body.children.find(
-      (child): child is VElement =>
-        child.nodeType === "element" && child.className === "content"
+      (child): child is VElement => child.nodeType === "element" && child.className === "content"
     );
 
     if (navigation && navigation.nodeType === "element") {
@@ -264,8 +262,7 @@ describe("Core Readability Functions", () => {
     if (result.root) {
       const contentText = result.root.children
         .filter(
-          (child): child is VElement =>
-            child.nodeType === "element" && child.tagName === "p" // Lowercase
+          (child): child is VElement => child.nodeType === "element" && child.tagName === "p" // Lowercase
         )
         .map((p: VElement) =>
           p.children
@@ -297,8 +294,7 @@ describe("Core Readability Functions", () => {
       const isArticleOrContainsArticle =
         result.root.tagName === "article" || // Lowercase
         result.root.children.some(
-          (child): boolean =>
-            child.nodeType === "element" && child.tagName === "article" // Lowercase
+          (child): boolean => child.nodeType === "element" && child.tagName === "article" // Lowercase
         );
 
       expect(isArticleOrContainsArticle).toBe(true);
@@ -323,8 +319,7 @@ describe("Core Readability Functions", () => {
       const contentOrParentOfContent =
         result.root.className === "content" ||
         result.root.children.some(
-          (child): boolean =>
-            child.nodeType === "element" && child.className === "content"
+          (child): boolean => child.nodeType === "element" && child.className === "content"
         );
 
       expect(contentOrParentOfContent).toBe(true);

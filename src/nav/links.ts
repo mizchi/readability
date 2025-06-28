@@ -49,8 +49,7 @@ export function calculateNodeWeight(
   const depthWeight = 1 / (depth + 1);
 
   // 位置重み: 上にあるほど高い点数
-  const positionWeight =
-    siblingCount > 1 ? (siblingCount - indexInParent) / siblingCount : 1;
+  const positionWeight = siblingCount > 1 ? (siblingCount - indexInParent) / siblingCount : 1;
 
   // コンテンツ重み: リンク数や子ノード数に基づく重み
   const linkCount = countLinks(node);
@@ -58,28 +57,14 @@ export function calculateNodeWeight(
   const contentWeight = linkCount * 0.5 + childCount * 0.3;
 
   // タイプ重み: 特定のタイプは重要度が高い
-  const importantTypes = [
-    "main",
-    "article",
-    "navigation",
-    "heading",
-    "link",
-    "list",
-  ];
+  const importantTypes = ["main", "article", "navigation", "heading", "link", "list"];
   const typeWeight = importantTypes.includes(node.type) ? 1.5 : 1;
 
   // 名前の有無による重み
   const nameWeight = node.name ? 1.2 : 0.8;
 
   // 総合重み
-  return (
-    (depthWeight * 3 +
-      positionWeight * 2 +
-      contentWeight +
-      typeWeight +
-      nameWeight) /
-    8
-  );
+  return (depthWeight * 3 + positionWeight * 2 + contentWeight + typeWeight + nameWeight) / 8;
 }
 
 /**

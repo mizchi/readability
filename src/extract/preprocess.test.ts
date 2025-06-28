@@ -45,10 +45,7 @@ describe("preprocessDocument function", () => {
     preprocessDocument(doc); // Note: preprocessDocument currently operates mainly on doc.body
 
     // Check head and body separately if needed, but TAGS_TO_REMOVE logic targets the whole documentElement initially
-    const styleElementsInHead = getElementsByTagName(
-      doc.documentElement,
-      "style"
-    );
+    const styleElementsInHead = getElementsByTagName(doc.documentElement, "style");
     expect(styleElementsInHead.length).toBe(0);
 
     // Double check body specifically if head wasn't parsed/handled as expected by default parser

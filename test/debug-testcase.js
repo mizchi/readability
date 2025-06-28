@@ -18,7 +18,6 @@ var src = fs
   })
   .trim();
 
-var doc = new JSDOM(src, { url: "http://fakehost/test/page.html" }).window
-  .document;
+var doc = new JSDOM(src, { url: "http://fakehost/test/page.html" }).window.document;
 
 new Readability(doc, { debug: true }).parse();

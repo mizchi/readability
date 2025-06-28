@@ -73,10 +73,7 @@ function serializeNode(node: VNode, parentId?: number): number {
   // Avoid re-serializing if already processed
   if (serializableNodes[id]) {
     // Update parentId if it wasn't set before and a parent is provided now
-    if (
-      serializableNodes[id].parentId === undefined &&
-      parentId !== undefined
-    ) {
+    if (serializableNodes[id].parentId === undefined && parentId !== undefined) {
       serializableNodes[id].parentId = parentId;
     }
     return id;
@@ -121,16 +118,11 @@ function serializeNode(node: VNode, parentId?: number): number {
 }
 
 // Modify serialize to accept pageType
-export function serialize(
-  snapshot: ExtractedSnapshot,
-  pageType: PageType
-): string {
+export function serialize(snapshot: ExtractedSnapshot, pageType: PageType): string {
   nodeIdCounter = 0;
   nodeMap.clear();
   // Clear object properly
-  Object.keys(serializableNodes).forEach(
-    (key) => delete serializableNodes[Number(key)]
-  );
+  Object.keys(serializableNodes).forEach((key) => delete serializableNodes[Number(key)]);
 
   let rootId: number | null = null;
   if (snapshot.root) {
@@ -147,9 +139,7 @@ export function serialize(
       // candidate.element might not be in the serialized tree if snapshot.root is different
       const elementId = nodeMap.get(candidate.element);
       // Only include candidates whose elements were successfully serialized
-      return elementId !== undefined
-        ? { score: candidate.score, elementId }
-        : null;
+      return elementId !== undefined ? { score: candidate.score, elementId } : null;
     })
     .filter((c): c is { score: number; elementId: number } => c !== null); // Type guard
 
@@ -256,9 +246,7 @@ export function deserialize(jsonString: string): {
         // (e.g., using IDs or direct references post-deserialization).
         // (childNode as any).parent = parentElement; // Avoid setting parent directly
       } else {
-        console.warn(
-          `Child node with id ${childId} not found for parent node ${id}`
-        );
+        console.warn(`Child node with id ${childId} not found for parent node ${id}`);
       }
     }
   }
@@ -266,21 +254,16 @@ export function deserialize(jsonString: string): {
   // Step 3: Reconstruct Snapshot
   const rootElement =
     serializableData.rootId !== null
-      ? ((deserializedNodes.get(serializableData.rootId) as VElement | null) ??
-        null) // Ensure it's VElement or null
+      ? ((deserializedNodes.get(serializableData.rootId) as VElement | null) ?? null) // Ensure it's VElement or null
       : null;
 
   // Use nullish coalescing for safety
   const candidatesData = serializableData.mainCandidates ?? [];
   const mainCandidates: CandidateInfo[] = candidatesData
     .map((c) => {
-      const element = deserializedNodes.get(c.elementId) as
-        | VElement
-        | undefined;
+      const element = deserializedNodes.get(c.elementId) as VElement | undefined;
       // Ensure the found node is actually an element
-      return element?.nodeType === "element"
-        ? { element: element, score: c.score }
-        : null;
+      return element?.nodeType === "element" ? { element: element, score: c.score } : null;
     })
     .filter((c): c is CandidateInfo => c !== null); // Use type guard
 

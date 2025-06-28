@@ -58,20 +58,11 @@ function inOrderIgnoreEmptyTextNodes(fromNode: Node | null): Node | null {
   return fromNode;
 }
 
-type TraverseCallback = (
-  actualNode: Node | null,
-  expectedNode: Node | null
-) => boolean;
+type TraverseCallback = (actualNode: Node | null, expectedNode: Node | null) => boolean;
 
-function traverseDOM(
-  callback: TraverseCallback,
-  actualDOM: Document,
-  expectedDOM: Document
-) {
-  let actualNode: Node | null =
-    actualDOM.documentElement || actualDOM.childNodes[0];
-  let expectedNode: Node | null =
-    expectedDOM.documentElement || expectedDOM.childNodes[0];
+function traverseDOM(callback: TraverseCallback, actualDOM: Document, expectedDOM: Document) {
+  let actualNode: Node | null = actualDOM.documentElement || actualDOM.childNodes[0];
+  let expectedNode: Node | null = expectedDOM.documentElement || expectedDOM.childNodes[0];
   while (actualNode || expectedNode) {
     // We'll stop if we don't have both actualNode and expectedNode
     if (!callback(actualNode, expectedNode)) {
@@ -143,10 +134,7 @@ function runTestsWithItems(
         if (n.nodeType !== Node.ELEMENT_NODE) {
           // Use Node.ELEMENT_NODE
           return (
-            "some other node type: " +
-            n.nodeType +
-            " with data " +
-            (n as CharacterData).data // Cast to CharacterData for 'data' property
+            "some other node type: " + n.nodeType + " with data " + (n as CharacterData).data // Cast to CharacterData for 'data' property
           );
         }
         const el = n as Element; // Cast to Element
@@ -157,9 +145,7 @@ function runTestsWithItems(
         if (el.className) {
           // className can be an object (SVGAnimatedString) or string
           const classNameStr =
-            typeof el.className === "string"
-              ? el.className
-              : (el.className as any).baseVal;
+            typeof el.className === "string" ? el.className : (el.className as any).baseVal;
           if (classNameStr) {
             rv += ".(" + classNameStr + ")";
           }
@@ -180,8 +166,7 @@ function runTestsWithItems(
         if (!parent) return nodeStr(node); // Handle case where parentNode is null
         const parentPath = genPath(parent);
         // Use Array.from for NodeList
-        const index =
-          Array.from(parent.childNodes).indexOf(node as ChildNode) + 1; // Cast node to ChildNode
+        const index = Array.from(parent.childNodes).indexOf(node as ChildNode) + 1; // Cast node to ChildNode
         return parentPath + " > " + nodeStr(node) + ":nth-child(" + index + ")";
       }
 
@@ -215,9 +200,7 @@ function runTestsWithItems(
             const actualDesc = nodeStr(actualNode);
             const expectedDesc = nodeStr(expectedNode);
             if (actualDesc !== expectedDesc) {
-              expect(actualDesc, findableNodeDesc(actualNode)).toEqual(
-                expectedDesc
-              );
+              expect(actualDesc, findableNodeDesc(actualNode)).toEqual(expectedDesc);
               return false;
             }
             // Compare text for text nodes:
@@ -225,9 +208,7 @@ function runTestsWithItems(
               // Use Node.TEXT_NODE
               const actualText = htmlTransform(actualNode.textContent);
               const expectedText = htmlTransform(expectedNode.textContent);
-              expect(actualText, findableNodeDesc(actualNode)).toEqual(
-                expectedText
-              );
+              expect(actualText, findableNodeDesc(actualNode)).toEqual(expectedText);
               if (actualText !== expectedText) {
                 return false;
               }
@@ -246,9 +227,7 @@ function runTestsWithItems(
                 ") should match (" +
                 expectedNodeAttributes.join(",") +
                 ") 1";
-              expect(actualNodeAttributes.length, desc).toEqual(
-                expectedNodeAttributes.length
-              );
+              expect(actualNodeAttributes.length, desc).toEqual(expectedNodeAttributes.length);
               for (let i = 0; i < actualNodeAttributes.length; i++) {
                 // Assuming actualNodeAttributes[i] is string 'name=value'
                 const attrName = actualNodeAttributes[i].split("=")[0];
@@ -334,10 +313,9 @@ describe("Readability API", () => {
     const doc: any = new JSDOMParser().parse("<html><div>yo</div></html>");
     it("should accept a debug option", () => {
       expect((new Readability(doc) as any)._debug).toEqual(false);
-      expect(
-        (new Readability(doc, { debug: true } as ReadabilityOptions) as any)
-          ._debug
-      ).toEqual(true);
+      expect((new Readability(doc, { debug: true } as ReadabilityOptions) as any)._debug).toEqual(
+        true
+      );
     });
 
     it("should accept a nbTopCandidates option", () => {
@@ -383,9 +361,7 @@ describe("Readability API", () => {
     it("should accept a allowedVideoRegex option or default it", () => {
       // Accessing prototype might need adjustment based on actual Readability structure
       const defaultVideoRegex = (Readability.prototype as any).REGEXPS?.videos;
-      expect((new Readability(doc) as any)._allowedVideoRegex).toEqual(
-        defaultVideoRegex
-      );
+      expect((new Readability(doc) as any)._allowedVideoRegex).toEqual(defaultVideoRegex);
       const allowedVideoRegex = /\/\/mydomain.com\/.*'/;
       expect(
         (
@@ -511,10 +487,7 @@ describe("Test pages", () => {
           const parser = new JSDOMParser();
           const doc: any = parser.parse(source, uri); // Assuming parse returns a Document-like object
           if (parser.errorState) {
-            console.error(
-              "JSDOMParser parsing caused errors:",
-              parser.errorState
-            );
+            console.error("JSDOMParser parsing caused errors:", parser.errorState);
             return null;
           }
           return doc as Document; // Cast to Document, assuming compatibility

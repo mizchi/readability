@@ -3,7 +3,7 @@ name: Release DXT Package
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -11,32 +11,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      
+          node-version: "20"
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Build project
         run: npm run build
-      
+
       - name: Install DXT CLI
         run: npm install -g @anthropic-ai/dxt
-      
+
       - name: Build DXT package
         run: dxt pack .
-      
+
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -47,25 +47,25 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             ## Readability MCP Server DXT Package
-            
+
             This release includes the DXT package for easy installation in Claude Desktop.
-            
+
             ### Installation
             1. Download `readability-${{ steps.version.outputs.version }}.dxt`
             2. Open Claude Desktop
             3. Drag and drop the .dxt file or use File → Install Extension
             4. Click "Install"
-            
+
             ### Usage
             Once installed, you can use the `read_url_content_as_markdown` tool to extract readable content from web pages.
-            
+
             Example prompt:
             ```
             Using read_url_content_as_markdown, extract and summarize the content from https://example.com/article
             ```
           draft: false
           prerelease: false
-      
+
       - name: Upload DXT Package
         uses: actions/upload-release-asset@v1
         env:

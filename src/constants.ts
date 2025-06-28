@@ -9,9 +9,7 @@
 export const DEFAULT_N_TOP_CANDIDATES = 5;
 
 // Element tags to score by default.
-export const DEFAULT_TAGS_TO_SCORE = "section,h2,h3,h4,h5,h6,p,td,pre".split(
-  ","
-);
+export const DEFAULT_TAGS_TO_SCORE = "section,h2,h3,h4,h5,h6,p,td,pre".split(",");
 
 // The default number of chars an article must have in order to return a result
 export const DEFAULT_CHAR_THRESHOLD = 500;
@@ -24,8 +22,7 @@ export const REGEXPS = {
     /-ad-|ai2html|banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|footer|gdpr|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i,
   okMaybeItsACandidate: /and|article|body|column|content|main|shadow/i,
 
-  positive:
-    /article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story/i,
+  positive: /article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story/i,
   negative:
     /-ad-|hidden|^hid$| hid$| hid |^hid |banner|combx|comment|com-|contact|footer|gdpr|masthead|media|meta|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|widget/i,
 

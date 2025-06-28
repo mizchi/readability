@@ -1,9 +1,5 @@
 import type { AriaTree, AriaNode } from "../types";
-import {
-  countLinks,
-  assignWeightsToTree,
-  filterNodesByWeight,
-} from "../nav/links";
+import { countLinks, assignWeightsToTree, filterNodesByWeight } from "../nav/links";
 
 /**
  * AriaTreeをYAML形式の文字列に変換する（Playwrightのスナップショット形式に準拠）
@@ -11,10 +7,7 @@ import {
  * @param maxLinks 最大表示リンク数（デフォルト: 60）
  */
 
-export function ariaTreeToString(
-  tree: AriaTree,
-  maxLinks: number = 60
-): string {
+export function ariaTreeToString(tree: AriaTree, maxLinks: number = 60): string {
   // ツリー内のリンク総数をカウント
   const totalLinks = countLinks(tree.root);
 
@@ -45,8 +38,7 @@ export function ariaTreeToString(
         (!node.children ||
           node.children.length === 0 ||
           node.children.every(
-            (child) =>
-              !child.name && (!child.children || child.children.length === 0)
+            (child) => !child.name && (!child.children || child.children.length === 0)
           )))
     ) {
       return "";
@@ -161,9 +153,7 @@ export function ariaTreeToString(
         const child = node.children[0];
         // 親の名前と子の名前を結合
         const combinedName =
-          node.name && child.name
-            ? `${node.name} ${child.name}`
-            : node.name || child.name || "";
+          node.name && child.name ? `${node.name} ${child.name}` : node.name || child.name || "";
 
         // 一時的に名前を変更して出力
         const tempNode = { ...node, name: combinedName };

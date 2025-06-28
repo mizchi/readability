@@ -13,10 +13,7 @@ import type { AriaNode } from "../types";
 
 describe("Navigation Links Utilities with Yahoo Fixture", () => {
   // Yahoo!ニュースのHTMLスナップショットを読み込む
-  const yahooHtml = readFileSync(
-    join(__dirname, "fixtures/yahoo.html"),
-    "utf-8"
-  );
+  const yahooHtml = readFileSync(join(__dirname, "fixtures/yahoo.html"), "utf-8");
 
   // ARIAツリーを抽出
   const ariaTree = extractAriaTree(yahooHtml, { compress: true });

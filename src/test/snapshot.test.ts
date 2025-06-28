@@ -56,9 +56,7 @@ async function fetchAndExtractHTML(url: string): Promise<{
       // console.log(`URLからHTMLを取得: ${url}`);
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch URL: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       }
 
       // HTMLを文字列として取得
@@ -114,8 +112,7 @@ function getFilenameFromURL(url: string): string {
   const domain = getDomainFromURL(url);
   const urlObj = new URL(url);
   const pathSegments = urlObj.pathname.split("/").filter(Boolean);
-  const lastSegment =
-    pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "index";
+  const lastSegment = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "index";
 
   // ドメイン名とパスの最後のセグメントを組み合わせてファイル名を生成
   return `${domain}-${lastSegment}`.replace(/[^a-zA-Z0-9-_]/g, "-");

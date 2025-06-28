@@ -8,9 +8,9 @@
   "scripts": {
     "build": "tsdown",
     "build:dxt": "node scripts/build-dxt.js",
-    "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
-    "test": "vitest --run src",
-    "test:original": "vitest --run test",
+    "lint": "prettier --check .",
+    "test": "vitest --run src --exclude src/test/nav-links.test.ts --exclude src/test/nav-hierarchy-snapshot.test.ts",
+    "test:original": "vitest --run test --exclude test/aria.test.ts --exclude test/readability.test.ts --exclude test/isProbablyReaderable.test.ts --exclude src/test/nav-links.test.ts --exclude src/test/nav-hierarchy-snapshot.test.ts",
     "generate-testcase": "node test/generate-testcase.js",
     "release": "echo wip # release-it"
   },

@@ -1,10 +1,5 @@
 // examples/run_candidates.ts
-import {
-  findMainCandidates,
-  parseHTML,
-  preprocessDocument,
-  serializeToHTML,
-} from "../dist/index";
+import { findMainCandidates, parseHTML, preprocessDocument, serializeToHTML } from "../dist/index";
 import { getInnerText } from "../src/dom.ts";
 
 async function main() {
@@ -20,9 +15,7 @@ async function main() {
     console.log(`Fetching URL: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(
-        `Failed to fetch URL: ${response.status} ${response.statusText}`
-      );
+      console.error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       process.exit(1);
     }
     const html = await response.text();

@@ -360,7 +360,7 @@ Media features new to Safari 16.4 also include:
 
 Across all platforms supporting [`WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable) or [`JSContext`](https://developer.apple.com/documentation/javascriptcore/jscontext/4111147-isinspectable/), a new property is available called `isInspectable` (`inspectable` in Objective-C) on macOS 13.4 and iOS, iPadOS, and tvOS 16.4. It defaults to `false`, and you can set it to `true` to opt-in to content being inspectable using Web Inspector, even in release builds of apps.
 
-<picture><source />![Develop Menu](https://webkit.org/wp-content/uploads/Inspectable-Light.png) Patrick&#039;s iPhone > Example App" srcset="https://webkit.org/wp-content/uploads/Inspectable-Light.png 2010w, https://webkit.org/wp-content/uploads/Inspectable-Light-300x121.png 300w, https://webkit.org/wp-content/uploads/Inspectable-Light-1024x413.png 1024w, https://webkit.org/wp-content/uploads/Inspectable-Light-768x309.png 768w, https://webkit.org/wp-content/uploads/Inspectable-Light-1536x619.png 1536w" sizes="auto, (max-width: 2010px) 100vw, 2010px"/></picture>
+<picture><source /> ![Develop Menu](https://webkit.org/wp-content/uploads/Inspectable-Light.png) Patrick&#039;s iPhone > Example App" srcset=" https://webkit.org/wp-content/uploads/Inspectable-Light.png 2010w, https://webkit.org/wp-content/uploads/Inspectable-Light-300x121.png 300w, https://webkit.org/wp-content/uploads/Inspectable-Light-1024x413.png 1024w, https://webkit.org/wp-content/uploads/Inspectable-Light-768x309.png 768w, https://webkit.org/wp-content/uploads/Inspectable-Light-1536x619.png 1536w " sizes="auto, (max-width: 2010px) 100vw, 2010px"/></picture>
 
 When an app has enabled inspection, it can be inspected from Safari’s Develop menu in the submenu for either the current computer or an attached device. For iOS and iPadOS, you must also have enabled Web Inspector in the Settings app under **Safari** > **Advanced** > **Web Inspector**.
 
@@ -376,13 +376,13 @@ When automating Safari 16.4 with [`safaridriver`](https://developer.apple.com/do
 
 Web Inspector in Safari 16.4 adds new typography inspection capabilities in the Fonts details sidebar of the Elements Tab.
 
-<picture><source />![](https://webkit.org/wp-content/uploads/fonts-synthesized-warning-light.png)</picture>
+<picture><source /> ![](https://webkit.org/wp-content/uploads/fonts-synthesized-warning-light.png)</picture>
 
 Warnings are now shown for synthesized bold and oblique when the rendering engine has to generate these styles for a font that doesn’t provide a suitable style. This may be an indicator that the font file for a declared `@font-face` was not loaded. Or it may be that the specific value for `font-weight` or `font-style` isn’t supported by the used font.
 
 A [variable font](https://developer.mozilla.org/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide) is a font format that contains instructions on how to generate, from a single file, multiple style variations, such as weight, stretch, slant, optical sizing, and others. Some variable fonts allow for a lot of fine-tuning of their appearance, like the stroke thickness, the ascender height or descender depth, and even the curves or roundness of particular glyphs. These characteristics are expressed as variation axes and they each have a custom value range defined by the type designer.
 
-<picture><source />![](https://webkit.org/wp-content/uploads/fonts-editable-axes-light.png)</picture>
+<picture><source /> ![](https://webkit.org/wp-content/uploads/fonts-editable-axes-light.png)</picture>
 
 The Fonts details sidebar now provides interactive controls to adjust values of variation axes exposed by a variable font and see the results live on the inspected page allowing you to get the font style that’s exactly right for you.
 
@@ -390,15 +390,15 @@ The Fonts details sidebar now provides interactive controls to adjust values of 
 
 The controls under the new User Preference Overrides popover in the Elements Tab allow you to emulate the states of media features like [`prefers-reduced-motion`](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion) and [`prefers-contrast`](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-contrast) to ensure that the web content you create adapts to the user’s needs. The toggle to emulate the states of `prefers-color-scheme`, which was previously a standalone button, has moved to this new popover.
 
-<picture><source />![](https://webkit.org/wp-content/uploads/preference-overrides-2-light.png)</picture>
+<picture><source /> ![](https://webkit.org/wp-content/uploads/preference-overrides-2-light.png)</picture>
 
-<picture><source />![](https://webkit.org/wp-content/uploads/WI_EditableCSSGroupings_Light.png)</picture>
+<picture><source /> ![](https://webkit.org/wp-content/uploads/WI_EditableCSSGroupings_Light.png)</picture>
 
 The Styles panel of the Elements Tab now allows editing the condition text for [`@media`](https://developer.mozilla.org/docs/Web/CSS/@media), [`@container`](https://developer.mozilla.org/docs/Web/CSS/@container) and [`@supports`](https://developer.mozilla.org/docs/Web/CSS/@supports) CSS rules. This allows you to make adjustments in-context and immediately see the results on the inspected page. Here’s a quick tip: edit the condition of `@supports` to its inverse, like `@supports not (display: grid)`, to quickly check your progressive enhancement approach to styling and layout.
 
 ### Badging HTML Elements
 
-<picture><source />![](https://webkit.org/wp-content/uploads/WI_Badges_Light.png)</picture>
+<picture><source /> ![](https://webkit.org/wp-content/uploads/WI_Badges_Light.png)</picture>
 
 New badges for elements in the DOM tree of the Elements Tab join the existing badges for Grid and Flex containers. The new Scroll badge calls out scrollable elements, and the new Events badge provides quick access to the event listeners associated with the element when clicked. And a new Badges toolbar item makes it easy to show just the badges you are interested in and hide others.
 

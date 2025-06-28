@@ -100,18 +100,12 @@ export function classify(
     }
 
     // トップレベルドメインやユーザーページは OTHER の可能性が高い
-    if (
-      url.match(/^https?:\/\/[^\/]+\/?$/) ||
-      url.match(/^https?:\/\/[^\/]+\/[^\/]+\/?$/)
-    ) {
+    if (url.match(/^https?:\/\/[^\/]+\/?$/) || url.match(/^https?:\/\/[^\/]+\/[^\/]+\/?$/)) {
       // ただし、内容が明らかに記事の場合は例外
       if (candidates.length > 0) {
         const textLength = getInnerText(candidates[0]).length;
         // 非常に長いテキストがあり、リンク密度が低い場合のみ ARTICLE
-        if (
-          textLength > charThreshold * 2 &&
-          getLinkDensity(candidates[0]) < 0.3
-        ) {
+        if (textLength > charThreshold * 2 && getLinkDensity(candidates[0]) < 0.3) {
           return PageType.ARTICLE;
         }
       }
@@ -131,8 +125,7 @@ export function classify(
   const h1Elements = getElementsByTagName(doc.body, "h1");
   const h2Elements = getElementsByTagName(doc.body, "h2");
   const h3Elements = getElementsByTagName(doc.body, "h3");
-  const headingCount =
-    h1Elements.length + h2Elements.length + h3Elements.length;
+  const headingCount = h1Elements.length + h2Elements.length + h3Elements.length;
 
   // 画像数をカウント
   const imgElements = getElementsByTagName(doc.body, "img");
@@ -152,8 +145,7 @@ export function classify(
         child.className?.toLowerCase().includes("item") ||
         child.className?.toLowerCase().includes("entry"))
   );
-  const listElementCount =
-    articleElements.length + listItemElements.length + cardElements.length;
+  const listElementCount = articleElements.length + listItemElements.length + cardElements.length;
 
   // 2. トップページの特徴を検出
   // - 多数の記事/カードリスト要素
@@ -180,8 +172,7 @@ export function classify(
     // 子要素にセマンティックタグがあるかもチェック
     topCandidate.children.some(
       (child) =>
-        child.nodeType === "element" &&
-        (child.tagName === "main" || child.tagName === "article")
+        child.nodeType === "element" && (child.tagName === "main" || child.tagName === "article")
     );
 
   if (isSemanticTag) {
@@ -275,10 +266,7 @@ export function analyzeUrlPattern(url: string): string {
     return `数字のみ (${lastPartWithoutExt})`;
   }
 
-  if (
-    /^[a-zA-Z0-9-_]+$/.test(lastPartWithoutExt) &&
-    /\d/.test(lastPartWithoutExt)
-  ) {
+  if (/^[a-zA-Z0-9-_]+$/.test(lastPartWithoutExt) && /\d/.test(lastPartWithoutExt)) {
     return `英数字混合 (${lastPartWithoutExt})`;
   }
 
@@ -320,14 +308,11 @@ export function analyzeContentCharacteristics(
     // 子要素にセマンティックタグがあるかもチェック
     topCandidate.children.some(
       (child) =>
-        child.nodeType === "element" &&
-        (child.tagName === "main" || child.tagName === "article")
+        child.nodeType === "element" && (child.tagName === "main" || child.tagName === "article")
     );
 
   if (isSemanticTag) {
-    reasons.push(
-      `セマンティックタグ(${topCandidate.tagName})が使用されています`
-    );
+    reasons.push(`セマンティックタグ(${topCandidate.tagName})が使用されています`);
   }
 
   // 2. テキスト長とリンク密度の確認
@@ -341,8 +326,7 @@ export function analyzeContentCharacteristics(
   const h1Elements = getElementsByTagName(doc.body, "h1");
   const h2Elements = getElementsByTagName(doc.body, "h2");
   const h3Elements = getElementsByTagName(doc.body, "h3");
-  const headingCount =
-    h1Elements.length + h2Elements.length + h3Elements.length;
+  const headingCount = h1Elements.length + h2Elements.length + h3Elements.length;
 
   reasons.push(`見出し要素数: ${headingCount}`);
 
@@ -382,9 +366,7 @@ export function analyzeContentCharacteristics(
     headingCount >= 1 &&
     headingCount <= 10
   ) {
-    reasons.push(
-      "十分なテキスト長、低いリンク密度、適切な見出し数を持っています"
-    );
+    reasons.push("十分なテキスト長、低いリンク密度、適切な見出し数を持っています");
     return { pageType: PageType.ARTICLE, reasons };
   }
 
@@ -402,9 +384,7 @@ export function analyzeContentCharacteristics(
 
   // 候補が平衡していて、リンク密度が高い場合はインデックスページの可能性
   if (candidates.length >= 2 && scoreRatio > 0.8 && linkDensity > 0.3) {
-    reasons.push(
-      "候補が平衡していて、リンク密度が高いです（インデックスページの特徴）"
-    );
+    reasons.push("候補が平衡していて、リンク密度が高いです（インデックスページの特徴）");
     return { pageType: PageType.OTHER, reasons };
   }
 
@@ -423,9 +403,7 @@ export function analyzeContentCharacteristics(
  * ExtractedSnapshot を入力として受け取り、ページタイプを分類し、
  * 可能性の高い順にソートされた Classified オブジェクトの配列を返す Classifier 実装。
  */
-export const classifySnapshot: Classifier = (
-  snapshot: ExtractedSnapshot
-): Array<Classified> => {
+export const classifySnapshot: Classifier = (snapshot: ExtractedSnapshot): Array<Classified> => {
   // 1. snapshotから情報を取り出す
   const { root, ariaTree, links, metadata, mainCandidates } = snapshot;
   const url = metadata.url;
@@ -454,9 +432,7 @@ export const classifySnapshot: Classifier = (
     topCandidate.className?.toLowerCase().includes("content") ||
     topCandidate.id?.toLowerCase().includes("content") ||
     topCandidate.children.some(
-      (child) =>
-        isVElement(child) &&
-        (child.tagName === "main" || child.tagName === "article")
+      (child) => isVElement(child) && (child.tagName === "main" || child.tagName === "article")
     );
   if (isSemanticTag) {
     articlePossibility += 0.2;
@@ -485,8 +461,7 @@ export const classifySnapshot: Classifier = (
   const h1Elements = getElementsByTagName(root, "h1");
   const h2Elements = getElementsByTagName(root, "h2");
   const h3Elements = getElementsByTagName(root, "h3");
-  const headingCount =
-    h1Elements.length + h2Elements.length + h3Elements.length;
+  const headingCount = h1Elements.length + h2Elements.length + h3Elements.length;
   if (headingCount >= 1 && headingCount <= 10) {
     articlePossibility += 0.1;
     reasons.push(`Appropriate heading count (${headingCount})`);
@@ -519,9 +494,7 @@ export const classifySnapshot: Classifier = (
     const scoreRatio = topScore > 0 ? secondScore / topScore : 0;
     if (scoreRatio > 0.8) {
       articlePossibility -= 0.1; // 候補が平衡していると減点
-      reasons.push(
-        `Candidates scores are balanced (ratio: ${scoreRatio.toFixed(2)})`
-      );
+      reasons.push(`Candidates scores are balanced (ratio: ${scoreRatio.toFixed(2)})`);
     }
   }
 
