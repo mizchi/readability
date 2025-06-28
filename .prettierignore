@@ -4,3 +4,4 @@ node_modules/
 test/test-pages/
 coverage/
 .git/
+src/test/snapshots/*.md
