@@ -20,9 +20,7 @@ exports.getTestPages = function () {
       dir,
       source: readFile(path.join(testPageRoot, dir, "source.html")),
       expectedContent: readFile(path.join(testPageRoot, dir, "expected.html")),
-      expectedMetadata: readJSON(
-        path.join(testPageRoot, dir, "expected-metadata.json")
-      ),
+      expectedMetadata: readJSON(path.join(testPageRoot, dir, "expected-metadata.json")),
     };
   });
 };

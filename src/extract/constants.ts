@@ -1,6 +1,5 @@
 // Element tags to score by default.
-export const DEFAULT_TAGS_TO_SCORE =
-  "section,h2,h3,h4,h5,h6,p,td,pre,div,article,main".split(","); // Add div, article, main
+export const DEFAULT_TAGS_TO_SCORE = "section,h2,h3,h4,h5,h6,p,td,pre,div,article,main".split(","); // Add div, article, main
 
 // The default number of chars an article must have in order to return a result
 export const DEFAULT_CHAR_THRESHOLD = 500;
@@ -15,8 +14,7 @@ export const REGEXPS_MAIN = {
   unlikelyCandidates:
     /-ad-|ai2html|banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|footer|gdpr|header|legends|menu|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote/i,
   okMaybeItsACandidate: /and|article|body|column|content|main|shadow/i,
-  positive:
-    /article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story/i,
+  positive: /article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story/i,
 };
 
 // DIV_TO_P_ELEMS is used for hasChildBlockElement

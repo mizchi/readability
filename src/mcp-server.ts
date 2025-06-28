@@ -20,10 +20,7 @@ const server = new McpServer({
 server.tool(
   "read_url_content_as_markdown",
   {
-    url: z
-      .string()
-      .url()
-      .describe("The URL to fetch and extract readable content from"),
+    url: z.string().url().describe("The URL to fetch and extract readable content from"),
     charThreshold: z
       .number()
       .optional()
@@ -35,9 +32,7 @@ server.tool(
       // Fetch the HTML content
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch URL: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       }
 
       const html = await response.text();

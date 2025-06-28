@@ -8,11 +8,7 @@ import { describe, it, expect } from "vitest";
 import { extract, classifyPageType } from "../src/index.ts";
 import { PageType, VDocument, VElement } from "../src/types.ts";
 import { parseHTML } from "../src/parsers/parser.ts";
-import {
-  getInnerText,
-  getLinkDensity,
-  getElementsByTagName,
-} from "../src/dom.ts";
+import { getInnerText, getLinkDensity, getElementsByTagName } from "../src/dom.ts";
 import { DEFAULT_CHAR_THRESHOLD } from "../src/constants.ts";
 
 // テスト対象のURL
@@ -119,18 +115,12 @@ function improvedClassifyPageType(
     }
 
     // トップレベルドメインやユーザーページは OTHER の可能性が高い
-    if (
-      url.match(/^https?:\/\/[^\/]+\/?$/) ||
-      url.match(/^https?:\/\/[^\/]+\/[^\/]+\/?$/)
-    ) {
+    if (url.match(/^https?:\/\/[^\/]+\/?$/) || url.match(/^https?:\/\/[^\/]+\/[^\/]+\/?$/)) {
       // ただし、内容が明らかに記事の場合は例外
       if (candidates.length > 0) {
         const textLength = getInnerText(candidates[0]).length;
         // 非常に長いテキストがあり、リンク密度が低い場合のみ ARTICLE
-        if (
-          textLength > charThreshold * 2 &&
-          getLinkDensity(candidates[0]) < 0.3
-        ) {
+        if (textLength > charThreshold * 2 && getLinkDensity(candidates[0]) < 0.3) {
           return PageType.ARTICLE;
         }
       }
@@ -150,8 +140,7 @@ function improvedClassifyPageType(
   const h1Elements = getElementsByTagName(doc.body, "h1");
   const h2Elements = getElementsByTagName(doc.body, "h2");
   const h3Elements = getElementsByTagName(doc.body, "h3");
-  const headingCount =
-    h1Elements.length + h2Elements.length + h3Elements.length;
+  const headingCount = h1Elements.length + h2Elements.length + h3Elements.length;
 
   // 画像数をカウント
   const imgElements = getElementsByTagName(doc.body, "img");
@@ -171,8 +160,7 @@ function improvedClassifyPageType(
         child.className?.toLowerCase().includes("item") ||
         child.className?.toLowerCase().includes("entry"))
   );
-  const listElementCount =
-    articleElements.length + listItemElements.length + cardElements.length;
+  const listElementCount = articleElements.length + listItemElements.length + cardElements.length;
 
   // 2. トップページの特徴を検出
   // - 多数の記事/カードリスト要素
@@ -199,8 +187,7 @@ function improvedClassifyPageType(
     // 子要素にセマンティックタグがあるかもチェック
     topCandidate.children.some(
       (child) =>
-        child.nodeType === "element" &&
-        (child.tagName === "main" || child.tagName === "article")
+        child.nodeType === "element" && (child.tagName === "main" || child.tagName === "article")
     );
 
   if (isSemanticTag) {
@@ -294,10 +281,7 @@ function analyzeUrlPattern(url: string): string {
     return `数字のみ (${lastPartWithoutExt})`;
   }
 
-  if (
-    /^[a-zA-Z0-9-_]+$/.test(lastPartWithoutExt) &&
-    /\d/.test(lastPartWithoutExt)
-  ) {
+  if (/^[a-zA-Z0-9-_]+$/.test(lastPartWithoutExt) && /\d/.test(lastPartWithoutExt)) {
     return `英数字混合 (${lastPartWithoutExt})`;
   }
 
@@ -309,10 +293,7 @@ function analyzeUrlPattern(url: string): string {
 }
 
 // 改善版extractContent関数
-function improvedExtract(
-  html: string,
-  url: string
-): ReturnType<typeof extract> {
+function improvedExtract(html: string, url: string): ReturnType<typeof extract> {
   // 通常のextract関数を呼び出す
   const result = extract(html);
 
@@ -323,12 +304,7 @@ function improvedExtract(
   const candidates = result.root ? [result.root] : [];
 
   // 改善版分類関数を呼び出し
-  const improvedPageType = improvedClassifyPageType(
-    doc,
-    candidates,
-    DEFAULT_CHAR_THRESHOLD,
-    url
-  );
+  const improvedPageType = improvedClassifyPageType(doc, candidates, DEFAULT_CHAR_THRESHOLD, url);
 
   // 結果を上書き
   result.pageType = improvedPageType;
@@ -347,28 +323,18 @@ describe("ページタイプ分類テスト", () => {
   // URLパターンに基づく分類テスト
   describe("URLパターンに基づく分類", () => {
     it("トップページのURLを正しく分類できる", () => {
-      expect(getExpectedPageTypeByUrl("https://zenn.dev/")).toBe(
-        PageType.OTHER
-      );
-      expect(getExpectedPageTypeByUrl("https://www.cnn.co.jp/")).toBe(
-        PageType.OTHER
-      );
-      expect(getExpectedPageTypeByUrl("https://automaton-media.com/")).toBe(
-        PageType.OTHER
-      );
+      expect(getExpectedPageTypeByUrl("https://zenn.dev/")).toBe(PageType.OTHER);
+      expect(getExpectedPageTypeByUrl("https://www.cnn.co.jp/")).toBe(PageType.OTHER);
+      expect(getExpectedPageTypeByUrl("https://automaton-media.com/")).toBe(PageType.OTHER);
     });
 
     it("ユーザーページのURLを正しく分類できる", () => {
-      expect(getExpectedPageTypeByUrl("https://zenn.dev/mizchi")).toBe(
-        PageType.OTHER
-      );
+      expect(getExpectedPageTypeByUrl("https://zenn.dev/mizchi")).toBe(PageType.OTHER);
     });
 
     it("/articles/を含むURLを正しく分類できる", () => {
       expect(
-        getExpectedPageTypeByUrl(
-          "https://zenn.dev/mizchi/articles/ts-using-resource-management"
-        )
+        getExpectedPageTypeByUrl("https://zenn.dev/mizchi/articles/ts-using-resource-management")
       ).toBe(PageType.ARTICLE);
       expect(
         getExpectedPageTypeByUrl(
@@ -378,9 +344,9 @@ describe("ページタイプ分類テスト", () => {
     });
 
     it("末尾に数字のIDを含むURLを正しく分類できる", () => {
-      expect(
-        getExpectedPageTypeByUrl("https://www.cnn.co.jp/world/35230995.html")
-      ).toBe(PageType.ARTICLE);
+      expect(getExpectedPageTypeByUrl("https://www.cnn.co.jp/world/35230995.html")).toBe(
+        PageType.ARTICLE
+      );
     });
   });
 
@@ -392,20 +358,16 @@ describe("ページタイプ分類テスト", () => {
     });
 
     it("英字のみの末尾を正しく分析できる", () => {
-      expect(analyzeUrlPattern("https://zenn.dev/mizchi")).toBe(
-        "英字のみ (mizchi)"
-      );
+      expect(analyzeUrlPattern("https://zenn.dev/mizchi")).toBe("英字のみ (mizchi)");
       expect(
-        analyzeUrlPattern(
-          "https://zenn.dev/mizchi/articles/ts-using-resource-management"
-        )
+        analyzeUrlPattern("https://zenn.dev/mizchi/articles/ts-using-resource-management")
       ).toBe("英字のみ (ts-using-resource-management)");
     });
 
     it("数字のみの末尾を正しく分析できる", () => {
-      expect(
-        analyzeUrlPattern("https://www.cnn.co.jp/world/35230995.html")
-      ).toBe("数字のみ (35230995)");
+      expect(analyzeUrlPattern("https://www.cnn.co.jp/world/35230995.html")).toBe(
+        "数字のみ (35230995)"
+      );
     });
   });
 

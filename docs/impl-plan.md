@@ -134,10 +134,8 @@ function getArticleMetadata(doc: VDocument): ReadabilityMetadata {
 
   // 4. 優先順位に基づいて統合
   return {
-    title: jsonLdMetadata.title || metaTagMetadata.title ||
-      htmlMetadata.title || null,
-    byline: jsonLdMetadata.byline || metaTagMetadata.byline ||
-      htmlMetadata.byline || null,
+    title: jsonLdMetadata.title || metaTagMetadata.title || htmlMetadata.title || null,
+    byline: jsonLdMetadata.byline || metaTagMetadata.byline || htmlMetadata.byline || null,
     // その他のメタデータ...
   };
 }
@@ -191,13 +189,13 @@ function scoreNode(node: VElement): number {
 
   // 1. タグに基づく基本スコア
   const tagScores: Record<string, number> = {
-    "DIV": 5,
-    "P": 5,
-    "BLOCKQUOTE": 3,
-    "PRE": 3,
-    "TD": 3,
-    "H1": -5,
-    "H2": -5,
+    DIV: 5,
+    P: 5,
+    BLOCKQUOTE: 3,
+    PRE: 3,
+    TD: 3,
+    H1: -5,
+    H2: -5,
     // その他のタグ...
   };
   score += tagScores[node.tagName] || 0;

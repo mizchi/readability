@@ -1,10 +1,5 @@
 // import { toHTML, extract } from "@mizchi/readability";
-import {
-  extract,
-  toReadableAriaTree,
-  toMarkdown,
-  extractAriaTree,
-} from "../src/index.ts";
+import { extract, toReadableAriaTree, toMarkdown, extractAriaTree } from "../src/index.ts";
 // import { toMarkdown } from "../src/markdown.ts";
 import process from "node:process";
 

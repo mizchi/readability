@@ -6,23 +6,23 @@ by Patrick Angle, Marcos Caceres, Razvan Caliman, Jon Davis, Brady Eidson, Timot
 
 <menu><menuitem>###### <label>Contents</label>
 
-* [Web Push on iOS and iPadOS](#web-push-on-ios-and-ipados)
-* [Improvements for Web Apps](#improvements-for-web-apps)
-* [Web Components](#web-components)
-* [CSS](#css)
-* [HTML](#html)
-* [JavaScript and WebAssembly](#javascript-and-webassembly)
-* [Web API](#web-api)
-* [Images, Video, and Audio](#images-video-and-audio)
-* [WKWebView](#wkwebview)
-* [Developer Tooling](#developer-tooling)
-* [Web Inspector](#web-inspector)
-* [Safari Web Extensions](#safari-web-extensions)
-* [Safari Content Blockers](#safari-content-blockers)
-* [New Restrictions in Lockdown Mode](#new-restrictions-in-lockdown-mode)
-* [More Improvements](#more-improvements)
-* [Bug Fixes](#bug-fixes)
-* [Feedback](#feedback)</menuitem></menu>
+- [Web Push on iOS and iPadOS](#web-push-on-ios-and-ipados)
+- [Improvements for Web Apps](#improvements-for-web-apps)
+- [Web Components](#web-components)
+- [CSS](#css)
+- [HTML](#html)
+- [JavaScript and WebAssembly](#javascript-and-webassembly)
+- [Web API](#web-api)
+- [Images, Video, and Audio](#images-video-and-audio)
+- [WKWebView](#wkwebview)
+- [Developer Tooling](#developer-tooling)
+- [Web Inspector](#web-inspector)
+- [Safari Web Extensions](#safari-web-extensions)
+- [Safari Content Blockers](#safari-content-blockers)
+- [New Restrictions in Lockdown Mode](#new-restrictions-in-lockdown-mode)
+- [More Improvements](#more-improvements)
+- [Bug Fixes](#bug-fixes)
+- [Feedback](#feedback)</menuitem></menu>
 
 Today, we’re thrilled to tell you about the many additions to WebKit that are included in Safari 16.4. This release is packed with 135 new web features and over 280 polish updates. Let’s take a look.
 
@@ -34,7 +34,7 @@ You can experience Safari 16.4 on [macOS Ventura](https://www.apple.com/macos/ve
 
 iOS and iPadOS 16.4 add support for Web Push to web apps added to the Home Screen. Web Push makes it possible for web developers to send push notifications to their users through the use of [Push API](https://developer.mozilla.org/docs/Web/API/Push_API), [Notifications API](https://developer.mozilla.org/docs/Web/API/Notifications_API), and [Service Workers](https://developer.mozilla.org/docs/Web/API/Service_Worker_API).
 
-Deeply integrated with iOS and iPadOS, Web Push notifications from web apps work exactly like notifications from other apps. They show on the Lock Screen, in Notification Center, and on a paired Apple Watch. [Focus](https://support.apple.com/HT212608) provides ways for users to precisely configure when or where to receive Web Push notifications — putting users firmly in control of the experience. For more details, read [*Web Push for Web Apps on iOS and iPadOS*](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
+Deeply integrated with iOS and iPadOS, Web Push notifications from web apps work exactly like notifications from other apps. They show on the Lock Screen, in Notification Center, and on a paired Apple Watch. [Focus](https://support.apple.com/HT212608) provides ways for users to precisely configure when or where to receive Web Push notifications — putting users firmly in control of the experience. For more details, read [_Web Push for Web Apps on iOS and iPadOS_](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
 
 ## Improvements for Web Apps
 
@@ -42,7 +42,7 @@ WebKit on iOS and iPadOS 16.4 adds support for the [Badging API](https://develop
 
 To support notifications and badging for multiple installs of the same web app, WebKit adds support for the [`id` member](https://developer.mozilla.org/docs/Web/Manifest/id) of the [Web Application Manifest](https://www.w3.org/TR/appmanifest/) standard. Doing so continues to provide users the convenience of saving multiple copies of a web app, perhaps logged in to different accounts separating work and personal usage — which is especially powerful when combined with the ability to customize Home Screen pages with different sets of apps for each [Focus](https://support.apple.com/HT212608).
 
-iOS and iPadOS 16.4 also add support so that third-party web browsers can offer “Add to Home Screen” in the Share menu. For the details on how browsers can implement support, as well more information about all the improvements to web apps, read [*Web Push for Web Apps on iOS and iPadOS*](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/)*.*
+iOS and iPadOS 16.4 also add support so that third-party web browsers can offer “Add to Home Screen” in the Share menu. For the details on how browsers can implement support, as well more information about all the improvements to web apps, read [_Web Push for Web Apps on iOS and iPadOS_](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/)_._
 
 We continue to care deeply about both the needs of a wide-range of web developers and the everyday experience of users. Please keep sending us your [ideas and requests](#feedback). There’s more work to do, and we couldn’t be more excited about where this space is headed.
 
@@ -117,7 +117,7 @@ img:dir(rtl) { rotate: 30deg; }
 
 Along with unprefixing the Fullscreen API (see below), the CSS [`:fullscreen`](https://developer.mozilla.org/docs/Web/CSS/:fullscreen) pseudo-class is also now unprefixed. And in Safari 16.4, the [`:modal`](https://developer.mozilla.org/docs/Web/CSS/:modal) pseudo-class also matches fullscreen elements.
 
-Safari 16.4 adds `:has()` support for the [`:lang`](https://developer.mozilla.org/docs/Web/CSS/:lang) pseudo-class, making it possible to style any part of a page when a particular language is being used on that page. In addition, the following media pseudo-classes now work dynamically inside of [`:has()`](https://developer.mozilla.org/docs/Web/CSS/:has), opening up a world of possibilities for styling when audio and video are in different states of being played or manipulated — [`:playing`](https://developer.mozilla.org/docs/Web/CSS/:playing), [`:paused`](https://developer.mozilla.org/docs/Web/CSS/:paused), `:seeking`, `:buffering`, `:stalled`, [`:picture-in-picture`](https://developer.mozilla.org/docs/Web/CSS/:picture-in-picture), `:volume-locked`, and `:muted`. To learn more about `:has()`, read [*Using :has() as a CSS Parent Selector and much more*](https://webkit.org/blog/13096/css-has-pseudo-class/).
+Safari 16.4 adds `:has()` support for the [`:lang`](https://developer.mozilla.org/docs/Web/CSS/:lang) pseudo-class, making it possible to style any part of a page when a particular language is being used on that page. In addition, the following media pseudo-classes now work dynamically inside of [`:has()`](https://developer.mozilla.org/docs/Web/CSS/:has), opening up a world of possibilities for styling when audio and video are in different states of being played or manipulated — [`:playing`](https://developer.mozilla.org/docs/Web/CSS/:playing), [`:paused`](https://developer.mozilla.org/docs/Web/CSS/:paused), `:seeking`, `:buffering`, `:stalled`, [`:picture-in-picture`](https://developer.mozilla.org/docs/Web/CSS/:picture-in-picture), `:volume-locked`, and `:muted`. To learn more about `:has()`, read [_Using :has() as a CSS Parent Selector and much more_](https://webkit.org/blog/13096/css-has-pseudo-class/).
 
 ### Color
 
@@ -130,8 +130,8 @@ section { background: hsl(from #1357a6 h s l / 0.5); }
 Or maybe you want to define a color as a variable, and then adjust that color using a mathematical formula in the `lch` color space, telling it to cut the lightness (`l`) in half with `calc(l / 2)`, while keeping the chroma (`c`) and hue (`h`) the same.
 
 ```
-:root { 
-    --color: green; 
+:root {
+    --color: green;
 }
 .component {
     --darker-accent: lch(from var(--color) calc(l / 2) c h);
@@ -180,8 +180,8 @@ Media Queries level 4 also brings more understandable syntax for combining queri
 
 ```
 @media (min-width: 40em), (min-height: 20em) {
-  @media not all and (pointer: none) { 
-    ... 
+  @media not all and (pointer: none) {
+    ...
   }
 }
 ```
@@ -190,7 +190,7 @@ Can instead be greatly simplified as:
 
 ```
 @media ((min-width: 40em) or (min-height: 20em)) and (not (pointer: none)) {
-  ... 
+  ...
 }
 ```
 
@@ -239,10 +239,10 @@ Safari 16.4 now supports [lazy loading](https://developer.mozilla.org/docs/Web/P
 By the way, you should always include the height and width attributes on iframes, so browsers can reserve space in the layout for it before the iframe has loaded. If you resize the iframe with CSS, be sure to define both width and height in your CSS. You can also use the [`aspect-ratio`](https://developer.mozilla.org/docs/Web/CSS/aspect-ratio) property to make sure an iframe keeps it’s shape as it’s resized by CSS.
 
 ```
-iframe { 
-    width: 100%; 
-    height: auto; 
-    aspect-ratio: 16 / 9; 
+iframe {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
 }
 ```
 
@@ -264,14 +264,14 @@ In WebAssembly, we’ve added support for 128-bit SIMD.
 
 Safari 16.4 also includes:
 
-* `Array.fromAsync`
-* `Array#group` and `Array#groupToMap`
-* `Atomics.waitAsync`
-* `import.meta.resolve()`
-* `Intl.DurationFormat`
-* `String#isWellFormed` and `String#toWellFormed`
-* class static initialization blocks
-* `Symbols` in `WeakMap` and `WeakSet`
+- `Array.fromAsync`
+- `Array#group` and `Array#groupToMap`
+- `Atomics.waitAsync`
+- `import.meta.resolve()`
+- `Intl.DurationFormat`
+- `String#isWellFormed` and `String#toWellFormed`
+- class static initialization blocks
+- `Symbols` in `WeakMap` and `WeakSet`
 
 ## Web API
 
@@ -289,9 +289,9 @@ Safari 16.4 now supports the updated and unprefixed [Fullscreen API](https://dev
 
 Along with the Fullscreen API we’ve added preliminary support for [Screen Orientation API](https://developer.mozilla.org/docs/Web/API/ScreenOrientation) in Safari 16.4, including:
 
-* `ScreenOrientation.prototype.type` returns the screen’s current orientation.
-* `ScreenOrientation.prototype.angle` returns the screen’s current orientation angle.
-* `ScreenOrientation.prototype.onchange` event handler, which fires whenever the screen changes orientation.
+- `ScreenOrientation.prototype.type` returns the screen’s current orientation.
+- `ScreenOrientation.prototype.angle` returns the screen’s current orientation angle.
+- `ScreenOrientation.prototype.onchange` event handler, which fires whenever the screen changes orientation.
 
 Support for the `lock()` and `unlock()` methods remain experimental features for the time being. If you’d like to try them out, you can enable them in the Settings app on iOS and iPadOS 16.4 via Safari → Advanced → Experimental Features → Screen Orientation API (Locking / Unlocking).
 
@@ -301,11 +301,11 @@ The [Screen Wake Lock API](https://developer.mozilla.org/docs/Web/API/Screen_Wak
 
 ### User Activation API
 
-[User Activation API](https://developer.mozilla.org/docs/Web/API/UserActivation) provides web developers with a means to check whether a user meaningfully interacted with a web page. This is useful as some APIs require meaningful “user activation”, such as, a click or touch, before they can be used. Because user activation is based on a timer, the API can be used to check if document currently has user activation as otherwise a call to an API would fail. Read [*The User Activation API*](https://webkit.org/blog/13862/the-user-activation-api/) for more details and usage examples.
+[User Activation API](https://developer.mozilla.org/docs/Web/API/UserActivation) provides web developers with a means to check whether a user meaningfully interacted with a web page. This is useful as some APIs require meaningful “user activation”, such as, a click or touch, before they can be used. Because user activation is based on a timer, the API can be used to check if document currently has user activation as otherwise a call to an API would fail. Read [_The User Activation API_](https://webkit.org/blog/13862/the-user-activation-api/) for more details and usage examples.
 
 ### WebGL Canvas Wide Gamut Color
 
-WebGL canvas now supports the `display-p3` wide-gamut color space. To learn more about color space support, read [*Improving Color on the Web*](https://webkit.org/blog/6682/improving-color-on-the-web/), [*Wide Gamut Color in CSS with Display-P3*](https://webkit.org/blog/10042/wide-gamut-color-in-css-with-display-p3/), and [*Wide Gamut 2D Graphics using HTML Canvas*](https://webkit.org/blog/12058/wide-gamut-2d-graphics-using-html-canvas/).
+WebGL canvas now supports the `display-p3` wide-gamut color space. To learn more about color space support, read [_Improving Color on the Web_](https://webkit.org/blog/6682/improving-color-on-the-web/), [_Wide Gamut Color in CSS with Display-P3_](https://webkit.org/blog/10042/wide-gamut-color-in-css-with-display-p3/), and [_Wide Gamut 2D Graphics using HTML Canvas_](https://webkit.org/blog/12058/wide-gamut-2d-graphics-using-html-canvas/).
 
 ### Compression Streams API
 
@@ -315,25 +315,25 @@ WebGL canvas now supports the `display-p3` wide-gamut color space. To learn more
 
 Safari 16.4 also includes many other new Web API features, including:
 
-* Reporting API
-* Notification API in dedicated workers
-* Permissions API for dedicated workers
-* Service Workers and Shared Workers to the Permissions API
-* `gamepad.vibrationActuator`
-* A submitter parameter in the FormData constructor
-* COEP violation reporting
-* COOP/COEP navigation violation reporting
-* Fetch Initiator
-* Fetch Metadata Request Headers
-* importing compressed EC keys in WebCrypto
-* loading scripts for nested workers
-* non-autofill credential type for the `autocomplete` attribute
-* revoking Blob URLs across same-origin contexts
-* `isComposing` attribute on InputEvent
-* termination of nested workers
-* transfer size metrics for first parties in `ServerTiming` and `PerformanceResourceTiming`
-* `KeyframeEffect.iterationComposite`
-* `WEBGL_clip_cull_distance`
+- Reporting API
+- Notification API in dedicated workers
+- Permissions API for dedicated workers
+- Service Workers and Shared Workers to the Permissions API
+- `gamepad.vibrationActuator`
+- A submitter parameter in the FormData constructor
+- COEP violation reporting
+- COOP/COEP navigation violation reporting
+- Fetch Initiator
+- Fetch Metadata Request Headers
+- importing compressed EC keys in WebCrypto
+- loading scripts for nested workers
+- non-autofill credential type for the `autocomplete` attribute
+- revoking Blob URLs across same-origin contexts
+- `isComposing` attribute on InputEvent
+- termination of nested workers
+- transfer size metrics for first parties in `ServerTiming` and `PerformanceResourceTiming`
+- `KeyframeEffect.iterationComposite`
+- `WEBGL_clip_cull_distance`
 
 ## Images, Video, and Audio
 
@@ -343,12 +343,12 @@ Safari 16.4 adds support for the video portion of [Web Codecs API](https://devel
 
 Media features new to Safari 16.4 also include:
 
-* Improvements to audio quality for web video conferencing
-* Support for a subset of the AudioSession Web API
-* Support for AVCapture virtual cameras
-* Support for inbound rtp `trackIdentifier` stat field
-* Support for VTT-based extended audio descriptions
-* Support to allow a site to provide an “alternate” URL to be used during AirPlay
+- Improvements to audio quality for web video conferencing
+- Support for a subset of the AudioSession Web API
+- Support for AVCapture virtual cameras
+- Support for inbound rtp `trackIdentifier` stat field
+- Support for VTT-based extended audio descriptions
+- Support to allow a site to provide an “alternate” URL to be used during AirPlay
 
 ## WKWebView
 
@@ -364,7 +364,7 @@ Across all platforms supporting [`WKWebView`](https://developer.apple.com/docume
 
 When an app has enabled inspection, it can be inspected from Safari’s Develop menu in the submenu for either the current computer or an attached device. For iOS and iPadOS, you must also have enabled Web Inspector in the Settings app under **Safari** > **Advanced** > **Web Inspector**.
 
-To learn more, read [*Enabling the Inspection of Web Content in Apps*](https://webkit.org/blog/13936/enabling-the-inspection-of-web-content-in-apps/).
+To learn more, read [_Enabling the Inspection of Web Content in Apps_](https://webkit.org/blog/13936/enabling-the-inspection-of-web-content-in-apps/).
 
 ### WebDriver
 
@@ -406,19 +406,19 @@ New badges for elements in the DOM tree of the Elements Tab join the existing ba
 
 Changes to Web Inspector in Safari 16.4 also include:
 
-* Elements Tab: Improved visual hierarchy of the Layout sidebar.
-* Elements Tab: Added support for nodes that aren’t visible on the page to appear dimmed in the DOM tree.
-* Console Tab: Added support for console snippets.
-* Sources Tab: Added showing relevant special breakpoints in the Pause Reason section.
-* Sources Tab: Added support for inline breakpoints.
-* Sources Tab: Added support for symbolic breakpoints
-* Network Tab: Added a Path column.
-* Network Tab: Added alphabetic sorting of headers.
-* Network Tab: Added support for per-page network throttling.
-* Network Tab: Added using the Shift key to highlight the initiator or initiated resources.
-* Graphics Tab: Added OpenGL object IDs in the Canvas inspector.
-* Settings Tab: Added a setting to turn off dimming nodes that aren’t visible on the page.
-* Added support for function breakpoints and tracepoints.
+- Elements Tab: Improved visual hierarchy of the Layout sidebar.
+- Elements Tab: Added support for nodes that aren’t visible on the page to appear dimmed in the DOM tree.
+- Console Tab: Added support for console snippets.
+- Sources Tab: Added showing relevant special breakpoints in the Pause Reason section.
+- Sources Tab: Added support for inline breakpoints.
+- Sources Tab: Added support for symbolic breakpoints
+- Network Tab: Added a Path column.
+- Network Tab: Added alphabetic sorting of headers.
+- Network Tab: Added support for per-page network throttling.
+- Network Tab: Added using the Shift key to highlight the initiator or initiated resources.
+- Graphics Tab: Added OpenGL object IDs in the Canvas inspector.
+- Settings Tab: Added a setting to turn off dimming nodes that aren’t visible on the page.
+- Added support for function breakpoints and tracepoints.
 
 ## Safari Web Extensions
 
@@ -426,10 +426,10 @@ Changes to Web Inspector in Safari 16.4 also include:
 
 Safari is always working on improving support for [`declarativeNetRequest`](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/declarativeNetRequest), the declarative way for web extensions to block and modify network requests. In Safari 16.4, several enhancements have been added to the API:
 
-* The `declarativeNetRequest.setExtensionActionOptions` API can be used to configure whether to automatically display the action count (number of blocked loads, etc.) as the extension’s badge text.
-* The `modifyHeaders` action type has been added to rewrite request and response headers. This action requires granted website permissions for the affected domains and the `declarativeNetRequestWithHostAccess` permission in the manifest.
-* The `redirect` action type now requires the `declarativeNetRequestWithHostAccess` permission in the manifest.
-* The `MAX_NUMBER_OF_DYNAMIC_AND_SESSION_RULES` property has been added to check the maximum number of combined dynamic and session rules an extension can add. The current limit is set at 5,000 rules.
+- The `declarativeNetRequest.setExtensionActionOptions` API can be used to configure whether to automatically display the action count (number of blocked loads, etc.) as the extension’s badge text.
+- The `modifyHeaders` action type has been added to rewrite request and response headers. This action requires granted website permissions for the affected domains and the `declarativeNetRequestWithHostAccess` permission in the manifest.
+- The `redirect` action type now requires the `declarativeNetRequestWithHostAccess` permission in the manifest.
+- The `MAX_NUMBER_OF_DYNAMIC_AND_SESSION_RULES` property has been added to check the maximum number of combined dynamic and session rules an extension can add. The current limit is set at 5,000 rules.
 
 These enhancements give developers more options to customize their content blocking extensions and provide users with better privacy protection.
 
@@ -463,13 +463,13 @@ Safari 16.4 has added support for [`:has()`](https://developer.mozilla.org/docs/
 
 If a user chooses to enable Lockdown mode on iOS 16.4, iPadOS 16.4, or macOS Ventura 13.3, Safari will now:
 
-* Disable binary fonts in the CSS Font Loading API
-* Disable Cache API
-* Disable CacheStorage API
-* Disable ServiceWorkers
-* Disable SVG fonts
-* Disable the WebLocks API
-* Disable WebSpeech API
+- Disable binary fonts in the CSS Font Loading API
+- Disable Cache API
+- Disable CacheStorage API
+- Disable ServiceWorkers
+- Disable SVG fonts
+- Disable the WebLocks API
+- Disable WebSpeech API
 
 ## More Improvements
 
@@ -481,346 +481,346 @@ In addition to the 135 new features, WebKit for Safari 16.4 includes an incredib
 
 ### CSS
 
-* Fixed `-webkit-mask-box-image: initial` to set the correct initial value.
-* Fixed `-webkit-radial-gradient` parsing accidentally treating several mandatory commas as optional.
-* Fixed `::placeholder` to not support `writing-mode`, `direction`, or `text-orientation.`
-* Fixed `@supports` to not work if `not`, `or`, or `and` isn’t followed by a space.
-* Fixed `background-repeat` not getting correctly exposed through inline styles.
-* Fixed `baseline-shift` to allow length or percentage, but not numbers.
-* Fixed `contain: inline-size` for replaced elements.
-* Fixed `CSSPerspective.toMatrix()` to throw a TypeError if its length is incompatible with the `px` unit.
-* Fixed `cx`, `cy`, `x`, and `y` CSS properties to allow length or percentage, but not numbers.
-* Fixed `filter: blur` on an absolutely positioned image losing `overflow: hidden`.
-* Fixed `font-face` to accept ranges in reverse order, and reverse them for computed styles.
-* Fixed `font-style: oblique` must allow angles equal to 90deg or -90deg.
-* Fixed `font-style: oblique` with `calc()` to allow out-of-range angles and clamp them for computed style.
-* Fixed `font-weight` to clamp to 1 as a minimum.
-* Fixed `font` shorthand to reject out-of-range angles for `font-style`.
-* Fixed `font` shorthand to reset more longhand properties.
-* Fixed `overflow-x: clip` causing a sibling image to not load.
-* Fixed `overflow: clip` not working on SVG elements.
-* Fixed `stroke-dasharray` parsing to align with standards.
-* Fixed `stroke-width` and `stroke-dashoffset` parsing to align with standards.
-* Fixed `text-decoration-thickness` property not repainting when changed.
-* Fixed allowing `calc()` that combines percentages and lengths for `line-height`.
-* Fixed an issue where using `box-sizing: border-box` causes the calculated aspect-ratio to create negative content sizes.
-* Fixed an issue with a monospace font on a parent causing children with a sans-serif font using `rem` or `rlh` units to grow to a larger size.
-* Fixed behavior of `cursor: auto` over links.
-* Fixed buttons with auto width and height to not set intrinsic margins.
-* Fixed calculating block size to use the correct box-sizing with aspect ratio.
-* Fixed cells overflowing their contents when a table cell has inline children which change `writing-mode`.
-* Fixed clipping `perspective``calc()` values to 0.
-* Fixed font shorthand to not reject values that happen to have CSS-wide keywords as non-first identifiers in a font family name.
-* Fixed hit testing for double-click selection on overflowing inline content.
-* Fixed honoring the content block size minimum for a `<fieldset>` element with `aspect-ratio` applied.
-* Fixed incorrectly positioned line break in contenteditable with tabs.
-* Fixed invalidation for class names within `:nth-child()` selector lists.
-* Fixed omitting the `normal` value for `line-height` from the `font` shorthand in the specified style, not just the computed style.
-* Fixed pseudo-elements to not be treated as ASCII case-insensitive.
-* Fixed rejecting a selector argument for `:nth-of-type` or `:nth-last-of-type`.
-* Fixed serialization order for `contain`.
-* Fixed strings not wrapped at zero width spaces when `word-break: keep-all` is set.
-* Fixed supporting `<string>` as an unprefixed keyframe name.
-* Fixed the `:has()` pseudo-selector parsing to be unforgiving.
-* Fixed the `font-face``src` descriptor format to allow only specified formats, others are a parse error.
-* Fixed the `tz` component not accounting for zoom when creating a `matrix3d`() value.
-* Fixed the computed value for `stroke-dasharray` to be in `px`.
-* Fixed the effect of the writing-mode property not getting removed when the property is removed from the root element.
-* Fixed the position of `text-shadow` used with `text-combine-upright`.
-* Fixed the title of a style element with an invalid type to never be added to preferred stylesheet set.
-* Fixed the transferred min/max sizes to be constrained by defined sizes for aspect ratio.
-* Fixed the user-agent stylesheet to align hidden elements, `abbr`, `acronym`, `marquee`, and `fieldset` with HTML specifications.
-* Fixed to always use percentages for computed values of `font-stretch`, never keywords.
-* Fixed to not require whitespace between `of` and the selector list in `:nth-child` or `:nth-last-child`.
+- Fixed `-webkit-mask-box-image: initial` to set the correct initial value.
+- Fixed `-webkit-radial-gradient` parsing accidentally treating several mandatory commas as optional.
+- Fixed `::placeholder` to not support `writing-mode`, `direction`, or `text-orientation.`
+- Fixed `@supports` to not work if `not`, `or`, or `and` isn’t followed by a space.
+- Fixed `background-repeat` not getting correctly exposed through inline styles.
+- Fixed `baseline-shift` to allow length or percentage, but not numbers.
+- Fixed `contain: inline-size` for replaced elements.
+- Fixed `CSSPerspective.toMatrix()` to throw a TypeError if its length is incompatible with the `px` unit.
+- Fixed `cx`, `cy`, `x`, and `y` CSS properties to allow length or percentage, but not numbers.
+- Fixed `filter: blur` on an absolutely positioned image losing `overflow: hidden`.
+- Fixed `font-face` to accept ranges in reverse order, and reverse them for computed styles.
+- Fixed `font-style: oblique` must allow angles equal to 90deg or -90deg.
+- Fixed `font-style: oblique` with `calc()` to allow out-of-range angles and clamp them for computed style.
+- Fixed `font-weight` to clamp to 1 as a minimum.
+- Fixed `font` shorthand to reject out-of-range angles for `font-style`.
+- Fixed `font` shorthand to reset more longhand properties.
+- Fixed `overflow-x: clip` causing a sibling image to not load.
+- Fixed `overflow: clip` not working on SVG elements.
+- Fixed `stroke-dasharray` parsing to align with standards.
+- Fixed `stroke-width` and `stroke-dashoffset` parsing to align with standards.
+- Fixed `text-decoration-thickness` property not repainting when changed.
+- Fixed allowing `calc()` that combines percentages and lengths for `line-height`.
+- Fixed an issue where using `box-sizing: border-box` causes the calculated aspect-ratio to create negative content sizes.
+- Fixed an issue with a monospace font on a parent causing children with a sans-serif font using `rem` or `rlh` units to grow to a larger size.
+- Fixed behavior of `cursor: auto` over links.
+- Fixed buttons with auto width and height to not set intrinsic margins.
+- Fixed calculating block size to use the correct box-sizing with aspect ratio.
+- Fixed cells overflowing their contents when a table cell has inline children which change `writing-mode`.
+- Fixed clipping `perspective``calc()` values to 0.
+- Fixed font shorthand to not reject values that happen to have CSS-wide keywords as non-first identifiers in a font family name.
+- Fixed hit testing for double-click selection on overflowing inline content.
+- Fixed honoring the content block size minimum for a `<fieldset>` element with `aspect-ratio` applied.
+- Fixed incorrectly positioned line break in contenteditable with tabs.
+- Fixed invalidation for class names within `:nth-child()` selector lists.
+- Fixed omitting the `normal` value for `line-height` from the `font` shorthand in the specified style, not just the computed style.
+- Fixed pseudo-elements to not be treated as ASCII case-insensitive.
+- Fixed rejecting a selector argument for `:nth-of-type` or `:nth-last-of-type`.
+- Fixed serialization order for `contain`.
+- Fixed strings not wrapped at zero width spaces when `word-break: keep-all` is set.
+- Fixed supporting `<string>` as an unprefixed keyframe name.
+- Fixed the `:has()` pseudo-selector parsing to be unforgiving.
+- Fixed the `font-face``src` descriptor format to allow only specified formats, others are a parse error.
+- Fixed the `tz` component not accounting for zoom when creating a `matrix3d`() value.
+- Fixed the computed value for `stroke-dasharray` to be in `px`.
+- Fixed the effect of the writing-mode property not getting removed when the property is removed from the root element.
+- Fixed the position of `text-shadow` used with `text-combine-upright`.
+- Fixed the title of a style element with an invalid type to never be added to preferred stylesheet set.
+- Fixed the transferred min/max sizes to be constrained by defined sizes for aspect ratio.
+- Fixed the user-agent stylesheet to align hidden elements, `abbr`, `acronym`, `marquee`, and `fieldset` with HTML specifications.
+- Fixed to always use percentages for computed values of `font-stretch`, never keywords.
+- Fixed to not require whitespace between `of` and the selector list in `:nth-child` or `:nth-last-child`.
 
 ### CSS API
 
-* Fixed `CSS.supports` returning false for custom properties.
-* Fixed `CSS.supports` whitespace handling with `!important`.
-* Fixed forgiving selectors to not be reported as supported with `CSS.supports("selector(...)")`.
-* Fixed `getComputedStyle()` to return a function list for the transform property.
-* Fixed `linear-gradient` keyword values not getting converted to their `rgb()` equivalents for `getComputedStyle()`.
+- Fixed `CSS.supports` returning false for custom properties.
+- Fixed `CSS.supports` whitespace handling with `!important`.
+- Fixed forgiving selectors to not be reported as supported with `CSS.supports("selector(...)")`.
+- Fixed `getComputedStyle()` to return a function list for the transform property.
+- Fixed `linear-gradient` keyword values not getting converted to their `rgb()` equivalents for `getComputedStyle()`.
 
 ### Content Security Policy
 
-* Fixed updating the Content Security Policy when a new header is sent as part of a 304 response.
+- Fixed updating the Content Security Policy when a new header is sent as part of a 304 response.
 
 ### Forms
 
-* Fixed , `,` and  to honor `font-size`, `padding`, `height`, and work with multi-line values.
-* Fixed firing the `change` event for  when a different file with the same name is selected.
-* Fixed preventing a disabled `<fieldset>` element from getting focus.
-* Fixed the `:out-of-range` pseudo class matching for empty `input[type=number]`.
+- Fixed , `,` and to honor `font-size`, `padding`, `height`, and work with multi-line values.
+- Fixed firing the `change` event for when a different file with the same name is selected.
+- Fixed preventing a disabled `<fieldset>` element from getting focus.
+- Fixed the `:out-of-range` pseudo class matching for empty `input[type=number]`.
 
 ### JavaScript
 
-* Fixed `Array.prototype.indexOf` constant-folding to account for a non-numeric index.
-* Fixed `Intl.NumberFormat``useGrouping` handling to match updated specs.
-* Fixed `Intl.NumberFormat` ignoring `maximumFractionDigits` with compact notation.
-* Fixed `String.prototype.includes` incorrectly returning false when the string is empty and the position is past end of the string.
-* Fixed `toLocaleLowerCase` and `toLocaleUpperCase` to throw an exception on an empty string.
+- Fixed `Array.prototype.indexOf` constant-folding to account for a non-numeric index.
+- Fixed `Intl.NumberFormat``useGrouping` handling to match updated specs.
+- Fixed `Intl.NumberFormat` ignoring `maximumFractionDigits` with compact notation.
+- Fixed `String.prototype.includes` incorrectly returning false when the string is empty and the position is past end of the string.
+- Fixed `toLocaleLowerCase` and `toLocaleUpperCase` to throw an exception on an empty string.
 
 ### HTML
 
-* Fixed aligning the parsing of `<body link vlink alink>` to follow standards.
-* Fixed `<legend>` to accept more `display` property values than `display: block`.
+- Fixed aligning the parsing of `<body link vlink alink>` to follow standards.
+- Fixed `<legend>` to accept more `display` property values than `display: block`.
 
 ### Intelligent Tracking Prevention
 
-* Fixed user initiated cross-domain link navigations getting counted as Top Frame Redirects.
+- Fixed user initiated cross-domain link navigations getting counted as Top Frame Redirects.
 
 ### Images
 
-* Fixed some display issues with HDR AVIF images.
-* Fixed the accept header to correctly indicate AVIF support.
+- Fixed some display issues with HDR AVIF images.
+- Fixed the accept header to correctly indicate AVIF support.
 
 ### Lockdown Mode
 
-* Fixed common cases of missing glyphs due to custom icon fonts.
+- Fixed common cases of missing glyphs due to custom icon fonts.
 
 ### Media
 
-* Fixed `enumerateDevices` may return filtered devices even if page is capturing.
-* Fixed `MediaRecorder.stop()` firing an additional `dataavailable` event with bytes after `MediaRecorder.pause()`.
-* Fixed duplicate `timeupdate` events.
-* Fixed limiting DOMAudioSession to third-party iframes with microphone access.
-* Fixed MSE to not seek with no seekable range.
-* Fixed mute microphone capture if capture fails to start because microphone is used by a high priority application.
-* Fixed not allowing text selection to start on an HTMLMediaElement.
-* Fixed only requiring a transient user activation for Web Audio rendering.
-* Fixed screen capture to fail gracefully if the window or screen selection takes too long.
-* Fixed switching to alternate `<source />` element for AirPlay when necessary.
-* Fixed the local WebRTC video element pausing after bluetooth `audioinput` is disconnected.
-* Fixed trying to use low latency for WebRTC HEVC encoder when available.
-* Fixed unmuting a TikTok video pauses it.
-* Fixed WebVTT styles not applied with in-band tracks.
+- Fixed `enumerateDevices` may return filtered devices even if page is capturing.
+- Fixed `MediaRecorder.stop()` firing an additional `dataavailable` event with bytes after `MediaRecorder.pause()`.
+- Fixed duplicate `timeupdate` events.
+- Fixed limiting DOMAudioSession to third-party iframes with microphone access.
+- Fixed MSE to not seek with no seekable range.
+- Fixed mute microphone capture if capture fails to start because microphone is used by a high priority application.
+- Fixed not allowing text selection to start on an HTMLMediaElement.
+- Fixed only requiring a transient user activation for Web Audio rendering.
+- Fixed screen capture to fail gracefully if the window or screen selection takes too long.
+- Fixed switching to alternate `<source />` element for AirPlay when necessary.
+- Fixed the local WebRTC video element pausing after bluetooth `audioinput` is disconnected.
+- Fixed trying to use low latency for WebRTC HEVC encoder when available.
+- Fixed unmuting a TikTok video pauses it.
+- Fixed WebVTT styles not applied with in-band tracks.
 
 ### Rendering
 
-* Ensured negative letter-spacing does not pull content outside of the inline box
-* Fixed `<div>` with `border-radius` not painted correctly while using jQuery’s `.slideToggle()`.
-* Fixed `border-radius` clipping on composited layers.
-* Fixed `box-shadow` to paint correctly on inline elements.
-* Fixed box-shadow invalidation on inline boxes.
-* Fixed calculating the width of an inline text box using simplified measuring to handle fonts with `Zero Width Joiner`, `Zero Width Non-Joner`, or `Zero Width No-Break Space`.
-* Fixed clearing floats added dynamically to previous siblings.
-* Fixed clipping the source image when the source rectangle is outside of the source image in canvas.
-* Fixed CSS keyframes names to not allow CSS wide keywords.
-* Fixed elements with negative margins not avoiding floats when appropriate.
-* Fixed floating boxes overlapping with their margin boxes.
-* Fixed HTMLImageElement width and height to update layout to return styled dimensions not the image attributes.
-* Fixed ignoring `nowrap` on `<td nowrap="nowrap">` when an absolute width is specified.
-* Fixed incorrect clipping when a layer is present between the column and the content layer.
-* Fixed incorrect static position of absolute positioned elements inside relative positioned containers.
-* Fixed layout for fixed position elements relative to a transformed container.
-* Fixed layout overflow rectangle overflows interfering with the scrollbar.
-* Fixed negative shadow repaint issue.
-* Fixed preventing a focus ring from being painted for anonymous block continuations.
-* Fixed recalculating intrinsic widths in the old containing block chain when an object goes out of flow.
-* Fixed rendering extreme `border-radius` values.
-* Fixed specified hue interpolation method for hues less than 0 or greater than 360.
-* Fixed tab handling in right-to-left editing.
-* Fixed text selection on flex and grid box items.
-* Fixed the position and thickness of underlines to be device pixel aligned.
-* Fixed transforms for table sections.
-* Fixed transition ellipsis box from “being a display box on the line” to “being an attachment” of the line box.
-* Fixed unexpected overlapping selection with tab in right-to-left context.
-* Fixed updating table rows during simplified layout.
-* Fixed: improved balancing for border, padding, and empty block content.
+- Ensured negative letter-spacing does not pull content outside of the inline box
+- Fixed `<div>` with `border-radius` not painted correctly while using jQuery’s `.slideToggle()`.
+- Fixed `border-radius` clipping on composited layers.
+- Fixed `box-shadow` to paint correctly on inline elements.
+- Fixed box-shadow invalidation on inline boxes.
+- Fixed calculating the width of an inline text box using simplified measuring to handle fonts with `Zero Width Joiner`, `Zero Width Non-Joner`, or `Zero Width No-Break Space`.
+- Fixed clearing floats added dynamically to previous siblings.
+- Fixed clipping the source image when the source rectangle is outside of the source image in canvas.
+- Fixed CSS keyframes names to not allow CSS wide keywords.
+- Fixed elements with negative margins not avoiding floats when appropriate.
+- Fixed floating boxes overlapping with their margin boxes.
+- Fixed HTMLImageElement width and height to update layout to return styled dimensions not the image attributes.
+- Fixed ignoring `nowrap` on `<td nowrap="nowrap">` when an absolute width is specified.
+- Fixed incorrect clipping when a layer is present between the column and the content layer.
+- Fixed incorrect static position of absolute positioned elements inside relative positioned containers.
+- Fixed layout for fixed position elements relative to a transformed container.
+- Fixed layout overflow rectangle overflows interfering with the scrollbar.
+- Fixed negative shadow repaint issue.
+- Fixed preventing a focus ring from being painted for anonymous block continuations.
+- Fixed recalculating intrinsic widths in the old containing block chain when an object goes out of flow.
+- Fixed rendering extreme `border-radius` values.
+- Fixed specified hue interpolation method for hues less than 0 or greater than 360.
+- Fixed tab handling in right-to-left editing.
+- Fixed text selection on flex and grid box items.
+- Fixed the position and thickness of underlines to be device pixel aligned.
+- Fixed transforms for table sections.
+- Fixed transition ellipsis box from “being a display box on the line” to “being an attachment” of the line box.
+- Fixed unexpected overlapping selection with tab in right-to-left context.
+- Fixed updating table rows during simplified layout.
+- Fixed: improved balancing for border, padding, and empty block content.
 
 ### Safari Web Extensions
 
-* Extensions that request the `unlimitedStorage` permission no longer need to also request `storage`.
-* Fixed `browser.declarativeNetRequest` namespace is now available when an extension has the `declarativeNetRequestWithHostAccess` permission.
-* Fixed `isUrlFilterCaseSensitive``declarativeNetRequest` rule condition to be `false` by default.
-* Fixed `tabs.onUpdated` getting called on tabs that were already closed.
-* Fixed background service worker failing to import scripts.
-* Fixed content scripts not injecting into subframes when extension accesses the page after a navigation.
-* Fixed CORS issue when doing fetch requests from a background service worker.
-* Fixed `declarativeNetRequest` errors not appearing correctly in the extension’s pane of Safari Settings.
-* Fixed display of extension cookie storage in Web Inspector. Now the extension name is shown instead of a UUID.
-* Fixed `declarativeNetRequest` rules not loading when an extension is turned off and then on.
-* Fixed result of `getMatchedRules()` to match other browsers.
-* Fixed `browser.webNavigation` events firing for hosts where the extension did not have access.
-* Removed Keyboard Shortcut conflict warnings for `browser.commands` when there are multiple commands without keyboard shortcuts assigned.
+- Extensions that request the `unlimitedStorage` permission no longer need to also request `storage`.
+- Fixed `browser.declarativeNetRequest` namespace is now available when an extension has the `declarativeNetRequestWithHostAccess` permission.
+- Fixed `isUrlFilterCaseSensitive``declarativeNetRequest` rule condition to be `false` by default.
+- Fixed `tabs.onUpdated` getting called on tabs that were already closed.
+- Fixed background service worker failing to import scripts.
+- Fixed content scripts not injecting into subframes when extension accesses the page after a navigation.
+- Fixed CORS issue when doing fetch requests from a background service worker.
+- Fixed `declarativeNetRequest` errors not appearing correctly in the extension’s pane of Safari Settings.
+- Fixed display of extension cookie storage in Web Inspector. Now the extension name is shown instead of a UUID.
+- Fixed `declarativeNetRequest` rules not loading when an extension is turned off and then on.
+- Fixed result of `getMatchedRules()` to match other browsers.
+- Fixed `browser.webNavigation` events firing for hosts where the extension did not have access.
+- Removed Keyboard Shortcut conflict warnings for `browser.commands` when there are multiple commands without keyboard shortcuts assigned.
 
 ### Scrolling
 
-* Fixed `overscroll-behavior: none` to prevent overscroll when the page is too small to scroll.
+- Fixed `overscroll-behavior: none` to prevent overscroll when the page is too small to scroll.
 
 ### SVG
 
-* Fixed `<svg:text>` to not auto-wrap.
-* Fixed `preserveAspectRatio` to stop accepting `defer`.
-* Fixed `SVG.currentScale` to only set the page zoom for a standalone SVG.
-* Fixed `svgElement.setCurrentTime` to restrict floats to finite values.
-* Fixed applying changes to `fill` with `currentColor` to other colors via CSS.
-* Fixed changes to the `filter` property getting ignored.
-* Fixed CSS and SVG filters resulting in a low quality, pixelated image.
-* Fixed focusability even when tab-to-links is enabled for `<svg:a>`.
-* Fixed handling animation freezes when `repeatDur` is not a multiple of `dur`.
-* Fixed making sure computed values for `baseline-shift` CSS property use `px` unit for lengths.
+- Fixed `<svg:text>` to not auto-wrap.
+- Fixed `preserveAspectRatio` to stop accepting `defer`.
+- Fixed `SVG.currentScale` to only set the page zoom for a standalone SVG.
+- Fixed `svgElement.setCurrentTime` to restrict floats to finite values.
+- Fixed applying changes to `fill` with `currentColor` to other colors via CSS.
+- Fixed changes to the `filter` property getting ignored.
+- Fixed CSS and SVG filters resulting in a low quality, pixelated image.
+- Fixed focusability even when tab-to-links is enabled for `<svg:a>`.
+- Fixed handling animation freezes when `repeatDur` is not a multiple of `dur`.
+- Fixed making sure computed values for `baseline-shift` CSS property use `px` unit for lengths.
 
 ### Tables
 
-* Fixed not forcing `display: table-cell`, `display: inline-table`, `display: table`, and `float: none` on table cell elements when in quirks mode.
-* Fixed removing the visual border when the table border attribute is removed.
+- Fixed not forcing `display: table-cell`, `display: inline-table`, `display: table`, and `float: none` on table cell elements when in quirks mode.
+- Fixed removing the visual border when the table border attribute is removed.
 
 ### Text
 
-* Fixed `font-optical-sizing: auto` having no effect in Safari 16.
-* Fixed directionality of the `<bdi>` and  elements to align with HTML specifications.
-* Fixed handling an invalid `dir` attribute to not affect directionality.
-* Fixed the default oblique angle from `20deg` to `14deg`.
-* Fixed the handling of `<bdo>`.
-* Fixed the order of how `@font-palette-values``override-colors` are applied.
+- Fixed `font-optical-sizing: auto` having no effect in Safari 16.
+- Fixed directionality of the `<bdi>` and elements to align with HTML specifications.
+- Fixed handling an invalid `dir` attribute to not affect directionality.
+- Fixed the default oblique angle from `20deg` to `14deg`.
+- Fixed the handling of `<bdo>`.
+- Fixed the order of how `@font-palette-values``override-colors` are applied.
 
 ### Web Animations
 
-* Fixed `@keyframes` rules using an `inherit` value to update the resolved value when the parent style changes.
-* Fixed `Animation.commitStyles()` triggering a mutation even when the styles are unchanged.
-* Fixed `Animation.startTime` and `Animation.currentTime` setters support for CSSNumberish values.
-* Fixed `baseline-shift` animation.
-* Fixed `baselineShift` inherited changes.
-* Fixed `commitStyles()` failing to commit a relative `line-height` value.
-* Fixed `getKeyframes()` serialization of CSS values for an `onkeyframe` sequence.
-* Fixed `rotate: x` and `transform: rotate(x)` to yield the same behavior with SVGs.
-* Fixed `word-spacing` to support animating between percentage and fixed values.
-* Fixed accounting for non-inherited CSS variables getting interpolated for standard properties on the same element.
-* Fixed accumulating and clamping filter values when blending with `"none"`.
-* Fixed accumulation support for the `filter` property.
-* Fixed additivity support for the `filter` property.
-* Fixed animation of color list custom properties with `iterationComposite`.
-* Fixed blend transform when iterationComposite is set to `accumulate`.
-* Fixed blending to account for `iterationComposite`.
-* Fixed Calculating computed keyframes for shorthand properties.
-* Fixed composite animations to compute blended additive or accumulative keyframes for in-between keyframes.
-* Fixed computing the `keyTimes` index correctly for discrete values animations.
-* Fixed CSS animations participation in the cascade.
-* Fixed custom properties to support interpolation with a single keyframe.
-* Fixed filter values containing a `url()` should animate discretely.
-* Fixed interpolating custom properties to take `iterationComposite` into account.
-* Fixed jittering when animating a rotated image.
-* Fixed keyframes to be recomputed if a custom property registration changes.
-* Fixed keyframes to be recomputed if the CSS variable used is changed.
-* Fixed keyframes to be recomputed when `bolder` or `lighter` is used on a `font-weight` property.
-* Fixed keyframes to be recomputed when a parent element changes value for a custom property set to `inherit`.
-* Fixed keyframes to be recomputed when a parent element changes value for a non-inherited property set to `inherit`.
-* Fixed keyframes to be recomputed when the `currentcolor` value is used on a custom property.
-* Fixed keyframes to be recomputed when the `currentcolor` value is used.
-* Fixed opacity to use unclamped values for `from` and `to` keyframes with `iterationComposite`.
-* Fixed running a transition on an inherited CSS variable getting reflected on a standard property using that variable as a value.
-* Fixed seamlessly updating the playback rate of an animation.
-* Fixed setting `iterationComposite` should invalidate the effect.
-* Fixed setting the `transition-property` to `none` does not disassociate the CSS Transition from owning the element.
-* Fixed the composite operation of implicit keyframes for CSS Animations to return `"replace"`.
-* Fixed the timing model for updating animations and sending events.
-* Fixed updating timing to invalidate the effect.
+- Fixed `@keyframes` rules using an `inherit` value to update the resolved value when the parent style changes.
+- Fixed `Animation.commitStyles()` triggering a mutation even when the styles are unchanged.
+- Fixed `Animation.startTime` and `Animation.currentTime` setters support for CSSNumberish values.
+- Fixed `baseline-shift` animation.
+- Fixed `baselineShift` inherited changes.
+- Fixed `commitStyles()` failing to commit a relative `line-height` value.
+- Fixed `getKeyframes()` serialization of CSS values for an `onkeyframe` sequence.
+- Fixed `rotate: x` and `transform: rotate(x)` to yield the same behavior with SVGs.
+- Fixed `word-spacing` to support animating between percentage and fixed values.
+- Fixed accounting for non-inherited CSS variables getting interpolated for standard properties on the same element.
+- Fixed accumulating and clamping filter values when blending with `"none"`.
+- Fixed accumulation support for the `filter` property.
+- Fixed additivity support for the `filter` property.
+- Fixed animation of color list custom properties with `iterationComposite`.
+- Fixed blend transform when iterationComposite is set to `accumulate`.
+- Fixed blending to account for `iterationComposite`.
+- Fixed Calculating computed keyframes for shorthand properties.
+- Fixed composite animations to compute blended additive or accumulative keyframes for in-between keyframes.
+- Fixed computing the `keyTimes` index correctly for discrete values animations.
+- Fixed CSS animations participation in the cascade.
+- Fixed custom properties to support interpolation with a single keyframe.
+- Fixed filter values containing a `url()` should animate discretely.
+- Fixed interpolating custom properties to take `iterationComposite` into account.
+- Fixed jittering when animating a rotated image.
+- Fixed keyframes to be recomputed if a custom property registration changes.
+- Fixed keyframes to be recomputed if the CSS variable used is changed.
+- Fixed keyframes to be recomputed when `bolder` or `lighter` is used on a `font-weight` property.
+- Fixed keyframes to be recomputed when a parent element changes value for a custom property set to `inherit`.
+- Fixed keyframes to be recomputed when a parent element changes value for a non-inherited property set to `inherit`.
+- Fixed keyframes to be recomputed when the `currentcolor` value is used on a custom property.
+- Fixed keyframes to be recomputed when the `currentcolor` value is used.
+- Fixed opacity to use unclamped values for `from` and `to` keyframes with `iterationComposite`.
+- Fixed running a transition on an inherited CSS variable getting reflected on a standard property using that variable as a value.
+- Fixed seamlessly updating the playback rate of an animation.
+- Fixed setting `iterationComposite` should invalidate the effect.
+- Fixed setting the `transition-property` to `none` does not disassociate the CSS Transition from owning the element.
+- Fixed the composite operation of implicit keyframes for CSS Animations to return `"replace"`.
+- Fixed the timing model for updating animations and sending events.
+- Fixed updating timing to invalidate the effect.
 
 ### Web API
 
-* Fixed `-webkit-user-select: none` allowing text to be copied to clipboard.
-* Fixed `contentEditable` caret getting left aligned instead of centered when the `:before` pseudo-element is used.
-* Fixed `Cross-Origin-Embedder-Policy` incorrectly blocking scripts on cache hit.
-* Fixed `CSSRule.type` to not return values greater than 15.
-* Fixed `document.open()` to abort all loads when the document is navigating.
-* Fixed `document.open()` to remove the initial `about:blank`\-ness of the document.
-* Fixed `Element.querySelectorAll` not obeying element scope with ID.
-* Fixed `FileSystemSyncAccessHandle` write operation to be quota protected.
-* Fixed `getBoundingClientRect()` returning the wrong value for `<tr>`, `<td>`, and its descendants for a vertical table.
-* Fixed `HTMLOutputElement.htmlFor` to make it settable.
-* Fixed `queryCommandValue("stylewithcss")` to always return an empty string.
-* Fixed `StorageEvent.initStorageEvent()` to align with HTML specifications.
-* Fixed `textContent` leaving dir=auto content in the wrong direction.
-* Fixed `-webkit-user-select: initial` content within `-webkit-user-select: none` should be copied
-* Fixed `WorkerGlobalScope.isSecureContext` to be based on the owner’s top URL, not the owner’s URL.
-* Fixed a bug where `mousedown` without `mouseup` in a frame prevents a click event in another frame.
-* Fixed a sometimes incorrect location after exiting mouse hover.
-* Fixed accepting `image/jpg` for compatibility.
-* Fixed adding a non-breaking space, instead of a plain space, when it is inserted before an empty text node.
-* Fixed behavior of nested click event on a label element with a checkbox.
-* Fixed BroadcastChannel in a SharedWorker when hosted in a cross-origin iframe.
-* Fixed calculation of direction for text form control elements with `dir="auto"`.
-* Fixed canvas fallback content focusability computation.
-* Fixed deleting a button element leaving the button’s style in a `contenteditable` element.
-* Fixed disconnected `<fieldset>` elements sometimes incorrectly matching `:valid` or `:invalid` selectors.
-* Fixed dragging the mouse over a `-webkit-user-select: none` node can begin selection in another node.
-* Fixed ensuring nested workers get controlled if matching a service worker registration.
-* Fixed errors caught and reported for `importScripts()`.
-* Fixed escaping “&” in JavaScript URLs for `innerHTML` and `outerHTML`.
-* Fixed EventSource to stop allowing trailing data when parsing a retry delay.
-* Fixed Fetch Request object to keep its Blob URL alive.
-* Fixed filled text on a canvas with a web font refreshing or disappearing.
-* Fixed find on page failing to show results in PDFs.
-* Fixed firing an error event when link preload fails synchronously.
-* Fixed form submissions to cancel JavaScript URL navigations.
-* Fixed handing the `onerror` content attribute on body and frameset elements.
-* Fixed handling opaque origin Blob URLs.
-* Fixed handling text documents to align to modern HTML specifications.
-* Fixed handling the onerror content attribute on `<body>` and `<frameset>` elements.
-* Fixed HTMLTemplateElement to have a `shadowRootMode` attribute.
-* Fixed including alternate stylesheets in `document.styleSheets`.
-* Fixed incorrect caret movement in some right-to-left `contenteditable` elements.
-* Fixed incorrect color for videos loaded in a canvas.
-* Fixed incorrect image `srcset` candidate chosen for `![]()` cloned from `<template>`.
-* Fixed incorrectly ignored `X-Frame-Options` HTTP headers with an empty value.
-* Fixed lazy loading images sometimes not loading.
-* Fixed link elements to be able to fire more than one `load` or `error` event.
-* Fixed loading Blob URLs with a fragment from opaque, unique origins.
-* Fixed maintaining the original `Content-Type` header on a 303 HTTP redirect.
-* Fixed module scripts to always decode using UTF-8.
-* Fixed MouseEventInit to take `movementX` and `movementY`.
-* Fixed not dispatching a `progress` event when reading an empty file or blob using the FileReader API.
-* Fixed not replacing the current history item when navigating a cross-origin iframe to the same URL.
-* Fixed overriding the mimetype for an XHR.
-* Fixed parsing of negative age values in CORS prefetch responses.
-* Fixed pasting of the first newline into text area.
-* Fixed preventing selection for generated counters in ordered lists.
-* Fixed Safari frequently using stale cached resources despite using Reload Page From Origin.
-* Fixed scheduling a navigation to a Blob URL to keep the URL alive until the navigation occurs.
-* Fixed sending Basic authentication via XHR using `setRequestHeader()` when there is an existing session.
-* Fixed setting `style=""` to destroy the element’s inline style.
-* Fixed setting the `tabIndex` of a non-focusable HTMLElement.
-* Fixed system colors not respecting inherited `color-scheme` values.
-* Fixed textarea placeholder text not disappearing when text is inserted without a user gesture.
-* Fixed the `event.keyIdentifier` value for F10 and F11 keys.
-* Fixed the click event to not get suppressed on textarea resize.
-* Fixed the computed value for the `transform` property with `SkewY`.
-* Fixed the initialization of color properties.
-* Fixed timing of ResizeObserver and IntersectionObserver to match other browsers.
-* Fixed toggling a details element when a summary element receives a `click()`.
-* Fixed updating Text node children of an option element to not reset the selection of the select element.
-* Fixed using NFC Security Key on iOS.
-* Fixed using WebAuthn credentials registered on iOS 15 if iCloud Keychain is disabled.
-* Fixed WebAuthn sending Attestation as None when requested as Direct.
-* Fixed XHR aborting to align with standards specification
-* Fixed XHR error events to return 0 for loaded and total.
-* Fixed: Made all FileSystemSyncAccessHandle methods synchronous.
-* Fixed: Removed the `precision="float"` attribute on .
+- Fixed `-webkit-user-select: none` allowing text to be copied to clipboard.
+- Fixed `contentEditable` caret getting left aligned instead of centered when the `:before` pseudo-element is used.
+- Fixed `Cross-Origin-Embedder-Policy` incorrectly blocking scripts on cache hit.
+- Fixed `CSSRule.type` to not return values greater than 15.
+- Fixed `document.open()` to abort all loads when the document is navigating.
+- Fixed `document.open()` to remove the initial `about:blank`\-ness of the document.
+- Fixed `Element.querySelectorAll` not obeying element scope with ID.
+- Fixed `FileSystemSyncAccessHandle` write operation to be quota protected.
+- Fixed `getBoundingClientRect()` returning the wrong value for `<tr>`, `<td>`, and its descendants for a vertical table.
+- Fixed `HTMLOutputElement.htmlFor` to make it settable.
+- Fixed `queryCommandValue("stylewithcss")` to always return an empty string.
+- Fixed `StorageEvent.initStorageEvent()` to align with HTML specifications.
+- Fixed `textContent` leaving dir=auto content in the wrong direction.
+- Fixed `-webkit-user-select: initial` content within `-webkit-user-select: none` should be copied
+- Fixed `WorkerGlobalScope.isSecureContext` to be based on the owner’s top URL, not the owner’s URL.
+- Fixed a bug where `mousedown` without `mouseup` in a frame prevents a click event in another frame.
+- Fixed a sometimes incorrect location after exiting mouse hover.
+- Fixed accepting `image/jpg` for compatibility.
+- Fixed adding a non-breaking space, instead of a plain space, when it is inserted before an empty text node.
+- Fixed behavior of nested click event on a label element with a checkbox.
+- Fixed BroadcastChannel in a SharedWorker when hosted in a cross-origin iframe.
+- Fixed calculation of direction for text form control elements with `dir="auto"`.
+- Fixed canvas fallback content focusability computation.
+- Fixed deleting a button element leaving the button’s style in a `contenteditable` element.
+- Fixed disconnected `<fieldset>` elements sometimes incorrectly matching `:valid` or `:invalid` selectors.
+- Fixed dragging the mouse over a `-webkit-user-select: none` node can begin selection in another node.
+- Fixed ensuring nested workers get controlled if matching a service worker registration.
+- Fixed errors caught and reported for `importScripts()`.
+- Fixed escaping “&” in JavaScript URLs for `innerHTML` and `outerHTML`.
+- Fixed EventSource to stop allowing trailing data when parsing a retry delay.
+- Fixed Fetch Request object to keep its Blob URL alive.
+- Fixed filled text on a canvas with a web font refreshing or disappearing.
+- Fixed find on page failing to show results in PDFs.
+- Fixed firing an error event when link preload fails synchronously.
+- Fixed form submissions to cancel JavaScript URL navigations.
+- Fixed handing the `onerror` content attribute on body and frameset elements.
+- Fixed handling opaque origin Blob URLs.
+- Fixed handling text documents to align to modern HTML specifications.
+- Fixed handling the onerror content attribute on `<body>` and `<frameset>` elements.
+- Fixed HTMLTemplateElement to have a `shadowRootMode` attribute.
+- Fixed including alternate stylesheets in `document.styleSheets`.
+- Fixed incorrect caret movement in some right-to-left `contenteditable` elements.
+- Fixed incorrect color for videos loaded in a canvas.
+- Fixed incorrect image `srcset` candidate chosen for `![]()` cloned from `<template>`.
+- Fixed incorrectly ignored `X-Frame-Options` HTTP headers with an empty value.
+- Fixed lazy loading images sometimes not loading.
+- Fixed link elements to be able to fire more than one `load` or `error` event.
+- Fixed loading Blob URLs with a fragment from opaque, unique origins.
+- Fixed maintaining the original `Content-Type` header on a 303 HTTP redirect.
+- Fixed module scripts to always decode using UTF-8.
+- Fixed MouseEventInit to take `movementX` and `movementY`.
+- Fixed not dispatching a `progress` event when reading an empty file or blob using the FileReader API.
+- Fixed not replacing the current history item when navigating a cross-origin iframe to the same URL.
+- Fixed overriding the mimetype for an XHR.
+- Fixed parsing of negative age values in CORS prefetch responses.
+- Fixed pasting of the first newline into text area.
+- Fixed preventing selection for generated counters in ordered lists.
+- Fixed Safari frequently using stale cached resources despite using Reload Page From Origin.
+- Fixed scheduling a navigation to a Blob URL to keep the URL alive until the navigation occurs.
+- Fixed sending Basic authentication via XHR using `setRequestHeader()` when there is an existing session.
+- Fixed setting `style=""` to destroy the element’s inline style.
+- Fixed setting the `tabIndex` of a non-focusable HTMLElement.
+- Fixed system colors not respecting inherited `color-scheme` values.
+- Fixed textarea placeholder text not disappearing when text is inserted without a user gesture.
+- Fixed the `event.keyIdentifier` value for F10 and F11 keys.
+- Fixed the click event to not get suppressed on textarea resize.
+- Fixed the computed value for the `transform` property with `SkewY`.
+- Fixed the initialization of color properties.
+- Fixed timing of ResizeObserver and IntersectionObserver to match other browsers.
+- Fixed toggling a details element when a summary element receives a `click()`.
+- Fixed updating Text node children of an option element to not reset the selection of the select element.
+- Fixed using NFC Security Key on iOS.
+- Fixed using WebAuthn credentials registered on iOS 15 if iCloud Keychain is disabled.
+- Fixed WebAuthn sending Attestation as None when requested as Direct.
+- Fixed XHR aborting to align with standards specification
+- Fixed XHR error events to return 0 for loaded and total.
+- Fixed: Made all FileSystemSyncAccessHandle methods synchronous.
+- Fixed: Removed the `precision="float"` attribute on .
 
 ### WebGL
 
-* Fixed video textures set to repeat.
+- Fixed video textures set to repeat.
 
 ### Web Inspector
 
-* Fixed “Inspect Element” not highlighting the element.
-* Fixed capturing async stack traces for `queueMicrotask`.
-* Fixed clicking coalesced events in the timeline selecting the wrong event.
-* Fixed event breakpoints to support case-insensitive and RegExp matching.
-* Fixed slow search with a lot of files in the Open Resource dialog.
-* Fixed sorting prefixed properties below non-prefixed properties in the Computed panel of the Elements Tab.
-* Fixed the always empty Attributes section in the Node panel of the Elements Tab.
-* Fixed the Computed Tab scrolling to the top when a `<style>` is added to the page.
-* Fixed URL breakpoints to also pause when HTML attributes are set that trigger loads.
+- Fixed “Inspect Element” not highlighting the element.
+- Fixed capturing async stack traces for `queueMicrotask`.
+- Fixed clicking coalesced events in the timeline selecting the wrong event.
+- Fixed event breakpoints to support case-insensitive and RegExp matching.
+- Fixed slow search with a lot of files in the Open Resource dialog.
+- Fixed sorting prefixed properties below non-prefixed properties in the Computed panel of the Elements Tab.
+- Fixed the always empty Attributes section in the Node panel of the Elements Tab.
+- Fixed the Computed Tab scrolling to the top when a `<style>` is added to the page.
+- Fixed URL breakpoints to also pause when HTML attributes are set that trigger loads.
 
 ### WebDriver
 
-* Fixed “Get Element Rect” to not round to integer values.
-* Fixed automation sessions terminating during navigation.
-* Fixed click element failing on iPad when Stage Manager is disabled.
-* Fixed HTTP GET requests with a body failing.
-* Fixed the Shift modifier key not applying to typed text.
+- Fixed “Get Element Rect” to not round to integer values.
+- Fixed automation sessions terminating during navigation.
+- Fixed click element failing on iPad when Stage Manager is disabled.
+- Fixed HTTP GET requests with a body failing.
+- Fixed the Shift modifier key not applying to typed text.
 
 ## Feedback
 

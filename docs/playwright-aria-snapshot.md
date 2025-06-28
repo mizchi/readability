@@ -12,8 +12,8 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 With Playwright's Snapshot testing you can assert the accessibility tree of a page against a predefined snapshot template.
 
 ```js
-await page.goto('https://playwright.dev/');
-await expect(page.getByRole('banner')).toMatchAriaSnapshot(`
+await page.goto("https://playwright.dev/");
+await expect(page.getByRole("banner")).toMatchAriaSnapshot(`
   - banner:
     - heading /Playwright enables reliable end-to-end/ [level=1]
     - link "Get started"
@@ -76,6 +76,7 @@ await Expect(page.Locator("banner")).ToMatchAriaSnapshotAsync(@"
 Snapshot testing and assertion testing serve different purposes in test automation:
 
 ### Assertion testing
+
 Assertion testing is a targeted approach where you assert specific values or conditions about elements or components. For instance, with Playwright, [`method: LocatorAssertions.toHaveText`]
 verifies that an element contains the expected text, and [`method: LocatorAssertions.toHaveValue`]
 confirms that an input field has the expected value.
@@ -85,17 +86,20 @@ They work well for predictable, single-value checks but are limited in scope whe
 broader structure or variations.
 
 **Advantages**
+
 - **Clarity**: The intent of the test is explicit and easy to understand.
 - **Specificity**: Tests focus on particular aspects of functionality, making them more robust
   against unrelated changes.
 - **Debugging**: Failures provide targeted feedback, pointing directly to the problematic aspect.
 
 **Disadvantages**
+
 - **Verbose for complex outputs**: Writing assertions for complex data structures or large outputs
   can be cumbersome and error-prone.
 - **Maintenance overhead**: As code evolves, manually updating assertions can be time-consuming.
 
 ### Snapshot testing
+
 Snapshot testing captures a “snapshot” or representation of the entire
 state of an element, component, or data at a given moment, which is then saved for future
 comparisons. When re-running tests, the current state is compared to the snapshot, and if there
@@ -104,11 +108,13 @@ structures, where manually asserting each detail would be too time-consuming. Sn
 is broader and more holistic than assertion testing, allowing you to track more complex changes over time.
 
 **Advantages**
+
 - **Simplifies complex outputs**: For example, testing a UI component's rendered output can be tedious with traditional assertions. Snapshots capture the entire output for easy comparison.
 - **Quick Feedback loop**: Developers can easily spot unintended changes in the output.
 - **Encourages consistency**: Helps maintain consistent output as code evolves.
 
 **Disadvantages**
+
 - **Over-Reliance**: It can be tempting to accept changes to snapshots without fully understanding
   them, potentially hiding bugs.
 - **Granularity**: Large snapshots may be hard to interpret when differences arise, especially
@@ -119,6 +125,7 @@ is broader and more holistic than assertion testing, allowing you to track more 
 ### When to use
 
 - **Snapshot testing** is ideal for:
+
   - UI testing of whole pages and components.
   - Broad structural checks for complex UI components.
   - Regression testing for outputs that rarely change structure.
@@ -154,7 +161,6 @@ Each accessible element in the tree is represented as a YAML node:
 These values are derived from ARIA attributes or calculated based on HTML semantics. To inspect the accessibility tree
 structure of a page, use the [Chrome DevTools Accessibility Tab](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
-
 ## Snapshot matching
 
 The [`method: LocatorAssertions.toMatchAriaSnapshot`] assertion method in Playwright compares the accessible
@@ -170,7 +176,7 @@ For the following DOM:
 You can match it using the following snapshot template:
 
 ```js
-await expect(page.locator('body')).toMatchAriaSnapshot(`
+await expect(page.locator("body")).toMatchAriaSnapshot(`
   - heading "title"
 `);
 ```
@@ -201,12 +207,11 @@ await Expect(page.Locator("body")).ToMatchAriaSnapshotAsync(@"
 
 When matching, the snapshot template is compared to the current accessibility tree of the page:
 
-* If the tree structure matches the template, the test passes; otherwise, it fails, indicating a mismatch between
+- If the tree structure matches the template, the test passes; otherwise, it fails, indicating a mismatch between
   expected and actual accessibility states.
-* The comparison is case-sensitive and collapses whitespace, so indentation and line breaks are ignored.
-* The comparison is order-sensitive, meaning the order of elements in the snapshot template must match the order in the
+- The comparison is case-sensitive and collapses whitespace, so indentation and line breaks are ignored.
+- The comparison is order-sensitive, meaning the order of elements in the snapshot template must match the order in the
   page's accessibility tree.
-
 
 ### Partial matching
 
@@ -218,7 +223,7 @@ attributes.
 <button>Submit</button>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - button
@@ -233,10 +238,10 @@ For elements with ARIA attributes like `checked` or `disabled`, omitting these a
 focusing solely on role and hierarchy.
 
 ```html
-<input type="checkbox" checked>
+<input type="checkbox" checked />
 ```
 
-*aria snapshot for partial match*
+_aria snapshot for partial match_
 
 ```yaml
 - checkbox
@@ -256,7 +261,7 @@ Similarly, you can partially match children in lists or groups by omitting speci
 </ul>
 ```
 
-*aria snapshot for partial match*
+_aria snapshot for partial match_
 
 ```yaml
 - list
@@ -275,7 +280,7 @@ support regex patterns.
 <h1>Issues 12</h1>
 ```
 
-*aria snapshot with regular expression*
+_aria snapshot with regular expression_
 
 ```yaml
 - heading /Issues \d+/
@@ -292,15 +297,16 @@ If you're using Playwright's [Code Generator](./codegen.md), generating aria sna
 interactive interface:
 
 - **"Assert snapshot" Action**: In the code generator, you can use the "Assert snapshot" action to automatically create
-a snapshot assertion for the selected elements. This is a quick way to capture the aria snapshot as part of your
-recorded test flow.
+  a snapshot assertion for the selected elements. This is a quick way to capture the aria snapshot as part of your
+  recorded test flow.
 
 - **"Aria snapshot" Tab**: The "Aria snapshot" tab within the code generator interface visually represents the
-aria snapshot for a selected locator, letting you explore, inspect, and verify element roles, attributes, and
-accessible names to aid snapshot creation and review.
+  aria snapshot for a selected locator, letting you explore, inspect, and verify element roles, attributes, and
+  accessible names to aid snapshot creation and review.
 
 ### Updating snapshots with `@playwright/test` and the `--update-snapshots` flag
-* langs: js
+
+- langs: js
 
 When using the Playwright test runner (`@playwright/test`), you can automatically update snapshots with the `--update-snapshots` flag, `-u` for short.
 
@@ -317,7 +323,7 @@ Updating snapshots is useful when application structure changes require new snap
 Passing an empty string as the template in an assertion generates a snapshot on-the-fly:
 
 ```js
-await expect(locator).toMatchAriaSnapshot('');
+await expect(locator).toMatchAriaSnapshot("");
 ```
 
 Note that Playwright will wait for the maximum expect timeout specified in the test runner configuration to ensure the
@@ -345,7 +351,7 @@ npx playwright test --update-snapshots --update-source-mode=3way
 To store your snapshots in a separate file, use the `toMatchAriaSnapshot` method with the `name` option, specifying a `.aria.yml` file extension.
 
 ```js
-await expect(page.getByRole('main')).toMatchAriaSnapshot({ name: 'main.aria.yml' });
+await expect(page.getByRole("main")).toMatchAriaSnapshot({ name: "main.aria.yml" });
 ```
 
 By default, snapshots from a test file `example.spec.ts` are placed in the `example.spec.ts-snapshots` directory. As snapshots should be the same across browsers, only one snapshot is saved even if testing with multiple browsers. Should you wish, you can customize the [snapshot path template](./api/class-testconfig#test-config-snapshot-path-template) using the following configuration:
@@ -354,7 +360,7 @@ By default, snapshots from a test file `example.spec.ts` are placed in the `exam
 export default defineConfig({
   expect: {
     toMatchAriaSnapshot: {
-      pathTemplate: '__snapshots__/{testFilePath}/{arg}{ext}',
+      pathTemplate: "__snapshots__/{testFilePath}/{arg}{ext}",
     },
   },
 });
@@ -368,7 +374,7 @@ elements within a locator's scope, especially helpful for generating snapshots d
 **Example**:
 
 ```js
-const snapshot = await page.locator('body').ariaSnapshot();
+const snapshot = await page.locator("body").ariaSnapshot();
 console.log(snapshot);
 ```
 
@@ -406,7 +412,7 @@ Headings can include a `level` attribute indicating their heading level.
 <h2>Subtitle</h2>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - heading "Title" [level=1]
@@ -421,7 +427,7 @@ Standalone or descriptive text elements appear as text nodes.
 <div>Sample accessible name</div>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - text: Sample accessible name
@@ -432,10 +438,10 @@ Standalone or descriptive text elements appear as text nodes.
 Multiline text, such as paragraphs, is normalized in the aria snapshot.
 
 ```html
-<p>Line 1<br>Line 2</p>
+<p>Line 1<br />Line 2</p>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - paragraph: Line 1 Line 2
@@ -449,7 +455,7 @@ Links display their text or composed content from pseudo-elements.
 <a href="#more-info">Read more about Accessibility</a>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - link "Read more about Accessibility"
@@ -460,10 +466,10 @@ Links display their text or composed content from pseudo-elements.
 Input elements of type `text` show their `value` attribute content.
 
 ```html
-<input type="text" value="Enter your name">
+<input type="text" value="Enter your name" />
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - textbox: Enter your name
@@ -480,12 +486,12 @@ Ordered and unordered lists include their list items.
 </ul>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - list "Main Features":
-  - listitem: Feature 1
-  - listitem: Feature 2
+    - listitem: Feature 1
+    - listitem: Feature 2
 ```
 
 ### Grouped elements
@@ -499,7 +505,7 @@ Groups capture nested elements, such as `<details>` elements with summary conten
 </details>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - group: Summary
@@ -513,10 +519,10 @@ control states.
 #### Checkbox with `checked` attribute
 
 ```html
-<input type="checkbox" checked>
+<input type="checkbox" checked />
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - checkbox [checked]
@@ -528,7 +534,7 @@ control states.
 <button aria-pressed="true">Toggle</button>
 ```
 
-*aria snapshot*
+_aria snapshot_
 
 ```yaml
 - button "Toggle" [pressed=true]

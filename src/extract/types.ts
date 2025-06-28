@@ -36,9 +36,7 @@ export interface OtherContent {
 }
 
 // pageTypeに応じたデータを取得する関数
-export function getContentByPageType(
-  result: ReadabilityArticle
-): ArticleContent | OtherContent {
+export function getContentByPageType(result: ReadabilityArticle): ArticleContent | OtherContent {
   if (result.pageType === PageType.ARTICLE) {
     // ARTICLEの場合、title, byline, rootを返す
     return {

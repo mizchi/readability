@@ -16,10 +16,7 @@ import type {
   // LinkInfo is already imported above
 } from "./types.ts";
 import { PageType, isVElement } from "./types.ts"; // Import PageType enum and isVElement guard
-import {
-  analyzeLinkHierarchy,
-  LinkHierarchyAnalysis,
-} from "./nav/hierarchy.ts"; // Import link hierarchy analysis
+import { analyzeLinkHierarchy, LinkHierarchyAnalysis } from "./nav/hierarchy.ts"; // Import link hierarchy analysis
 import { parseHTML as internalParseHTML } from "./parsers/parser.ts";
 import { preprocessDocument as internalPreprocessDocument } from "./extract/preprocess.ts";
 import {
@@ -40,8 +37,7 @@ import {
 } from "./serializer.ts"; // Import serializer functions
 
 /** Options for the Readable class */
-export interface ReadableOptions
-  extends Omit<InternalReadabilityOptions, "generateAriaTree"> {
+export interface ReadableOptions extends Omit<InternalReadabilityOptions, "generateAriaTree"> {
   // Omit generateAriaTree
   // pageType?: PageType; // pageType is determined internally or loaded
   baseURI?: string; // Add baseURI to options for context when parsing fragments
@@ -97,19 +93,14 @@ export class Readable implements IReadable {
    * @param content HTML content string
    * @param options Options for extraction and classification
    */
-  public static fromHTML(
-    content: string,
-    options: ReadableOptions = {}
-  ): Readable {
+  public static fromHTML(content: string, options: ReadableOptions = {}): Readable {
     // 1. Parse and ensure we have a VDocument
     const parsedResult = internalParseHTML(content);
     let doc: InternalVDocument; // Ensure doc is always VDocument type
 
     if (isVElement(parsedResult)) {
       // If parser returns just a root element (fragment)
-      console.warn(
-        "Parser returned a VElement fragment. Wrapping it in a VDocument."
-      );
+      console.warn("Parser returned a VElement fragment. Wrapping it in a VDocument.");
       // Create a VDocument containing the fragment
       doc = {
         documentElement: parsedResult, // Treat fragment root as documentElement
@@ -155,12 +146,10 @@ export class Readable implements IReadable {
     const links = internalExtractLinks(doc);
     // countNodes operates on VElement or null, which is fine
     const nodeCount = rootElement ? internalCountNodes(rootElement) : 0;
-    const mainCandidatesInfo: InternalCandidateInfo[] = candidates.map(
-      (el) => ({
-        element: el,
-        score: el.readability?.contentScore || 0,
-      })
-    );
+    const mainCandidatesInfo: InternalCandidateInfo[] = candidates.map((el) => ({
+      element: el,
+      score: el.readability?.contentScore || 0,
+    }));
 
     // 7. Build AriaTree (always build, pass VDocument)
     const ariaTree = internalBuildAriaTree(doc); // Build from the preprocessed doc
@@ -183,14 +172,10 @@ export class Readable implements IReadable {
    * @param jsonString The JSON string created by the serialize() method.
    * @param options Options to apply on load (e.g., regenerating AriaTree).
    */
-  public static load(
-    jsonString: string,
-    options: ReadableOptions = {}
-  ): Readable {
+  public static load(jsonString: string, options: ReadableOptions = {}): Readable {
     // Deserialize returns InternalExtractedSnapshot
     // Deserialize returns both snapshot and pageType
-    const { snapshot, pageType: loadedPageType } =
-      internalDeserialize(jsonString);
+    const { snapshot, pageType: loadedPageType } = internalDeserialize(jsonString);
 
     // Use the loaded pageType directly
     // const loadedPageType =
@@ -215,9 +200,7 @@ export class Readable implements IReadable {
    * Returns the generated ARIA tree, if available.
    * @param options Options for retrieving the tree, e.g., { compact: boolean }. Default is compact: true.
    */
-  public getAriaTree(
-    options?: GetAriaTreeOptions
-  ): InternalAriaTree | undefined {
+  public getAriaTree(options?: GetAriaTreeOptions): InternalAriaTree | undefined {
     // Default to compact: true if options or compact property is undefined
     const compact = options?.compact ?? true;
     const filter = options?.filter;
@@ -232,9 +215,7 @@ export class Readable implements IReadable {
       );
     }
     if (filter) {
-      console.warn(
-        "ARIA tree filtering is not yet implemented. Returning the unfiltered tree."
-      );
+      console.warn("ARIA tree filtering is not yet implemented. Returning the unfiltered tree.");
       // Placeholder for filtering logic:
       // let treeToReturn = this.snapshot.ariaTree;
       // if (treeToReturn && filter) {
@@ -279,10 +260,7 @@ export class Readable implements IReadable {
  * @param options Options for extraction and classification
  * @returns A Readable instance
  */
-export function readable(
-  content: string,
-  options: ReadableOptions = {}
-): Readable {
+export function readable(content: string, options: ReadableOptions = {}): Readable {
   return Readable.fromHTML(content, options);
 }
 

@@ -22,8 +22,8 @@ OpenAI と AnthropicAI の Tools の叩き方を確認したが、 Gemini はそ
 
 まず、 AI 周りの CLI ツールは専用の面倒臭さがあることを知っておく必要がある。
 
-* ストリーミング
-* Tools の応答
+- ストリーミング
+- Tools の応答
 
 AI 周りの応答をストリーミングするのは LLM 関係なくストリーミング処理を大量に書く必要がある。
 
@@ -37,8 +37,8 @@ Vercel の `ai`, `@ai-sdk/*` はその辺の処理をラップしている。 Ve
 
 ## 元々使ってたスクリプト
 
-* Deno
-* Claude
+- Deno
+- Claude
 
 ```
 #!/usr/bin/env -S deno run -A
@@ -640,9 +640,10 @@ write("\n");
 
 ## まとめ
 
-* Vercel AI SDK は Deno CLI でも使えた
-* 面倒なストリーム処理やToolsの応答をラップしてくれる
-* ツールに特化しない範囲で、コピペ元として用意しておくと便利
+- Vercel AI SDK は Deno CLI でも使えた
+- 面倒なストリーム処理やToolsの応答をラップしてくれる
+- ツールに特化しない範囲で、コピペ元として用意しておくと便利
 
 ### Discussion
+
 ![](https://static.zenn.studio/images/drawing/discussion.png)

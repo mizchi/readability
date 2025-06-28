@@ -99,17 +99,7 @@ function convertNodeToMarkdown(
       "table",
       "div",
     ].includes(tagName);
-    const isInline = [
-      "a",
-      "strong",
-      "b",
-      "em",
-      "i",
-      "code",
-      "img",
-      "br",
-      "span",
-    ].includes(tagName);
+    const isInline = ["a", "strong", "b", "em", "i", "code", "img", "br", "span"].includes(tagName);
 
     // Process children, store results in an array
     const childrenResults: string[] = [];
@@ -119,9 +109,7 @@ function convertNodeToMarkdown(
         child,
         tagName,
         // Increment depth for lists and blockquotes
-        tagName === "ul" || tagName === "ol" || tagName === "blockquote"
-          ? depth + 1
-          : depth,
+        tagName === "ul" || tagName === "ol" || tagName === "blockquote" ? depth + 1 : depth,
         isCurrentChildFirst
       );
       childrenResults.push(childResult);
@@ -170,26 +158,20 @@ function convertNodeToMarkdown(
           );
           let delimiter = "`".repeat(longestSequence + 1);
 
-          if (
-            codeContent.match(/^`+$/) &&
-            codeContent.length >= delimiter.length
-          ) {
+          if (codeContent.match(/^`+$/) && codeContent.length >= delimiter.length) {
             delimiter = "`".repeat(codeContent.length + 1);
           }
 
           // Determine padding based on GFM rules:
           // Add space if content starts/ends with backtick, OR if content consists only of backticks.
           // Also add space if content is empty or whitespace only to ensure delimiters are visible.
-          const startsOrEndsWithBacktick =
-            codeContent.startsWith("`") || codeContent.endsWith("`");
+          const startsOrEndsWithBacktick = codeContent.startsWith("`") || codeContent.endsWith("`");
           // Check if the content consists *only* of one or more backticks
           const consistsOnlyOfBackticks = /^`+$/.test(codeContent);
           const isEmptyOrWhitespace = !codeContent.trim();
 
           const needsPadding =
-            startsOrEndsWithBacktick ||
-            consistsOnlyOfBackticks ||
-            isEmptyOrWhitespace;
+            startsOrEndsWithBacktick || consistsOnlyOfBackticks || isEmptyOrWhitespace;
 
           // Apply padding *inside* the delimiters if needed
           const finalContent = needsPadding ? ` ${codeContent} ` : codeContent;
@@ -214,9 +196,7 @@ function convertNodeToMarkdown(
 
           if (node.nodeType === "element") {
             // 装飾用のspanなどの要素内のテキストも再帰的に取得
-            return (node as VElement).children
-              .map((child) => getAllTextContent(child))
-              .join("");
+            return (node as VElement).children.map((child) => getAllTextContent(child)).join("");
           }
 
           return "";
@@ -247,21 +227,15 @@ function convertNodeToMarkdown(
         const content = childrenMarkdown.trim();
         if (!content) return "";
         const lines = content.split("\n");
-        const quotedLines = lines.map((line) =>
-          line.trim() === "" ? ">" : `> ${line}`
-        );
+        const quotedLines = lines.map((line) => (line.trim() === "" ? ">" : `> ${line}`));
         return quotedLines.join("\n") + "\n\n";
       }
       case "ul":
       case "ol":
         // Process only li children, join results with newline
         const listItems = element.children
-          .filter(
-            (c): c is VElement => c.nodeType === "element" && c.tagName === "li"
-          )
-          .map((child, index) =>
-            convertNodeToMarkdown(child, tagName, depth + 1, index === 0)
-          )
+          .filter((c): c is VElement => c.nodeType === "element" && c.tagName === "li")
+          .map((child, index) => convertNodeToMarkdown(child, tagName, depth + 1, index === 0))
           .filter((item) => item.trim() !== ""); // Filter empty items AFTER processing
 
         if (listItems.length === 0) return "";
@@ -288,15 +262,8 @@ function convertNodeToMarkdown(
         const nestedListParts: string[] = [];
 
         element.children.forEach((child) => {
-          if (
-            child.nodeType === "element" &&
-            (child.tagName === "ul" || child.tagName === "ol")
-          ) {
-            const nestedListMd = convertNodeToMarkdown(
-              child,
-              tagName,
-              depth + 1
-            );
+          if (child.nodeType === "element" && (child.tagName === "ul" || child.tagName === "ol")) {
+            const nestedListMd = convertNodeToMarkdown(child, tagName, depth + 1);
             // The recursive call to convertNodeToMarkdown handles the indentation
             // based on the increased depth. The ul/ol handler will indent it.
             if (nestedListMd) {
@@ -374,22 +341,16 @@ function convertNodeToMarkdown(
         let maxColumns = 0;
 
         const thead = element.children.find(
-          (c): c is VElement =>
-            c.nodeType === "element" && c.tagName === "thead"
+          (c): c is VElement => c.nodeType === "element" && c.tagName === "thead"
         );
         const tbody = element.children.find(
-          (c): c is VElement =>
-            c.nodeType === "element" && c.tagName === "tbody"
+          (c): c is VElement => c.nodeType === "element" && c.tagName === "tbody"
         );
 
         // Process cell content: Recursively convert, then trim whitespace *within* the cell
         const processCell = (cell: VElement): string => {
           // Pass 'td' or 'th' as parentTagName
-          return convertNodeToMarkdown(
-            cell,
-            cell.tagName.toLowerCase(),
-            depth + 1
-          ).trim();
+          return convertNodeToMarkdown(cell, cell.tagName.toLowerCase(), depth + 1).trim();
         };
 
         // Process header row
@@ -399,10 +360,7 @@ function convertNodeToMarkdown(
           );
           if (headerTr) {
             headerRow = headerTr.children
-              .filter(
-                (c): c is VElement =>
-                  c.nodeType === "element" && c.tagName === "th"
-              )
+              .filter((c): c is VElement => c.nodeType === "element" && c.tagName === "th")
               .map(processCell);
             maxColumns = Math.max(maxColumns, headerRow.length);
           }
@@ -411,15 +369,12 @@ function convertNodeToMarkdown(
         // Process body rows
         const rowsContainer = tbody || element;
         rowsContainer.children
-          .filter(
-            (c): c is VElement => c.nodeType === "element" && c.tagName === "tr"
-          )
+          .filter((c): c is VElement => c.nodeType === "element" && c.tagName === "tr")
           .forEach((tr) => {
             const row = tr.children
               .filter(
                 (c): c is VElement =>
-                  c.nodeType === "element" &&
-                  (c.tagName === "td" || c.tagName === "th")
+                  c.nodeType === "element" && (c.tagName === "td" || c.tagName === "th")
               )
               .map(processCell);
             bodyRows.push(row);

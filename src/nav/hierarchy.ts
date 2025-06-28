@@ -157,10 +157,7 @@ export function analyzeLinkHierarchy(
     }
 
     // Ignore links pointing to the exact same path (after resolving)
-    if (
-      linkUrl.pathname === currentUrl.pathname &&
-      linkUrl.search === currentUrl.search
-    ) {
+    if (linkUrl.pathname === currentUrl.pathname && linkUrl.search === currentUrl.search) {
       // Consider hash differences? For hierarchy, usually ignore.
       continue;
     }
@@ -187,8 +184,7 @@ export function analyzeLinkHierarchy(
     while (
       commonPrefixLength < currentLen &&
       commonPrefixLength < linkLen &&
-      currentPathSegments[commonPrefixLength] ===
-        linkPathSegments[commonPrefixLength]
+      currentPathSegments[commonPrefixLength] === linkPathSegments[commonPrefixLength]
     ) {
       commonPrefixLength++;
     }

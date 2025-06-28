@@ -124,10 +124,7 @@ function findStructuralElements(doc: VDocument): {
         className?.includes("masthead")
       ) {
         // より上位の要素を優先 (body直下など)
-        if (
-          !header ||
-          (el.parent?.deref() === body && header.parent?.deref() !== body)
-        ) {
+        if (!header || (el.parent?.deref() === body && header.parent?.deref() !== body)) {
           header = el;
         }
       }
@@ -183,13 +180,7 @@ function findStructuralElements(doc: VDocument): {
   const asideTags = getElementsByTagName(body, "aside");
   const navTags = getElementsByTagName(body, "nav");
 
-  const potentialNodes = [
-    ...mainTags,
-    ...articleTags,
-    ...sectionTags,
-    ...asideTags,
-    ...navTags,
-  ];
+  const potentialNodes = [...mainTags, ...articleTags, ...sectionTags, ...asideTags, ...navTags];
 
   // クラス名やIDに基づいて意味のある要素を追加
   addSignificantElementsByClassOrId(body, potentialNodes);
@@ -208,10 +199,7 @@ function findStructuralElements(doc: VDocument): {
 
     if (!isInsideHeaderOrFooter && !otherSignificantNodes.includes(node)) {
       // 簡単な可視性チェックと最低限のテキスト量チェック
-      if (
-        isProbablyVisible(node) &&
-        (isSignificantNode(node) || isSemanticTag(node.tagName))
-      ) {
+      if (isProbablyVisible(node) && (isSignificantNode(node) || isSemanticTag(node.tagName))) {
         otherSignificantNodes.push(node);
       }
     }
@@ -226,10 +214,7 @@ function findStructuralElements(doc: VDocument): {
 /**
  * クラス名やIDに基づいて意味のある要素を検出し、potentialNodesに追加する
  */
-function addSignificantElementsByClassOrId(
-  body: VElement,
-  potentialNodes: VElement[]
-): void {
+function addSignificantElementsByClassOrId(body: VElement, potentialNodes: VElement[]): void {
   const allElements = getElementsByTagName(body, "*");
 
   // 意味のあるクラス名やIDのパターン
@@ -403,8 +388,7 @@ export function findMainCandidates(
       const textDensity = getTextDensity(candidate);
       if (textDensity > 0) {
         // Slightly increase the score for higher text density (up to 10%)
-        candidate.readability.contentScore *=
-          1 + Math.min(textDensity / 10, 0.1);
+        candidate.readability.contentScore *= 1 + Math.min(textDensity / 10, 0.1);
       }
 
       // Check parent node score - the parent might be a better candidate
@@ -419,8 +403,7 @@ export function findMainCandidates(
         if (
           parentElement.readability &&
           currentCandidate.readability &&
-          parentElement.readability.contentScore >
-            currentCandidate.readability.contentScore
+          parentElement.readability.contentScore > currentCandidate.readability.contentScore
         ) {
           currentCandidate = parentElement;
         }
@@ -445,9 +428,7 @@ export function findMainCandidates(
   scoredCandidates.sort((a, b) => b.score - a.score);
 
   // Return top N candidates
-  const topCandidates = scoredCandidates
-    .slice(0, nbTopCandidates)
-    .map((c) => c.element);
+  const topCandidates = scoredCandidates.slice(0, nbTopCandidates).map((c) => c.element);
 
   // Return body if no candidate is found and body exists
   if (topCandidates.length === 0 && doc.body) {
@@ -660,8 +641,7 @@ export function classifyPageType(
     // 子要素にセマンティックタグがあるかもチェック
     topCandidate.children.some(
       (child) =>
-        child.nodeType === "element" &&
-        (child.tagName === "main" || child.tagName === "article")
+        child.nodeType === "element" && (child.tagName === "main" || child.tagName === "article")
     )
   ) {
     // セマンティックタグが使われている場合でも、テキスト長とリンク密度を確認
@@ -790,10 +770,7 @@ export function extractAriaTree(
 /**
  * Extract article from HTML (Refactored)
  */
-export function extract(
-  html: string,
-  options: ReadabilityOptions = {}
-): ExtractedSnapshot {
+export function extract(html: string, options: ReadabilityOptions = {}): ExtractedSnapshot {
   // Parse HTML to create virtual DOM
   const parser = options.parser || parseHTML;
   const parsedResult = parser(html);
@@ -836,8 +813,7 @@ export function extract(
   // --- Start: Added logic for snapshot test ---
   // Classify page type
   const charThreshold = options.charThreshold || DEFAULT_CHAR_THRESHOLD;
-  let pageType =
-    options.forcedPageType || classifyPageType(doc, candidates, charThreshold); // Use stored candidates
+  let pageType = options.forcedPageType || classifyPageType(doc, candidates, charThreshold); // Use stored candidates
 
   // Determine root based on classification
   let root: VElement | null = null;
@@ -897,19 +873,14 @@ export function createExtractor(opts: {
     forcedPageType: defaultForcedPageType, // Rename for clarity
   } = opts;
 
-  return (
-    html: string,
-    options: Omit<ReadabilityOptions, "parser"> = {}
-  ): ExtractedSnapshot => {
+  return (html: string, options: Omit<ReadabilityOptions, "parser"> = {}): ExtractedSnapshot => {
     // Call the refactored extract function with the configured parser and merged options
     return extract(html, {
       ...options, // Pass through options provided to the returned function
       parser: parser, // Use the pre-configured parser
       // Prioritize options passed to the returned function, then defaults from createExtractor
       forcedPageType:
-        options.forcedPageType !== undefined
-          ? options.forcedPageType
-          : defaultForcedPageType, // No default ARTICLE here, extract handles defaults if needed
+        options.forcedPageType !== undefined ? options.forcedPageType : defaultForcedPageType, // No default ARTICLE here, extract handles defaults if needed
     });
   };
 }

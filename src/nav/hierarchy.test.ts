@@ -32,9 +32,7 @@ describe("analyzeLinkHierarchy", () => {
       external: [],
       scores: new Map(),
     });
-    expect(
-      analyzeLinkHierarchy(links, { title: "No URL" } as PageMetadata)
-    ).toEqual({
+    expect(analyzeLinkHierarchy(links, { title: "No URL" } as PageMetadata)).toEqual({
       parent: [],
       sibling: [],
       child: [],
@@ -68,9 +66,7 @@ describe("analyzeLinkHierarchy", () => {
       createMockLink("https://example.com/articles/tech/security"), // Sibling
       createMockLink("mobile-apps"), // Sibling (relative)
       createMockLink("/articles/tech/mobile-apps"), // Sibling (relative, absolute path)
-      createMockLink(
-        "https://example.com/articles/tech/web-development/details"
-      ), // Child
+      createMockLink("https://example.com/articles/tech/web-development/details"), // Child
       createMockLink("details/more"), // Child (relative)
       createMockLink("/articles/tech/web-development/details/more"), // Child (relative, absolute path)
       createMockLink("https://othersite.com/page"), // External
@@ -127,12 +123,8 @@ describe("analyzeLinkHierarchy", () => {
     Object.keys(expected).forEach((key) => {
       const k = key as keyof LinkHierarchyAnalysis;
       if (k !== "scores") {
-        (result[k] as LinkInfo[]).sort((a, b) =>
-          (a.href || "").localeCompare(b.href || "")
-        );
-        (expected[k] as LinkInfo[]).sort((a, b) =>
-          (a.href || "").localeCompare(b.href || "")
-        );
+        (result[k] as LinkInfo[]).sort((a, b) => (a.href || "").localeCompare(b.href || ""));
+        (expected[k] as LinkInfo[]).sort((a, b) => (a.href || "").localeCompare(b.href || ""));
       }
     });
 

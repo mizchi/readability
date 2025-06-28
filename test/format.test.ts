@@ -31,8 +31,7 @@ describe("toHTML function", () => {
     spanInP.children.push(createTextNode(" Important text."));
     p1.children.push(spanInP); // Add span inside p
 
-    const expectedHTML =
-      '<div id="main"><p>This is a paragraph. Important text.</p></div>';
+    const expectedHTML = '<div id="main"><p>This is a paragraph. Important text.</p></div>';
     expect(toHTML(element)).toBe(expectedHTML);
   });
 
@@ -86,8 +85,7 @@ describe("toHTML function", () => {
     img.attributes.alt = "test"; // Keep alt attribute
     element.children.push(img);
 
-    const expectedHTML =
-      '<div><br/><hr/><img src="test.png" alt="test"/></div>';
+    const expectedHTML = '<div><br/><hr/><img src="test.png" alt="test"/></div>';
     expect(toHTML(element)).toBe(expectedHTML);
   });
 

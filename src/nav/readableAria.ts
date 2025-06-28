@@ -4,13 +4,7 @@
  * Functions for building and formatting a simplified, readable ARIA tree.
  */
 
-import type {
-  VElement,
-  AriaNode,
-  AriaNodeType,
-  AriaTree,
-  VDocument,
-} from "../types.ts";
+import type { VElement, AriaNode, AriaNodeType, AriaTree, VDocument } from "../types.ts";
 import { getAttribute, isProbablyVisible, getInnerText } from "../dom.ts";
 import {
   getAriaRole,
@@ -18,12 +12,7 @@ import {
   getAriaNodeType,
   buildAriaNode as buildBaseAriaNode, // Rename to avoid conflict
 } from "./aria.ts";
-import {
-  getNodeDepth,
-  countLinks,
-  assignWeightsToTree,
-  filterNodesByWeight,
-} from "./links.ts";
+import { getNodeDepth, countLinks, assignWeightsToTree, filterNodesByWeight } from "./links.ts";
 
 /**
  * ドキュメントからAriaTreeを構築する
@@ -44,14 +33,7 @@ export function buildAriaTree(doc: VDocument): AriaTree {
   ) {
     // 意味のある子ノードを探す（main, article, sectionなど）
     const significantChild = compressedRoot.children.find((child) =>
-      [
-        "main",
-        "article",
-        "section",
-        "navigation",
-        "banner",
-        "contentinfo",
-      ].includes(child.type)
+      ["main", "article", "section", "navigation", "banner", "contentinfo"].includes(child.type)
     );
 
     // 意味のある子ノードがあれば、それをルートにする
@@ -97,11 +79,7 @@ function toCompact(node: AriaNode): AriaNode {
   // Helper function to determine if a node is insignificant
   function isInsignificantNode(node: AriaNode): boolean {
     // 名前がなく、特定のタイプでもなく、子ノードもない場合は意味がない
-    return (
-      !node.name &&
-      node.type === "generic" &&
-      (!node.children || node.children.length === 0)
-    );
+    return !node.name && node.type === "generic" && (!node.children || node.children.length === 0);
   }
 
   // 子ノードがない場合はそのまま返す
@@ -122,22 +100,12 @@ function toCompact(node: AriaNode): AriaNode {
     .map((child) => toCompact(child)) // Call toCompact recursively
     .filter((child) => !isInsignificantNode(child))
     // 要件1: textの中身が空のノードを削除
-    .filter(
-      (child) =>
-        !(child.type === "text" && (!child.name || child.name.trim() === ""))
-    );
+    .filter((child) => !(child.type === "text" && (!child.name || child.name.trim() === "")));
 
   // 特殊ケース: textノードが意味のあるノードを1つだけ含む場合、そのノードを直接返す
   if (node.type === "text" && processedChildren.length === 1) {
     const significantChild = processedChildren[0];
-    const significantTypes = [
-      "main",
-      "article",
-      "section",
-      "navigation",
-      "banner",
-      "contentinfo",
-    ];
+    const significantTypes = ["main", "article", "section", "navigation", "banner", "contentinfo"];
 
     if (significantTypes.includes(significantChild.type)) {
       // 親の名前を子にマージ（必要な場合）
@@ -200,8 +168,7 @@ function toCompact(node: AriaNode): AriaNode {
   if (
     processedChildren.length > 0 &&
     (processedChildren.every((child) => child.type === "generic") ||
-      (isSignificantNode &&
-        processedChildren.some((child) => child.type === "generic")))
+      (isSignificantNode && processedChildren.some((child) => child.type === "generic")))
   ) {
     // genericの子を持つノードの場合、子ノードの子をすべて自分の子にする
     const newChildren: AriaNode[] = [];
@@ -251,9 +218,7 @@ function toCompact(node: AriaNode): AriaNode {
     // 同じタイプのノードを見つけた場合、マージする
     // 名前をマージ
     if (child.name) {
-      currentGroup.name = currentGroup.name
-        ? `${currentGroup.name} ${child.name}`
-        : child.name;
+      currentGroup.name = currentGroup.name ? `${currentGroup.name} ${child.name}` : child.name;
     }
 
     // 子ノードをマージ
@@ -293,14 +258,11 @@ function toCompact(node: AriaNode): AriaNode {
       // 親と子が同じタイプの場合、または親がtextで子が意味のあるノードの場合、マージする
       if (
         child.type === grandchild.type ||
-        (child.type === "text" &&
-          ["main", "article", "section"].includes(grandchild.type))
+        (child.type === "text" && ["main", "article", "section"].includes(grandchild.type))
       ) {
         // 孫ノードの名前を親ノードにマージ
         if (grandchild.name) {
-          child.name = child.name
-            ? `${child.name} ${grandchild.name}`
-            : grandchild.name;
+          child.name = child.name ? `${child.name} ${grandchild.name}` : grandchild.name;
         }
 
         // 孫ノードの子を親ノードに移動
@@ -317,23 +279,17 @@ function toCompact(node: AriaNode): AriaNode {
 
     // 子ノードが複数あり、その中に親と同じタイプのノードがある場合
     if (child.children && child.children.length > 1) {
-      const sameTypeChildren = child.children.filter(
-        (c) => c.type === child.type
-      );
+      const sameTypeChildren = child.children.filter((c) => c.type === child.type);
 
       if (sameTypeChildren.length > 0) {
         // 同じタイプの子ノードの内容を親にマージし、それらを削除
-        const otherChildren = child.children.filter(
-          (c) => c.type !== child.type
-        );
+        const otherChildren = child.children.filter((c) => c.type !== child.type);
         const newChildren: AriaNode[] = [];
 
         // 同じタイプの子ノードの名前をマージ
         for (const sameChild of sameTypeChildren) {
           if (sameChild.name) {
-            child.name = child.name
-              ? `${child.name} ${sameChild.name}`
-              : sameChild.name;
+            child.name = child.name ? `${child.name} ${sameChild.name}` : sameChild.name;
           }
 
           // 同じタイプの子ノードの子を新しい子リストに追加
@@ -397,10 +353,7 @@ function countNodes(node: AriaNode): number {
  * @param doc VDocument オブジェクト
  * @param maxLinks 最大表示リンク数（デフォルト: 60）
  */
-export function toReadableAriaTree(
-  doc: VDocument,
-  maxLinks: number = 60
-): string {
+export function toReadableAriaTree(doc: VDocument, maxLinks: number = 60): string {
   // AriaTreeを構築
   const tree = buildAriaTree(doc);
 
@@ -437,8 +390,7 @@ export function toReadableAriaTree(
         (!node.children ||
           node.children.length === 0 ||
           node.children.every(
-            (child) =>
-              !child.name && (!child.children || child.children.length === 0)
+            (child) => !child.name && (!child.children || child.children.length === 0)
           )))
     ) {
       return "";
@@ -553,9 +505,7 @@ export function toReadableAriaTree(
         const child = node.children[0];
         // 親の名前と子の名前を結合
         const combinedName =
-          node.name && child.name
-            ? `${node.name} ${child.name}`
-            : node.name || child.name || "";
+          node.name && child.name ? `${node.name} ${child.name}` : node.name || child.name || "";
 
         // 一時的に名前を変更して出力
         const tempNode = { ...node, name: combinedName };
@@ -597,10 +547,7 @@ export function toReadableAriaTree(
  * @param tree AriaTree オブジェクト
  * @param maxLinks 最大表示リンク数（デフォルト: 60）
  */
-export function ariaTreeToString(
-  tree: AriaTree,
-  maxLinks: number = 60
-): string {
+export function ariaTreeToString(tree: AriaTree, maxLinks: number = 60): string {
   // ツリー内のリンク総数をカウント
   const totalLinks = countLinks(tree.root);
 
@@ -631,8 +578,7 @@ export function ariaTreeToString(
         (!node.children ||
           node.children.length === 0 ||
           node.children.every(
-            (child) =>
-              !child.name && (!child.children || child.children.length === 0)
+            (child) => !child.name && (!child.children || child.children.length === 0)
           )))
     ) {
       return "";
@@ -747,9 +693,7 @@ export function ariaTreeToString(
         const child = node.children[0];
         // 親の名前と子の名前を結合
         const combinedName =
-          node.name && child.name
-            ? `${node.name} ${child.name}`
-            : node.name || child.name || "";
+          node.name && child.name ? `${node.name} ${child.name}` : node.name || child.name || "";
 
         // 一時的に名前を変更して出力
         const tempNode = { ...node, name: combinedName };

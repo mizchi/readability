@@ -109,17 +109,9 @@ export function getAccessibleName(element: VElement): string | undefined {
   }
 
   // 見出し要素、リンク、ボタンなどはテキストコンテンツを名前として使用
-  const isNameFromContent = [
-    "a",
-    "button",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "label",
-  ].includes(element.tagName);
+  const isNameFromContent = ["a", "button", "h1", "h2", "h3", "h4", "h5", "h6", "label"].includes(
+    element.tagName
+  );
 
   if (isNameFromContent) {
     const text = getInnerText(element);
@@ -193,10 +185,7 @@ export function getAriaNodeType(element: VElement): AriaNodeType {
   };
 
   // テキストノードの子を持つ要素で、他のロールがない場合はテキストとして扱う
-  if (
-    role === "generic" &&
-    element.children.some((child) => child.nodeType === "text")
-  ) {
+  if (role === "generic" && element.children.some((child) => child.nodeType === "text")) {
     return "text";
   }
 
@@ -234,8 +223,7 @@ export function buildAriaNode(element: VElement): AriaNode {
   // チェックボックスや選択状態
   if (type === "checkbox" || type === "radio") {
     node.checked =
-      element.attributes.checked !== undefined ||
-      getAttribute(element, "aria-checked") === "true";
+      element.attributes.checked !== undefined || getAttribute(element, "aria-checked") === "true";
   }
 
   if (type === "option" || type === "tab") {
@@ -266,20 +254,17 @@ export function buildAriaNode(element: VElement): AriaNode {
   }
 
   // 値の範囲（スライダーなど）
-  const valuemin =
-    getAttribute(element, "aria-valuemin") || element.attributes.min;
+  const valuemin = getAttribute(element, "aria-valuemin") || element.attributes.min;
   if (valuemin) {
     node.valuemin = parseFloat(valuemin);
   }
 
-  const valuemax =
-    getAttribute(element, "aria-valuemax") || element.attributes.max;
+  const valuemax = getAttribute(element, "aria-valuemax") || element.attributes.max;
   if (valuemax) {
     node.valuemax = parseFloat(valuemax);
   }
 
-  const valuetext =
-    getAttribute(element, "aria-valuetext") || element.attributes.value;
+  const valuetext = getAttribute(element, "aria-valuetext") || element.attributes.value;
   if (valuetext) {
     node.valuetext = valuetext;
   }

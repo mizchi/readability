@@ -16,13 +16,15 @@
 
 関連記事
 
-* [![monster-hunter-wilds-20250527-341371-header](https://automaton-media.com/wp-content/uploads/2025/05/monster-hunter-wilds-20250527-341371-header-150x90.jpg)
+- [![monster-hunter-wilds-20250527-341371-header](https://automaton-media.com/wp-content/uploads/2025/05/monster-hunter-wilds-20250527-341371-header-150x90.jpg)
 
 『モンスターハンターワイルズ』ディレクターいわく、「豪鬼」は本当に拳で狩猟できる。高難度モンスター狩猟も”不可能ではない”](https://automaton-media.com/articles/newsjp/monster-hunter-wilds-20250527-341371/)
-* [![240422_LAW_4m_SIECP_banner](https://automaton-media.com/wp-content/uploads/2025/03/loawson-20250324-332249-header-150x90.jpg)
+
+- [![240422_LAW_4m_SIECP_banner](https://automaton-media.com/wp-content/uploads/2025/03/loawson-20250324-332249-header-150x90.jpg)
 
 PSストアカード1万円券以上をローソンで買えば「最大10万Pontaポイント/dポイント」当たる。1週間限定の運試しキャンペーン開幕](https://automaton-media.com/articles/newsjp/loawson-20250321-332249/)
-* [![monster-hunter-wilds-20250321-332314-header](https://automaton-media.com/wp-content/uploads/2025/03/monster-hunter-wilds-20250321-332314-header-150x90.jpg)
+
+- [![monster-hunter-wilds-20250321-332314-header](https://automaton-media.com/wp-content/uploads/2025/03/monster-hunter-wilds-20250321-332314-header-150x90.jpg)
 
 「モンスターハンターワイルズ ショーケース」3月25日23時より配信決定。約15分にわたり無料アプデ第1弾の配信日や、主な内容について紹介](https://automaton-media.com/articles/newsjp/monster-hunter-wilds-20250321-332314/)
 

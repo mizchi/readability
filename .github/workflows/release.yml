@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -11,59 +11,59 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: 9
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22.x
-        cache: 'pnpm'
-    
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-    
-    - name: Run tests
-      run: pnpm test
-    
-    - name: Build
-      run: pnpm run build
-    
-    - name: Build DXT
-      run: pnpm run build:dxt
-    
-    - name: Pack DXT
-      run: |
-        # Try to install and use dxt if available
-        if pnpm view dxt >/dev/null 2>&1; then
-          pnpm add -g dxt
-          dxt pack .
-        else
-          # Fallback: create a simple zip file as .dxt
-          echo "Creating DXT package manually..."
-          zip -r readability-${{ github.ref_name }}.dxt \
-            dist/ \
-            src/ \
-            package.json \
-            README.md \
-            LICENSE \
-            -x "*.test.*" -x "*/__tests__/*"
-        fi
-    
-    - name: Create Release
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        tag_name="${{ github.ref_name }}"
-        dxt_file=$(ls -1 *.dxt | head -n 1)
-        
-        gh release create "$tag_name" \
-          --title "Release $tag_name" \
-          --generate-notes \
-          "$dxt_file"
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Build DXT
+        run: pnpm run build:dxt
+
+      - name: Pack DXT
+        run: |
+          # Try to install and use dxt if available
+          if pnpm view dxt >/dev/null 2>&1; then
+            pnpm add -g dxt
+            dxt pack .
+          else
+            # Fallback: create a simple zip file as .dxt
+            echo "Creating DXT package manually..."
+            zip -r readability-${{ github.ref_name }}.dxt \
+              dist/ \
+              src/ \
+              package.json \
+              README.md \
+              LICENSE \
+              -x "*.test.*" -x "*/__tests__/*"
+          fi
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag_name="${{ github.ref_name }}"
+          dxt_file=$(ls -1 *.dxt | head -n 1)
+
+          gh release create "$tag_name" \
+            --title "Release $tag_name" \
+            --generate-notes \
+            "$dxt_file"

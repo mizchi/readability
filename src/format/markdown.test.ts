@@ -342,9 +342,7 @@ Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
         .replace(/[ \t]+/g, " ")
         .replace(/\n+/g, "\n")
         .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(normalize(toMarkdown(elementToConvert))).toBe(normalize(expectedMarkdown));
   });
 
   test("should convert table without thead", () => {
@@ -375,9 +373,7 @@ Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
         .replace(/[ \t]+/g, " ")
         .replace(/\n+/g, "\n")
         .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(normalize(toMarkdown(elementToConvert))).toBe(normalize(expectedMarkdown));
   });
 
   test("should convert table with varying columns (padded)", () => {
@@ -405,9 +401,7 @@ Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
         .replace(/[ \t]+/g, " ")
         .replace(/\n+/g, "\n")
         .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(normalize(toMarkdown(elementToConvert))).toBe(normalize(expectedMarkdown));
   });
 
   test("should handle nested blockquotes", () => {
@@ -433,9 +427,7 @@ Just backticks: \`\` \` \`\` and \`\`\` \`\` \`\`\``;
         .replace(/\n{2,}/g, "\n")
         .replace(/^ +/gm, "")
         .trim();
-    expect(normalize(toMarkdown(elementToConvert))).toBe(
-      normalize(expectedMarkdown)
-    );
+    expect(normalize(toMarkdown(elementToConvert))).toBe(normalize(expectedMarkdown));
   });
 
   // TODO: Add tests for footnotes

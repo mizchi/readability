@@ -48,14 +48,9 @@ export interface VDocument {
 export type Parser = (html: string) => VDocument | VElement; // Can return a full document or just a root element (fragment)
 
 // Type guard to check if a node is a VElement
-export function isVElement(
-  node: VNode | VDocument | VElement
-): node is VElement {
+export function isVElement(node: VNode | VDocument | VElement): node is VElement {
   return (
-    typeof node === "object" &&
-    node !== null &&
-    "nodeType" in node &&
-    node.nodeType === "element"
+    typeof node === "object" && node !== null && "nodeType" in node && node.nodeType === "element"
   );
 }
 

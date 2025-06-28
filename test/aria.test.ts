@@ -200,16 +200,13 @@ describe("ARIA Snapshot Utilities", () => {
     // 意味のないノードが削除されているか
     const hasGenericWithoutName = compressedNode.children?.some(
       (child) =>
-        child.type === "generic" &&
-        !child.name &&
-        (!child.children || child.children.length === 0)
+        child.type === "generic" && !child.name && (!child.children || child.children.length === 0)
     );
     expect(hasGenericWithoutName).toBeFalsy();
 
     // 子を一つしか持たないtextの入れ子がたたまれているか
     const nestedTextNode = compressedNode.children?.find(
-      (child) =>
-        child.type === "text" && child.name?.includes("ネストされたテキスト")
+      (child) => child.type === "text" && child.name?.includes("ネストされたテキスト")
     );
     expect(nestedTextNode).toBeDefined();
     expect(nestedTextNode?.children).toBeUndefined();

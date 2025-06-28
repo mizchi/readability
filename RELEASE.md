@@ -3,11 +3,13 @@
 ## 自動リリース（推奨）
 
 1. バージョンを更新
+
    ```bash
    npm version patch  # または minor, major
    ```
 
 2. タグをプッシュ
+
    ```bash
    git push origin main --tags
    ```
@@ -21,6 +23,7 @@
 ## 手動リリース
 
 1. ビルドとパッケージ作成
+
    ```bash
    npm install
    npm run build
@@ -40,15 +43,18 @@
 ## Readability MCP Server v0.6.8
 
 ### 新機能
+
 - DXT (Desktop Extensions) サポートを追加
 - Claude Desktopでワンクリックインストール可能に
 
 ### インストール方法
+
 1. `readability-0.6.8.dxt` をダウンロード
 2. Claude Desktopを開く
 3. .dxtファイルをドラッグ&ドロップ
 4. "Install" をクリック
 
 ### 使用方法
+
 `read_url_content_as_markdown` ツールを使用してWebページから読みやすいコンテンツを抽出できます。
 ```
