@@ -101,3 +101,8 @@ export async function startMcpServer() {
   await server.connect(transport);
   console.log("MCP server is running. Waiting for requests...");
 }
+
+// Run if called directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  startMcpServer();
+}

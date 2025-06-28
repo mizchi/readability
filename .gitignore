@@ -16,3 +16,10 @@ out/cache
 **/_meta/
 out
 out-*
+
+# DXT build output
+*.dxt
+
+# Package lock files (using pnpm)
+package-lock.json
+yarn.lock
