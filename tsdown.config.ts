@@ -1,21 +1,38 @@
 import { defineConfig } from 'tsdown'
 
-export default defineConfig({
-  entry: ['mcp.ts'],
-  format: 'esm',
-  target: 'node20',
-  external: [],
-  clean: true,
-  outDir: 'dist-mcp',
-  bundle: true,
-  minify: true,
-  platform: 'node',
-  define: {
-    'import.meta.vitest': 'undefined',
+export default defineConfig([
+  // Library build (replacing vite)
+  {
+    entry: ['src/index.ts'],
+    format: 'esm',
+    target: 'esnext',
+    external: ['htmlparser2'],
+    clean: true,
+    outDir: 'dist',
+    bundle: true,
+    minify: true,
+    platform: 'neutral',
+    sourcemap: true,
+    dts: true,
   },
-  esbuild: {
-    banner: {
-      js: '#!/usr/bin/env node',
+  // MCP server bundle
+  {
+    entry: ['mcp.ts'],
+    format: 'esm',
+    target: 'node20',
+    external: [],
+    clean: false,
+    outDir: 'dist-mcp',
+    bundle: true,
+    minify: true,
+    platform: 'node',
+    define: {
+      'import.meta.vitest': 'undefined',
+    },
+    esbuild: {
+      banner: {
+        js: '#!/usr/bin/env node',
+      },
     },
   },
-})
+])

@@ -6,8 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "vite build && npm run build:mcp",
-    "build:mcp": "tsdown",
+    "build": "tsdown",
     "lint": "eslint . && prettier Readability.js JSDOMParser.js test/*.js --check",
     "test": "vitest --run src crawler",
     "test:original": "vitest --run test",
@@ -44,8 +43,6 @@
     "tsdown": "^0.12.9",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "vite": "^6.2.3",
-    "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.0.9",
     "xml-name-validator": "^5.0.0"
   },
