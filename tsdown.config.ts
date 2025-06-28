@@ -17,7 +17,7 @@ export default defineConfig([
   },
   // MCP server bundle
   {
-    entry: ['mcp.ts'],
+    entry: ['src/mcp.ts'],
     format: 'esm',
     target: 'node20',
     external: [],
@@ -29,6 +29,23 @@ export default defineConfig([
     define: {
       'import.meta.vitest': 'undefined',
     },
+    esbuild: {
+      banner: {
+        js: '#!/usr/bin/env node',
+      },
+    },
+  },
+  // DXT entry point
+  {
+    entry: ['src/run_mcp.ts'],
+    format: 'esm',
+    target: 'node20',
+    external: [],
+    clean: false,
+    outDir: 'dist',
+    bundle: true,
+    minify: true,
+    platform: 'node',
     esbuild: {
       banner: {
         js: '#!/usr/bin/env node',
