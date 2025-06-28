@@ -1,0 +1,48 @@
+{
+  "dxt_version": "0.1",
+  "name": "readability",
+  "version": "0.6.8",
+  "description": "Extract readable content from web pages and convert them to markdown",
+  "author": {
+    "name": "mizchi"
+  },
+  "homepage": "https://github.com/mizchi/readability",
+  "license": "Apache-2.0",
+  "server": {
+    "type": "node",
+    "entry_point": "cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/cli.js", "--mcp"]
+    }
+  },
+  "tools": [
+    {
+      "name": "read_url_content_as_markdown",
+      "description": "Fetch a URL and extract readable content as markdown",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The URL to fetch and extract readable content from"
+          },
+          "charThreshold": {
+            "type": "number",
+            "description": "Character threshold for content extraction",
+            "default": 100
+          }
+        },
+        "required": ["url"]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "readability://info",
+      "name": "Readability Server Info",
+      "description": "Information about the Readability MCP server"
+    }
+  ]
+}
