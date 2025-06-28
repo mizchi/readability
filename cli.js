@@ -40,8 +40,8 @@ if (
 async function main() {
   // before parse
   if (process.argv.includes("--mcp") || process.argv.includes("-v")) {
-    const mod = await import("./dist/mcp.js");
-    await mod.startMcpServer();
+    const { startMcpServer } = await import("./src/mcp-server.js");
+    await startMcpServer();
     return;
   }
 
@@ -71,8 +71,8 @@ async function main() {
     allowPositionals: true,
   });
   if (parsed.values.mcp) {
-    const mod = await import("./dist/mcp.js");
-    await mod.startMcpServer();
+    const { startMcpServer } = await import("./src/mcp-server.js");
+    await startMcpServer();
     return;
   }
 
