@@ -9,7 +9,7 @@ export default defineConfig([
     external: ['htmlparser2'],
     clean: true,
     outDir: 'dist',
-    bundle: true,
+    unbundle: false,
     minify: true,
     platform: 'neutral',
     sourcemap: true,
@@ -23,6 +23,7 @@ export default defineConfig([
     external: [],
     clean: false,
     outDir: 'dist',
+    unbundle: false,
     bundle: true,
     minify: true,
     platform: 'node',
@@ -35,7 +36,7 @@ export default defineConfig([
       },
     },
   },
-  // DXT entry point
+  // DXT entry point - full bundle for standalone execution
   {
     entry: ['src/run_mcp.ts'],
     format: 'esm',
@@ -43,7 +44,7 @@ export default defineConfig([
     external: [],
     clean: false,
     outDir: 'dist',
-    bundle: true,
+    unbundle: false,
     minify: true,
     platform: 'node',
     esbuild: {

@@ -1,5 +1,11 @@
-node_modules/
-*.map
+# Include only necessary dependencies for MCP server
+node_modules/*
+!node_modules/@modelcontextprotocol/
+!node_modules/zod/
+!node_modules/htmlparser2/
+
+# Source files
+src/test/
 *.test.ts
 *.test.js
 test/
@@ -7,6 +13,8 @@ tests/
 __tests__/
 *.spec.ts
 *.spec.js
+
+# Build and config files
 .git/
 .github/
 docs/
@@ -19,13 +27,18 @@ vitest.config.ts
 vite.config.ts
 tsconfig.json
 .vscode/
-*.md
-!LICENSE.md
+*.map
 *.lock
 *.log
 .DS_Store
 out/
 out-*/
+
+# Documentation
+*.md
+!LICENSE.md
+
+# DXT specific
 *.dxt
 mcp.ts
 tsdown.config.ts
