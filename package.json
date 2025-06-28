@@ -48,7 +48,6 @@
   },
   "files": [
     "cli.js",
-    "dist-mcp/mcp.js",
     "src",
     "dist"
   ],

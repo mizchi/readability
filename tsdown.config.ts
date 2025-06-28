@@ -22,7 +22,7 @@ export default defineConfig([
     target: 'node20',
     external: [],
     clean: false,
-    outDir: 'dist-mcp',
+    outDir: 'dist',
     bundle: true,
     minify: true,
     platform: 'node',

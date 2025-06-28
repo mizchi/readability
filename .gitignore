@@ -10,7 +10,6 @@ node_modules
 *.xpi
 
 dist
-dist-mcp
 # .crawler_cache # 削除
 out/meta
 out/cache
