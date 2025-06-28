@@ -78,7 +78,7 @@ The [JS++](/wiki/JS%2B%2B "JS++") programming language, released in 2011, is a s
 
 * <link /><cite>Siek, Jeremy G.; Vitousek, Michael M.; Cimini, Matteo; Boyland, John Tang (2015). Ball, Thomas; Bodik, Rastislav; Krishnamurthi, Shriram; Lerner, Benjamin S.; Morrisett, Greg (eds.). *Refined Criteria for Gradual Typing*. Leibniz International Proceedings in Informatics. Vol. 32. Dagstuhl, Germany: Schloss Dagstuhl–Leibniz-Zentrum fuer Informatik. pp. 274–293. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.4230/lipics.snapl.2015.274](https://doi.org/10.4230%2Flipics.snapl.2015.274). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [<bdi>9783939897804</bdi>](/wiki/Special:BookSources/9783939897804 "Special:BookSources/9783939897804"). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [15383644](https://api.semanticscholar.org/CorpusID:15383644).</cite>
 
-Retrieved from "[https://en.wikipedia.org/w/index.php?title=Gradual\_typing&oldid=1280551774](https://en.wikipedia.org/w/index.php?title=Gradual_typing&oldid=1280551774)"
+Retrieved from "[https://en.wikipedia.org/w/index.php?title=Gradual\_typing&oldid=1297107097](https://en.wikipedia.org/w/index.php?title=Gradual_typing&oldid=1297107097)"
 
 [Category](/wiki/Help:Category "Help:Category"):
 * [Type systems](/wiki/Category:Type_systems "Category:Type systems")
