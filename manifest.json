@@ -1,7 +1,7 @@
 {
   "dxt_version": "0.1",
   "name": "readability",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "Extract readable content from web pages and convert them to markdown",
   "author": {
     "name": "mizchi"
