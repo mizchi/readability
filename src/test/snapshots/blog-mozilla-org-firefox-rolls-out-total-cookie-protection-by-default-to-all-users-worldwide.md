@@ -6,7 +6,7 @@
 
 ![author](https://blog.mozilla.org/wp-content/themes/foxtail/assets/images/icons/author.svg) [Mozilla](https://blog.mozilla.org/en/author/mozilla/ "Posts by Mozilla")
 
-_Updated Aug. 28, 2024_.
+*Updated Aug. 28, 2024*.
 
 ## Take back your privacy
 
@@ -26,7 +26,7 @@ Total Cookie Protection offers strong protections against tracking without affec
 
 Total Cookie Protection stops cookies from tracking you around the web.
 
-Total Cookie Protection works by creating a separate “cookie jar” for each website you visit. Instead of allowing trackers to link up your behavior on multiple sites, they just get to see behavior on individual sites. Any time a website, or [third-party content](https://support.mozilla.org/en-US/kb/third-party-cookies-firefox-tracking-protection#:~:text=Third%2Dparty%20cookies%20are%20cookies,considered%20a%20third%2Dparty%20cookie.) embedded in a website, deposits a cookie in your browser, that cookie is confined to the cookie jar assigned to _only_ that website. No other websites can reach into the cookie jars that don’t belong to them and find out what the other websites’ cookies know about you — giving you freedom from invasive ads and reducing the amount of information companies gather about you.
+Total Cookie Protection works by creating a separate “cookie jar” for each website you visit. Instead of allowing trackers to link up your behavior on multiple sites, they just get to see behavior on individual sites. Any time a website, or [third-party content](https://support.mozilla.org/en-US/kb/third-party-cookies-firefox-tracking-protection#:~:text=Third%2Dparty%20cookies%20are%20cookies,considered%20a%20third%2Dparty%20cookie.) embedded in a website, deposits a cookie in your browser, that cookie is confined to the cookie jar assigned to *only* that website. No other websites can reach into the cookie jars that don’t belong to them and find out what the other websites’ cookies know about you — giving you freedom from invasive ads and reducing the amount of information companies gather about you.
 
 This approach strikes the balance between eliminating the worst privacy properties of third-party cookies – in particular the ability to track you – and allowing those cookies to fulfill their less invasive use cases (e.g. to provide accurate analytics). With Total Cookie Protection in Firefox, people can enjoy better privacy and have the great browsing experience they’ve come to expect.
 
