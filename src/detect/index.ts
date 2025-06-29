@@ -31,13 +31,23 @@ export interface AnalyzeOptions {
    * ヘッダー内のナビゲーションのみを対象とするか
    */
   headerNavigationOnly?: boolean;
+
+  /**
+   * ドキュメントサイトモード（サイドバーナビゲーションを優先）
+   */
+  documentMode?: boolean;
 }
 
 /**
  * ページ構造を総合的に解析する
  */
 export function analyzePageStructure(html: string, options: AnalyzeOptions = {}): PageStructure {
-  const { extractContent = false, maxNavigations = 10, headerNavigationOnly = false } = options;
+  const { 
+    extractContent = false, 
+    maxNavigations = 10, 
+    headerNavigationOnly = false,
+    documentMode = false 
+  } = options;
 
   // HTMLを直接パースしてARIAツリーを構築
   // ナビゲーション・ヘッダー検出のため、圧縮しないARIAツリーを使用
@@ -55,9 +65,23 @@ export function analyzePageStructure(html: string, options: AnalyzeOptions = {})
     navigations = navigations.filter((nav) => nav.location === "header");
   }
 
+  // ドキュメントモードの場合、サイドバーナビゲーションを優先
+  let effectiveMaxNavigations = maxNavigations;
+  if (documentMode) {
+    // サイドバー内のナビゲーションを検出
+    const sidebar = findSidebar(ariaTree.root);
+    if (sidebar) {
+      const sidebarNavigations = detectNavigations(sidebar);
+      // サイドバーナビゲーションを優先的に追加
+      navigations = [...sidebarNavigations, ...navigations];
+    }
+    // ドキュメントモードではより多くのナビゲーションを保持
+    effectiveMaxNavigations = maxNavigations * 2;
+  }
+
   // 最大数で制限
-  if (navigations.length > maxNavigations) {
-    navigations = prioritizeNavigations(navigations).slice(0, maxNavigations);
+  if (navigations.length > effectiveMaxNavigations) {
+    navigations = prioritizeNavigations(navigations, documentMode).slice(0, effectiveMaxNavigations);
   }
 
   // 特定の要素を抽出
@@ -87,9 +111,20 @@ export function analyzePageStructure(html: string, options: AnalyzeOptions = {})
 /**
  * ナビゲーションの優先順位付け
  */
-function prioritizeNavigations(navigations: NavigationInfo[]): NavigationInfo[] {
+function prioritizeNavigations(navigations: NavigationInfo[], documentMode: boolean = false): NavigationInfo[] {
   // 優先順位マップ
-  const priorityMap = {
+  const priorityMap = documentMode ? {
+    // ドキュメントモードではTOCとローカルナビゲーションを優先
+    toc: 10,
+    local: 9,
+    global: 8,
+    breadcrumb: 7,
+    utility: 6,
+    pagination: 5,
+    footer: 4,
+    social: 3,
+  } : {
+    // 通常モード
     global: 10,
     breadcrumb: 9,
     toc: 8,
@@ -103,6 +138,14 @@ function prioritizeNavigations(navigations: NavigationInfo[]): NavigationInfo[] 
   return navigations.sort((a, b) => {
     const priorityA = priorityMap[a.type] || 0;
     const priorityB = priorityMap[b.type] || 0;
+
+    // ドキュメントモードでは、サイドバー内のナビゲーションを優先
+    if (documentMode) {
+      const aInSidebar = a.location === "sidebar";
+      const bInSidebar = b.location === "sidebar";
+      if (aInSidebar && !bInSidebar) return -1;
+      if (!aInSidebar && bInSidebar) return 1;
+    }
 
     // 優先順位が同じ場合は、アイテム数で判定
     if (priorityA === priorityB) {

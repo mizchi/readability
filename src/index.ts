@@ -72,3 +72,7 @@ export type {
   LogoInfo,
   SiteTitleInfo,
 } from "./detect/index.ts";
+
+// Export document-specific analysis functions and types
+export { analyzeDocumentStructure, extractDocumentContent } from "./detect/document.ts";
+export type { DocumentStructure, DocumentContent, SectionInfo } from "./detect/document.ts";
