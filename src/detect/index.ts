@@ -21,12 +21,12 @@ export interface AnalyzeOptions {
    * 本文も抽出するかどうか
    */
   extractContent?: boolean;
-  
+
   /**
    * 最大ナビゲーション数（パフォーマンス対策）
    */
   maxNavigations?: number;
-  
+
   /**
    * ヘッダー内のナビゲーションのみを対象とするか
    */
@@ -36,48 +36,41 @@ export interface AnalyzeOptions {
 /**
  * ページ構造を総合的に解析する
  */
-export function analyzePageStructure(
-  html: string, 
-  options: AnalyzeOptions = {}
-): PageStructure {
-  const {
-    extractContent = false,
-    maxNavigations = 10,
-    headerNavigationOnly = false,
-  } = options;
-  
+export function analyzePageStructure(html: string, options: AnalyzeOptions = {}): PageStructure {
+  const { extractContent = false, maxNavigations = 10, headerNavigationOnly = false } = options;
+
   // HTMLを直接パースしてARIAツリーを構築
   // ナビゲーション・ヘッダー検出のため、圧縮しないARIAツリーを使用
   const doc = parseHTML(html);
   const ariaTree = buildAriaTree(doc, { compress: false });
-  
+
   // ヘッダーを検出
   const headers = detectHeaders(ariaTree.root);
-  
+
   // ナビゲーションを検出
   let navigations = detectNavigations(ariaTree.root);
-  
+
   // オプションに基づいてフィルタリング
   if (headerNavigationOnly) {
-    navigations = navigations.filter(nav => nav.location === "header");
+    navigations = navigations.filter((nav) => nav.location === "header");
   }
-  
+
   // 最大数で制限
   if (navigations.length > maxNavigations) {
     navigations = prioritizeNavigations(navigations).slice(0, maxNavigations);
   }
-  
+
   // 特定の要素を抽出
-  const mainHeader = headers.find(h => h.type === "main");
-  const mainNavigation = navigations.find(n => n.type === "global");
-  const breadcrumb = navigations.find(n => n.type === "breadcrumb");
-  const toc = navigations.find(n => n.type === "toc");
-  
+  const mainHeader = headers.find((h) => h.type === "main");
+  const mainNavigation = navigations.find((n) => n.type === "global");
+  const breadcrumb = navigations.find((n) => n.type === "breadcrumb");
+  const toc = navigations.find((n) => n.type === "toc");
+
   // ページ構造要素を検出
   const mainContent = findMainContent(ariaTree.root);
   const sidebar = findSidebar(ariaTree.root);
   const footer = findFooter(ariaTree.root);
-  
+
   return {
     headers,
     navigations,
@@ -106,16 +99,16 @@ function prioritizeNavigations(navigations: NavigationInfo[]): NavigationInfo[] 
     footer: 4,
     social: 3,
   };
-  
+
   return navigations.sort((a, b) => {
     const priorityA = priorityMap[a.type] || 0;
     const priorityB = priorityMap[b.type] || 0;
-    
+
     // 優先順位が同じ場合は、アイテム数で判定
     if (priorityA === priorityB) {
       return b.items.length - a.items.length;
     }
-    
+
     return priorityB - priorityA;
   });
 }
@@ -130,37 +123,37 @@ function findMainContent(root: AriaNode): AriaNode | undefined {
     if (element && (element.tagName === "main" || element.attributes?.role === "main")) {
       return node;
     }
-    
+
     if (node.children) {
       for (const child of node.children) {
         const main = findMain(child);
         if (main) return main;
       }
     }
-    
+
     return null;
   }
-  
+
   const main = findMain(root);
   if (main) return main;
-  
+
   // article要素を探す（フォールバック）
   function findArticle(node: AriaNode): AriaNode | null {
     const element = node.originalElement?.deref();
     if (element && element.tagName === "article") {
       return node;
     }
-    
+
     if (node.children) {
       for (const child of node.children) {
         const article = findArticle(child);
         if (article) return article;
       }
     }
-    
+
     return null;
   }
-  
+
   const article = findArticle(root);
   return article || undefined;
 }
@@ -171,24 +164,25 @@ function findMainContent(root: AriaNode): AriaNode | undefined {
 function findSidebar(root: AriaNode): AriaNode | undefined {
   function find(node: AriaNode): AriaNode | null {
     const element = node.originalElement?.deref();
-    if (element && (
-      element.tagName === "aside" || 
-      element.attributes?.role === "complementary" ||
-      /\b(sidebar|aside)\b/i.test(element.className || "")
-    )) {
+    if (
+      element &&
+      (element.tagName === "aside" ||
+        element.attributes?.role === "complementary" ||
+        /\b(sidebar|aside)\b/i.test(element.className || ""))
+    ) {
       return node;
     }
-    
+
     if (node.children) {
       for (const child of node.children) {
         const sidebar = find(child);
         if (sidebar) return sidebar;
       }
     }
-    
+
     return null;
   }
-  
+
   const sidebar = find(root);
   return sidebar || undefined;
 }
@@ -199,38 +193,35 @@ function findSidebar(root: AriaNode): AriaNode | undefined {
 function findFooter(root: AriaNode): AriaNode | undefined {
   function find(node: AriaNode, depth: number = 0): AriaNode | null {
     const element = node.originalElement?.deref();
-    if (element && (
-      element.tagName === "footer" || 
-      element.attributes?.role === "contentinfo"
-    )) {
+    if (element && (element.tagName === "footer" || element.attributes?.role === "contentinfo")) {
       return node;
     }
-    
+
     // トップレベルに近いfooterクラスも検出
     if (depth <= 2 && element && /\bfooter\b/i.test(element.className || "")) {
       return node;
     }
-    
+
     if (node.children) {
       for (const child of node.children) {
         const footer = find(child, depth + 1);
         if (footer) return footer;
       }
     }
-    
+
     return null;
   }
-  
+
   const footer = find(root);
   return footer || undefined;
 }
 
 // Re-export types
 export type { HeaderInfo, LogoInfo, SiteTitleInfo } from "./header";
-export type { 
-  NavigationInfo, 
-  NavigationItem, 
-  NavigationType, 
+export type {
+  NavigationInfo,
+  NavigationItem,
+  NavigationType,
   NavigationLocation,
-  NavigationStructure 
+  NavigationStructure,
 } from "./navigation";

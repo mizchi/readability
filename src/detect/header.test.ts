@@ -14,11 +14,11 @@ describe("Header Detection", () => {
         </nav>
       </header>
     `;
-    
+
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const headers = detectHeaders(tree.root);
-    
+
     expect(headers).toHaveLength(1);
     expect(headers[0].type).toBe("main");
     expect(headers[0].contains.siteTitle?.text).toBe("My Website");
@@ -32,11 +32,11 @@ describe("Header Detection", () => {
         <span class="site-title">Example Corp</span>
       </div>
     `;
-    
+
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const headers = detectHeaders(tree.root);
-    
+
     expect(headers).toHaveLength(1);
     expect(headers[0].contains.logo?.alt).toBe("Company Logo");
     expect(headers[0].contains.siteTitle?.text).toBe("Example Corp");
@@ -55,11 +55,11 @@ describe("Header Detection", () => {
         </article>
       </body>
     `;
-    
+
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const headers = detectHeaders(tree.root);
-    
+
     expect(headers).toHaveLength(2);
     expect(headers[0].type).toBe("main");
     expect(headers[1].type).toBe("article");
@@ -71,11 +71,11 @@ describe("Header Detection", () => {
         <h1>Sticky Site</h1>
       </header>
     `;
-    
+
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const headers = detectHeaders(tree.root);
-    
+
     expect(headers[0].isSticky).toBe(true);
   });
 
@@ -88,11 +88,11 @@ describe("Header Detection", () => {
         </form>
       </header>
     `;
-    
+
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const headers = detectHeaders(tree.root);
-    
+
     expect(headers[0].contains.search).toBeDefined();
   });
 });
@@ -103,7 +103,7 @@ describe("Logo Detection", () => {
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const logo = detectLogo(tree.root);
-    
+
     expect(logo).toBeDefined();
     expect(logo?.alt).toBe("Company Logo");
     expect(logo?.src).toContain("logo.png");
@@ -114,7 +114,7 @@ describe("Logo Detection", () => {
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const logo = detectLogo(tree.root);
-    
+
     expect(logo).toBeDefined();
     expect(logo?.text).toBe("ACME Corp");
   });
@@ -126,7 +126,7 @@ describe("Site Title Detection", () => {
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const title = detectSiteTitle(tree.root);
-    
+
     expect(title).toBeDefined();
     expect(title?.text).toBe("My Awesome Blog");
     expect(title?.level).toBe(1);
@@ -137,7 +137,7 @@ describe("Site Title Detection", () => {
     const doc = parseHTML(html);
     const tree = buildAriaTree(doc);
     const title = detectSiteTitle(tree.root);
-    
+
     expect(title).toBeDefined();
     expect(title?.text).toBe("Corporate Website");
     expect(title?.level).toBe(0); // Not a heading element

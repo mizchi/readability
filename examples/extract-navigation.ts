@@ -89,19 +89,21 @@ pageStructure.navigations.forEach((nav, index) => {
   console.log("構造:", nav.structure);
   console.log("ラベル:", nav.label || "なし");
   console.log("アイテム数:", nav.items.length);
-  
+
   // アイテムの詳細を表示
   console.log("アイテム:");
   nav.items.forEach((item, i) => {
     const indent = "  ".repeat(item.level + 1);
     const current = item.isCurrent ? " (現在のページ)" : "";
     console.log(`${indent}${i + 1}. ${item.label} - ${item.href || "リンクなし"}${current}`);
-    
+
     // 子アイテムがある場合
     if (item.children && item.children.length > 0) {
       item.children.forEach((child, j) => {
         const childIndent = "  ".repeat(child.level + 1);
-        console.log(`${childIndent}${i + 1}.${j + 1}. ${child.label} - ${child.href || "リンクなし"}`);
+        console.log(
+          `${childIndent}${i + 1}.${j + 1}. ${child.label} - ${child.href || "リンクなし"}`
+        );
       });
     }
   });
@@ -113,17 +115,17 @@ console.log("\n\n=== 特定のナビゲーションタイプ ===");
 if (pageStructure.mainNavigation) {
   console.log("\nメインナビゲーション:");
   console.log("アイテム数:", pageStructure.mainNavigation.items.length);
-  console.log("アイテム:", pageStructure.mainNavigation.items.map(item => item.label).join(", "));
+  console.log("アイテム:", pageStructure.mainNavigation.items.map((item) => item.label).join(", "));
 }
 
 if (pageStructure.breadcrumb) {
   console.log("\nパンくずリスト:");
-  console.log("パス:", pageStructure.breadcrumb.items.map(item => item.label).join(" > "));
+  console.log("パス:", pageStructure.breadcrumb.items.map((item) => item.label).join(" > "));
 }
 
 if (pageStructure.toc) {
   console.log("\n目次:");
-  pageStructure.toc.items.forEach(item => {
+  pageStructure.toc.items.forEach((item) => {
     console.log(`- ${item.label} (${item.href})`);
   });
 }
@@ -136,21 +138,20 @@ const doc = readable(html);
 try {
   const structure = doc.getPageStructure({
     headerNavigationOnly: false, // すべてのナビゲーションを取得
-    maxNavigations: 10
+    maxNavigations: 10,
   });
-  
+
   console.log("Readableクラス経由で取得したナビゲーション数:", structure.navigations.length);
-  
+
   // ヘッダー内のナビゲーションのみ取得
   const headerOnlyStructure = doc.getPageStructure({
-    headerNavigationOnly: true
+    headerNavigationOnly: true,
   });
-  
+
   console.log("ヘッダー内のナビゲーション数:", headerOnlyStructure.navigations.length);
-  headerOnlyStructure.navigations.forEach(nav => {
+  headerOnlyStructure.navigations.forEach((nav) => {
     console.log(`- ${nav.type}: ${nav.items.length}個のアイテム`);
   });
-  
 } catch (error) {
   console.error("エラー:", error.message);
 }

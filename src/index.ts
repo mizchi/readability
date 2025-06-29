@@ -60,7 +60,7 @@ export { readable, type ReadableOptions } from "./readable.ts";
 
 // Export page structure analysis function and related types
 export { analyzePageStructure } from "./detect/index.ts";
-export type { 
+export type {
   PageStructure,
   AnalyzeOptions,
   HeaderInfo,

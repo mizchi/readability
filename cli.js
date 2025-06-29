@@ -20,7 +20,7 @@ async function fetchLoader(urlOrPath) {
       throw new Error(`Failed to read file ${urlOrPath}: ${err.message}`);
     }
   }
-  
+
   const res = await fetch(urlOrPath);
   if (!res.ok) {
     throw new Error(`Failed to fetch ${urlOrPath}: ${res.statusText}`);
@@ -134,22 +134,22 @@ async function main() {
    * @type {string}
    */
   let content;
-  
+
   // Handle navigation-related options
   if (parsed.values["nav-only"] || format === "nav" || format === "json") {
     const pageStructure = analyzePageStructure(html);
     let navigations = pageStructure.navigations;
-    
+
     // Filter by navigation type if specified
     if (parsed.values["nav-type"]) {
-      navigations = navigations.filter(nav => nav.type === parsed.values["nav-type"]);
+      navigations = navigations.filter((nav) => nav.type === parsed.values["nav-type"]);
     }
-    
+
     // Filter by navigation location if specified
     if (parsed.values["nav-location"]) {
-      navigations = navigations.filter(nav => nav.location === parsed.values["nav-location"]);
+      navigations = navigations.filter((nav) => nav.location === parsed.values["nav-location"]);
     }
-    
+
     // Create output object
     const navOutput = {
       url: url,
@@ -160,21 +160,27 @@ async function main() {
           acc[nav.type] = (acc[nav.type] || 0) + 1;
           return acc;
         }, {}),
-        mainNavigation: pageStructure.mainNavigation ? {
-          items: pageStructure.mainNavigation.items.map(item => item.label),
-        } : null,
-        breadcrumb: pageStructure.breadcrumb ? {
-          path: pageStructure.breadcrumb.items.map(item => item.label).join(" > "),
-        } : null,
-        toc: pageStructure.toc ? {
-          items: pageStructure.toc.items.map(item => ({
-            label: item.label,
-            href: item.href,
-          })),
-        } : null,
-      }
+        mainNavigation: pageStructure.mainNavigation
+          ? {
+              items: pageStructure.mainNavigation.items.map((item) => item.label),
+            }
+          : null,
+        breadcrumb: pageStructure.breadcrumb
+          ? {
+              path: pageStructure.breadcrumb.items.map((item) => item.label).join(" > "),
+            }
+          : null,
+        toc: pageStructure.toc
+          ? {
+              items: pageStructure.toc.items.map((item) => ({
+                label: item.label,
+                href: item.href,
+              })),
+            }
+          : null,
+      },
     };
-    
+
     content = JSON.stringify(navOutput, null, 2);
   } else if (format === "html") {
     content = toHTML(result.root);

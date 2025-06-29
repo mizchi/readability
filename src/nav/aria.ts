@@ -95,9 +95,18 @@ export function getAccessibleName(element: VElement): string | undefined {
   }
 
   // 見出し要素、リンク、ボタン、リストアイテムなどはテキストコンテンツを名前として使用
-  const isNameFromContent = ["a", "button", "h1", "h2", "h3", "h4", "h5", "h6", "label", "li"].includes(
-    element.tagName
-  );
+  const isNameFromContent = [
+    "a",
+    "button",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "label",
+    "li",
+  ].includes(element.tagName);
 
   if (isNameFromContent) {
     const text = getInnerText(element);

@@ -35,7 +35,7 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
   const parser = new Parser({
     onopentag(name, attributes) {
       const tagLower = name.toLowerCase();
-      
+
       // Handle special cases for html and body tags
       if (tagLower === "html") {
         // Update attributes on existing documentElement
@@ -47,7 +47,7 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
         currentElement = document.documentElement;
         return;
       }
-      
+
       if (tagLower === "body") {
         // Update attributes on existing body
         for (const [key, value] of Object.entries(attributes)) {
@@ -55,13 +55,13 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
         }
         if (attributes.id) document.body.id = attributes.id;
         if (attributes.class) document.body.className = attributes.class;
-        
+
         // If not already in documentElement, add it
         if (!bodyFound) {
           document.documentElement.children.push(document.body);
           bodyFound = true;
         }
-        
+
         currentElement = document.body;
         return;
       }
@@ -102,13 +102,13 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
     },
     onclosetag(name) {
       const tagLower = name.toLowerCase();
-      
+
       // Don't go above documentElement for html tag
       if (tagLower === "html") {
         currentElement = document.documentElement;
         return;
       }
-      
+
       // Return to parent element
       const parentRef = currentElement.parent;
       if (parentRef) {

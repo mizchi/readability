@@ -37,10 +37,10 @@ describe("Readability Core Tests", () => {
 
     test("should extract article content using readable()", () => {
       const doc = readable(BASIC_ARTICLE_HTML);
-      
+
       expect(doc.inferPageType()).toBe(PageType.ARTICLE);
       expect(doc.snapshot.root).not.toBeNull();
-      
+
       const markdown = doc.toMarkdown();
       expect(markdown).toContain("Test Article Title");
       expect(markdown).toContain("first paragraph");
@@ -49,7 +49,7 @@ describe("Readability Core Tests", () => {
 
     test("should extract metadata correctly", () => {
       const doc = readable(BASIC_ARTICLE_HTML);
-      
+
       expect(doc.snapshot.metadata.title).toBe("Test Article - Sample Blog");
       expect(doc.snapshot.metadata.siteName).toBeUndefined(); // No og:site_name in this example
     });
@@ -57,7 +57,7 @@ describe("Readability Core Tests", () => {
     test("should serialize and deserialize correctly", () => {
       const doc = readable(BASIC_ARTICLE_HTML);
       const serialized = doc.serialize();
-      
+
       const Readable = doc.constructor as any;
       const doc2 = Readable.load(serialized);
       expect(doc2.inferPageType()).toBe(PageType.ARTICLE);
@@ -112,7 +112,7 @@ describe("Readability Core Tests", () => {
 
     test("should extract content using extract()", () => {
       const result = extract(TEST_HTML, { charThreshold: 50 });
-      
+
       expect(result.root).not.toBeNull();
       expect(result.metadata.title).toBe("");
       expect(result.links.length).toBe(0);
@@ -120,7 +120,7 @@ describe("Readability Core Tests", () => {
 
     test("should extract ARIA tree", () => {
       const ariaTree = extractAriaTree(TEST_HTML);
-      
+
       expect(ariaTree).toBeDefined();
       expect(ariaTree.root).toBeDefined();
       expect(ariaTree.nodeCount).toBeGreaterThan(0);
@@ -151,7 +151,7 @@ describe("Readability Core Tests", () => {
     test("should convert to Markdown correctly", () => {
       const result = extract(FORMATTED_CONTENT_HTML, { charThreshold: 50 });
       const markdown = toMarkdown(result.root);
-      
+
       expect(markdown).toContain("# Formatting Test");
       expect(markdown).toContain("## Subheading");
       expect(markdown).toContain("**bold**");
@@ -165,7 +165,7 @@ describe("Readability Core Tests", () => {
     test("should convert to HTML correctly", () => {
       const result = extract(FORMATTED_CONTENT_HTML, { charThreshold: 50 });
       const html = toHTML(result.root);
-      
+
       expect(html).toContain("<h1>Formatting Test</h1>");
       expect(html).toContain("<strong>bold</strong>");
       expect(html).toContain("<em>italic</em>");
@@ -216,7 +216,7 @@ describe("Readability Core Tests", () => {
     test("should analyze link hierarchy", () => {
       const doc = readable(HTML_WITH_LINKS);
       const hierarchy = doc.getLinkHierarchy();
-      
+
       expect(hierarchy.parent.length).toBeGreaterThan(0);
       expect(hierarchy.external.length).toBeGreaterThan(0);
       expect(hierarchy.child.length).toBeGreaterThan(0);

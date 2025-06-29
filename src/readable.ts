@@ -268,10 +268,10 @@ export class Readable implements IReadable {
     if (!this.originalHTML) {
       throw new Error(
         "Page structure analysis requires the original HTML content. " +
-        "This method is only available when creating Readable instances with fromHTML()."
+          "This method is only available when creating Readable instances with fromHTML()."
       );
     }
-    
+
     return analyzePageStructure(this.originalHTML, options);
   }
 } // This closes the Readable class properly

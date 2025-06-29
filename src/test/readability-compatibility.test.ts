@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 describe("Readability Compatibility Tests", () => {
   describe("Test Pages Compatibility", () => {
     const TEST_PAGES_DIR = path.resolve(__dirname, "../../test/test-pages");
-    
+
     // 互換性を確認するテストケース
     const compatibilityTestCases = [
       {
@@ -30,7 +30,7 @@ describe("Readability Compatibility Tests", () => {
         shouldExtract: true,
       },
       {
-        name: "ACLU article", 
+        name: "ACLU article",
         dir: "aclu",
         shouldExtract: true,
       },
@@ -40,7 +40,7 @@ describe("Readability Compatibility Tests", () => {
       test(`${name} - should extract content similarly to original`, () => {
         const sourcePath = path.join(TEST_PAGES_DIR, dir, "source.html");
         const metadataPath = path.join(TEST_PAGES_DIR, dir, "expected-metadata.json");
-        
+
         // Skip if files don't exist
         if (!fs.existsSync(sourcePath) || !fs.existsSync(metadataPath)) {
           test.skip;
@@ -49,15 +49,15 @@ describe("Readability Compatibility Tests", () => {
 
         const source = fs.readFileSync(sourcePath, "utf-8");
         const expectedMetadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-        
+
         const doc = readable(source);
         const result = extract(source);
-        
+
         if (shouldExtract) {
           expect(result.root).not.toBeNull();
           expect(doc.inferPageType()).toBe(PageType.ARTICLE);
         }
-        
+
         // Check metadata extraction
         if (expectedMetadata.title) {
           expect(result.metadata.title).toBeTruthy();
@@ -129,7 +129,7 @@ describe("Readability Compatibility Tests", () => {
     patterns.forEach(({ name, html, shouldExtract }) => {
       test(name, () => {
         const result = extract(html, { charThreshold: 50 });
-        
+
         if (shouldExtract) {
           expect(result.root).not.toBeNull();
           const markdown = toMarkdown(result.root);
@@ -261,10 +261,13 @@ describe("Readability Compatibility Tests", () => {
 
   describe("Performance Characteristics", () => {
     test("should handle large documents efficiently", () => {
-      const paragraphs = Array(100).fill(null).map((_, i) => 
-        `<p>This is paragraph ${i + 1} with some content to make it substantial.</p>`
-      ).join("\n");
-      
+      const paragraphs = Array(100)
+        .fill(null)
+        .map(
+          (_, i) => `<p>This is paragraph ${i + 1} with some content to make it substantial.</p>`
+        )
+        .join("\n");
+
       const html = `
         <html>
           <body>
@@ -279,7 +282,7 @@ describe("Readability Compatibility Tests", () => {
       const startTime = performance.now();
       const result = extract(html, { charThreshold: 50 });
       const endTime = performance.now();
-      
+
       expect(result.root).not.toBeNull();
       expect(endTime - startTime).toBeLessThan(1000); // Should complete in less than 1 second
     });

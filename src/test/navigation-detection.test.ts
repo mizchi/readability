@@ -30,7 +30,7 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect main navigation", () => {
       const structure = analyzePageStructure(HTML_WITH_NAV);
-      
+
       expect(structure.navigations.length).toBeGreaterThan(0);
       expect(structure.mainNavigation).toBeDefined();
       expect(structure.mainNavigation?.type).toBe("global");
@@ -40,7 +40,7 @@ describe("Navigation Detection Tests", () => {
     test("should extract navigation items correctly", () => {
       const structure = analyzePageStructure(HTML_WITH_NAV);
       const nav = structure.mainNavigation!;
-      
+
       expect(nav.items[0].label).toBe("Home");
       expect(nav.items[0].href).toBe("/");
       expect(nav.items[1].label).toBe("About");
@@ -94,7 +94,7 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect breadcrumb navigation", () => {
       const structure = analyzePageStructure(BREADCRUMB_HTML);
-      
+
       expect(structure.breadcrumb).toBeDefined();
       expect(structure.breadcrumb?.type).toBe("breadcrumb");
       expect(structure.breadcrumb?.items.length).toBe(3);
@@ -102,18 +102,18 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect pagination navigation", () => {
       const structure = analyzePageStructure(PAGINATION_HTML);
-      
-      const pagination = structure.navigations.find(nav => nav.type === "pagination");
+
+      const pagination = structure.navigations.find((nav) => nav.type === "pagination");
       expect(pagination).toBeDefined();
       expect(pagination?.items.length).toBeGreaterThan(0);
     });
 
     test("should detect table of contents", () => {
       const structure = analyzePageStructure(TOC_HTML);
-      
+
       expect(structure.toc).toBeDefined();
       expect(structure.toc?.type).toBe("toc");
-      expect(structure.toc?.items.every(item => item.href?.startsWith("#"))).toBe(true);
+      expect(structure.toc?.items.every((item) => item.href?.startsWith("#"))).toBe(true);
     });
   });
 
@@ -150,11 +150,11 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect navigation in different locations", () => {
       const structure = analyzePageStructure(MULTI_LOCATION_HTML);
-      
-      const headerNav = structure.navigations.find(nav => nav.location === "header");
-      const sidebarNav = structure.navigations.find(nav => nav.location === "sidebar");
-      const footerNav = structure.navigations.find(nav => nav.location === "footer");
-      
+
+      const headerNav = structure.navigations.find((nav) => nav.location === "header");
+      const sidebarNav = structure.navigations.find((nav) => nav.location === "sidebar");
+      const footerNav = structure.navigations.find((nav) => nav.location === "footer");
+
       expect(headerNav).toBeDefined();
       expect(sidebarNav).toBeDefined();
       expect(footerNav).toBeDefined();
@@ -189,11 +189,11 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect nested navigation structure", () => {
       const structure = analyzePageStructure(NESTED_NAV_HTML);
-      
+
       const nav = structure.navigations[0];
       expect(nav?.structure).toBe("nested");
-      
-      const productsItem = nav?.items.find(item => item.label === "Products");
+
+      const productsItem = nav?.items.find((item) => item.label === "Products");
       expect(productsItem?.children).toBeDefined();
       expect(productsItem?.children?.length).toBe(2);
     });
@@ -225,7 +225,7 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect headers", () => {
       const structure = analyzePageStructure(HEADER_HTML);
-      
+
       expect(structure.headers.length).toBeGreaterThan(0);
       expect(structure.mainHeader).toBeDefined();
       expect(structure.mainHeader?.type).toBe("main");
@@ -233,7 +233,7 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect logo and site title", () => {
       const structure = analyzePageStructure(HEADER_HTML);
-      
+
       const mainHeader = structure.mainHeader!;
       expect(mainHeader.contains.logo).toBeDefined();
       expect(mainHeader.contains.siteTitle).toBeDefined();
@@ -271,7 +271,7 @@ describe("Navigation Detection Tests", () => {
 
     test("should detect all page structure elements", () => {
       const structure = analyzePageStructure(FULL_PAGE_HTML);
-      
+
       expect(structure.mainContent).toBeDefined();
       expect(structure.sidebar).toBeDefined();
       expect(structure.footer).toBeDefined();
@@ -298,18 +298,18 @@ describe("Navigation Detection Tests", () => {
 
     test("should respect maxNavigations option", () => {
       const structure = analyzePageStructure(COMPLEX_NAV_HTML, {
-        maxNavigations: 3
+        maxNavigations: 3,
       });
-      
+
       expect(structure.navigations.length).toBeLessThanOrEqual(3);
     });
 
     test("should respect headerNavigationOnly option", () => {
       const structure = analyzePageStructure(COMPLEX_NAV_HTML, {
-        headerNavigationOnly: true
+        headerNavigationOnly: true,
       });
-      
-      expect(structure.navigations.every(nav => nav.location === "header")).toBe(true);
+
+      expect(structure.navigations.every((nav) => nav.location === "header")).toBe(true);
     });
   });
 });

@@ -22,7 +22,7 @@ import { getNodeDepth, countLinks, assignWeightsToTree, filterNodesByWeight } fr
  */
 export function buildAriaTree(doc: VDocument, options: { compress?: boolean } = {}): AriaTree {
   const { compress = true } = options;
-  
+
   // ドキュメントのbody要素からツリーを構築
   const rootNode = buildBaseAriaNode(doc.body); // Use renamed function
 
@@ -34,11 +34,7 @@ export function buildAriaTree(doc: VDocument, options: { compress?: boolean } = 
 
     // ルートレベルでの入れ子も解消
     // ルートがtextで、子がある場合、意味のある子を直接ルートにする
-    if (
-      resultRoot.type === "text" &&
-      resultRoot.children &&
-      resultRoot.children.length > 0
-    ) {
+    if (resultRoot.type === "text" && resultRoot.children && resultRoot.children.length > 0) {
       // 意味のある子ノードを探す（main, article, sectionなど）
       const significantChild = resultRoot.children.find((child) =>
         ["main", "article", "section", "navigation", "banner", "contentinfo"].includes(child.type)
@@ -59,9 +55,7 @@ export function buildAriaTree(doc: VDocument, options: { compress?: boolean } = 
 
         // 子の名前をマージ
         if (child.name) {
-          resultRoot.name = resultRoot.name
-            ? `${resultRoot.name} ${child.name}`
-            : child.name;
+          resultRoot.name = resultRoot.name ? `${resultRoot.name} ${child.name}` : child.name;
         }
 
         // 子の子をルートに移動
