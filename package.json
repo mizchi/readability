@@ -1,6 +1,6 @@
 {
   "name": "@mizchi/readability",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "type": "module",
   "description": "A standalone version of the readability library used for Firefox Reader View.",
   "main": "dist/index.js",
