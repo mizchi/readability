@@ -41,8 +41,8 @@ jobs:
       - name: Pack DXT
         run: |
           # Try to install and use dxt if available
-          if pnpm view dxt >/dev/null 2>&1; then
-            pnpm add -g dxt
+          if pnpm add -g dxt 2>/dev/null; then
+            echo "Using dxt to create package..."
             dxt pack .
           else
             # Fallback: create a simple zip file as .dxt
