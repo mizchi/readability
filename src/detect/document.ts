@@ -3,6 +3,7 @@ import { parseHTML } from "../parsers/parser";
 import { buildAriaTree } from "../nav/readableAria";
 import { analyzePageStructure, type PageStructure, type AnalyzeOptions } from "./index";
 import type { NavigationInfo } from "./navigation";
+import { extractTextFromAriaNode } from "../aria/utils";
 
 /**
  * ドキュメントサイトの構造情報
@@ -207,7 +208,7 @@ export function extractDocumentContent(html: string): DocumentContent {
   
   // メインコンテンツを抽出
   if (structure.mainContent) {
-    result.content = extractTextFromAriaNode(structure.mainContent);
+    result.content = extractTextFromAriaNode(structure.mainContent, true);
   }
   
   // サイドバーナビゲーションを整形
@@ -238,21 +239,7 @@ export function extractDocumentContent(html: string): DocumentContent {
 /**
  * AriaNodeからテキストを抽出
  */
-function extractTextFromAriaNode(node: AriaNode): string {
-  let text = "";
-  
-  if (node.name) {
-    text += node.name + "\n";
-  }
-  
-  if (node.children) {
-    for (const child of node.children) {
-      text += extractTextFromAriaNode(child);
-    }
-  }
-  
-  return text;
-}
+// extractTextFromAriaNode is now imported from aria/utils
 
 /**
  * ナビゲーションをマークダウン形式に整形

@@ -1,5 +1,6 @@
 import type { AriaNode, VElement } from "../types";
 import { getAccessibleName } from "../nav/aria";
+import { extractTextFromAriaNode } from "../aria/utils";
 
 export type NavigationType =
   | "global" // グローバルナビゲーション（メインメニュー）
@@ -284,7 +285,7 @@ function extractItemFromListItem(li: AriaNode, level: number): NavigationItem | 
     const label = getAccessibleName(liElement);
     if (!label || label.trim() === "") {
       // テキストコンテンツを直接取得してみる
-      const textContent = getTextFromNode(li);
+      const textContent = extractTextFromAriaNode(li, false);
       if (textContent && textContent.trim() !== "") {
         return {
           label: textContent.trim(),
@@ -336,22 +337,7 @@ function extractDirectLinks(node: AriaNode, level: number): NavigationItem[] {
 /**
  * AriaNodeからテキストコンテンツを取得
  */
-function getTextFromNode(node: AriaNode): string {
-  let text = "";
-
-  // AriaNodeはnameプロパティを持つ
-  if (node.name) {
-    text += node.name;
-  }
-
-  if (node.children) {
-    for (const child of node.children) {
-      text += getTextFromNode(child);
-    }
-  }
-
-  return text;
-}
+// Use extractTextFromAriaNode from aria/utils
 
 function isNavigationElement(node: AriaNode): boolean {
   // AriaNodeのtypeをチェック
