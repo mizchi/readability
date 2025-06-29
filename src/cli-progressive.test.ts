@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 describe("CLI Progressive Analysis", () => {
   const cliPath = path.join(process.cwd(), "cli.js");
-  const testHtmlPath = path.join(process.cwd(), "test-progressive.html");
+  const testHtmlPath = path.join(process.cwd(), `test-progressive-${Date.now()}.html`);
 
   beforeAll(() => {
     // Create a test HTML file with enough content to pass default threshold

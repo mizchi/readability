@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 describe("CLI document mode", () => {
   const cliPath = path.join(process.cwd(), "cli.js");
-  const testHtmlPath = path.join(process.cwd(), "test-doc.html");
+  const testHtmlPath = path.join(process.cwd(), `test-doc-${Date.now()}.html`);
 
   beforeAll(() => {
     // Create a test HTML file for documentation site
@@ -133,7 +133,7 @@ describe("CLI document mode", () => {
   });
 
   it("should output to file with -o option", async () => {
-    const outputPath = path.join(process.cwd(), "test-output.md");
+    const outputPath = path.join(process.cwd(), `test-output-${Date.now()}.md`);
 
     await execAsync(`node ${cliPath} --doc-mode -o ${outputPath} ${testHtmlPath}`);
 
@@ -146,7 +146,7 @@ describe("CLI document mode", () => {
   });
 
   it("should handle sites without navigation gracefully", async () => {
-    const simpleHtmlPath = path.join(process.cwd(), "test-simple.html");
+    const simpleHtmlPath = path.join(process.cwd(), `test-simple-${Date.now()}.html`);
     const simpleHtml = `
       <!DOCTYPE html>
       <html>
@@ -186,7 +186,7 @@ describe("CLI document mode", () => {
 
 describe("CLI navigation options", () => {
   const cliPath = path.join(process.cwd(), "cli.js");
-  const testHtmlPath = path.join(process.cwd(), "test-nav.html");
+  const testHtmlPath = path.join(process.cwd(), `test-nav-${Date.now()}.html`);
 
   beforeAll(() => {
     const testHtml = `
