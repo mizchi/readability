@@ -34,14 +34,14 @@ jobs:
       - name: Run linter
         run: pnpm run lint
 
+      - name: Build
+        run: pnpm run build
+
       - name: Run tests
         run: pnpm test
 
       - name: Run original tests
         run: pnpm run test:original
-
-      - name: Build
-        run: pnpm run build
 
       - name: Build DXT
         run: pnpm run build:dxt
