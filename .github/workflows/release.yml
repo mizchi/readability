@@ -40,21 +40,17 @@ jobs:
 
       - name: Pack DXT
         run: |
-          # Try to install and use dxt if available
-          if pnpm add -g dxt 2>/dev/null; then
-            echo "Using dxt to create package..."
-            dxt pack .
-          else
-            # Fallback: create a simple zip file as .dxt
-            echo "Creating DXT package manually..."
-            zip -r readability-${{ github.ref_name }}.dxt \
-              dist/ \
-              src/ \
-              package.json \
-              README.md \
-              LICENSE \
-              -x "*.test.*" -x "*/__tests__/*"
-          fi
+          # Always use zip to create DXT package for now
+          # The dxt npm package has compatibility issues with Node.js v22
+          echo "Creating DXT package with zip..."
+          zip -r readability-${{ github.ref_name }}.dxt \
+            dist/ \
+            src/ \
+            package.json \
+            README.md \
+            LICENSE \
+            cli.js \
+            -x "*.test.*" -x "*/__tests__/*" -x "*.test.ts" -x "*.test.js"
 
       - name: Create Release
         env:
