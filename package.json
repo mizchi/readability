@@ -11,6 +11,9 @@
     "lint": "prettier --check .",
     "test": "vitest --run src --exclude src/test/nav-links.test.ts --exclude src/test/nav-hierarchy-snapshot.test.ts --exclude src/detect/header.test.ts --exclude src/format/markdown.test.ts --exclude src/test/readability-core.test.ts --exclude src/test/readability-compatibility.test.ts",
     "test:original": "vitest --run test --exclude test/aria.test.ts --exclude test/readability.test.ts --exclude test/isProbablyReaderable.test.ts --exclude src/test/nav-links.test.ts --exclude src/test/nav-hierarchy-snapshot.test.ts --exclude src/detect/header.test.ts --exclude src/format/markdown.test.ts --exclude src/test/readability-core.test.ts --exclude src/test/readability-compatibility.test.ts",
+    "test:coverage": "vitest --run --coverage src --exclude src/test/nav-links.test.ts --exclude src/test/nav-hierarchy-snapshot.test.ts --exclude src/detect/header.test.ts --exclude src/format/markdown.test.ts --exclude src/test/readability-core.test.ts --exclude src/test/readability-compatibility.test.ts",
+    "test:coverage:all": "vitest --run --coverage src",
+    "coverage": "npm run test:coverage",
     "generate-testcase": "node test/generate-testcase.js",
     "release": "echo wip # release-it"
   },
@@ -33,6 +36,7 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.13.13",
+    "@vitest/coverage-v8": "^3.2.4",
     "esbuild": "^0.25.1",
     "html-to-md": "^0.8.6",
     "htmltidy2": "1.0.0",

@@ -2,12 +2,15 @@
 
 WIP
 
-- [x] Main Conetnt Extraction
+- [x] Main Content Extraction
 - [x] Pure JS Impl (NO DOM API for Cloudflare)
 - [ ] Pass original tests
 - [ ] Custom Parser (now only supports `htmlparser2`)
-- [x] Accessibilty
+- [x] Accessibility
 - [x] Markdown Serializer
+- [x] Navigation Detection
+- [x] Document Structure Analysis
+- [x] Test Coverage Support
 
 ## CLI
 
@@ -42,6 +45,27 @@ Prompt
 ```
 Given a URL, use read_url_content_as_markdown and summary contents
 ```
+
+## Development
+
+### Test Coverage
+
+```bash
+# Run tests with coverage
+npm run test:coverage
+
+# Run all tests with coverage (including excluded tests)
+npm run test:coverage:all
+
+# View coverage report in browser
+open coverage/index.html
+```
+
+Current coverage thresholds:
+- Lines: 50%
+- Functions: 60%
+- Branches: 75%
+- Statements: 50%
 
 ## How to use
 

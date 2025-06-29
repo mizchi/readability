@@ -23,3 +23,8 @@ out-*
 # Package lock files (using pnpm)
 package-lock.json
 yarn.lock
+
+# Test coverage
+coverage/
+.coverage/
+*.lcov
