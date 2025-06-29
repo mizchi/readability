@@ -14,18 +14,82 @@ WIP
 
 ## CLI
 
+### Installation
+
 ```bash
 $ npm install -g @mizchi/readability
-$ readability
-Usage: @mizchi/readability [options] <url>
-Options:
-  -t, --threshold <number>   Character threshold for extraction (default: 250)
-  -h, --help                 Show this help message
-  -f, --format <format>      Output format (md or html)
-  -o, --out <file>          Output file path (default: stdout)
-$ readability https://zenn.dev/mizchi/articles/pglite-vector-search
-...
 ```
+
+### Basic Usage
+
+```bash
+$ readability https://example.com/article
+# Outputs extracted content as markdown
+```
+
+### Options
+
+```bash
+$ readability --help
+Usage: @mizchi/readability [options] <url>
+
+Options:
+  -t, --threshold <number>        Character threshold for extraction (default: 250)
+  -h, --help                      Show this help message
+  -f, --format <format>           Output format: md, html, doc, ai-summary, ai-structured (default: md)
+  -o, --out <file>                Output file path (default: stdout)
+  
+  # Progressive Analysis Options
+  --analyze-structure             Analyze page structure without extracting content
+  --extract-nav                   Extract navigation information only
+  --extract-content               Extract main content only
+  --with-context                  Include context when extracting content
+  --full-analysis                 Perform complete page analysis
+  
+  # Navigation Options  
+  --nav-only                      Extract navigation information (legacy)
+  --nav-type <type>               Filter navigation by type (global/local/breadcrumb/toc/sidebar/footer)
+  --nav-location <location>       Filter navigation by location (header/main/sidebar/footer)
+  
+  # Document Mode Options
+  --doc-mode                      Extract documentation structure
+```
+
+### Examples
+
+```bash
+# Extract content as markdown
+$ readability https://example.com/article
+
+# Extract content with AI-friendly summary
+$ readability -f ai-summary https://example.com/article
+
+# Analyze page structure
+$ readability --analyze-structure https://example.com/article
+
+# Extract navigation only
+$ readability --extract-nav https://example.com/article
+
+# Extract content with context (breadcrumb, surrounding navigation)
+$ readability --extract-content --with-context https://example.com/article
+
+# Full page analysis (structure + navigation + content)
+$ readability --full-analysis https://example.com/article
+
+# Documentation mode (for technical documentation sites)
+$ readability --doc-mode https://docs.example.com/guide
+
+# Save output to file
+$ readability -o article.md https://example.com/article
+```
+
+### Output Formats
+
+- `md` (default): Markdown format
+- `html`: HTML format 
+- `doc`: Documentation structure with navigation
+- `ai-summary`: AI-optimized summary with metadata
+- `ai-structured`: Structured format for AI processing
 
 ## readability-mcp
 
