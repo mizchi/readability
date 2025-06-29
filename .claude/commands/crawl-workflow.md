@@ -182,18 +182,18 @@ cat "$OUTPUT_DIR/navigation.json" | jq -r '.navigations[].items[].href' | while 
   else
     URL="${BASE_URL}${path}"
   fi
-  
+
   # ファイル名を生成
   FILENAME=$(echo "$path" | sed 's/[^a-zA-Z0-9]/-/g' | sed 's/--*/-/g')
-  
+
   echo "Crawling: $URL"
-  
+
   # コンテンツを抽出
   readability --doc-mode "$URL" > "$OUTPUT_DIR/${FILENAME}.md"
-  
+
   # AI向けサマリーも生成
   readability -f ai-summary "$URL" > "$OUTPUT_DIR/${FILENAME}-summary.json"
-  
+
   sleep 1  # Be nice to the server
 done
 ```
@@ -201,68 +201,53 @@ done
 ### Node.jsスクリプト
 
 ```javascript
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import fs from 'fs/promises';
-import path from 'path';
+import { exec } from "child_process";
+import { promisify } from "util";
+import fs from "fs/promises";
+import path from "path";
 
 const execAsync = promisify(exec);
 
 async function crawlDocumentation(baseUrl, outputDir) {
   await fs.mkdir(outputDir, { recursive: true });
-  
+
   // Step 1: Extract navigation
-  console.log('Extracting navigation structure...');
-  const { stdout: navJson } = await execAsync(
-    `readability --extract-nav ${baseUrl}`
-  );
+  console.log("Extracting navigation structure...");
+  const { stdout: navJson } = await execAsync(`readability --extract-nav ${baseUrl}`);
   const navigation = JSON.parse(navJson);
-  
-  await fs.writeFile(
-    path.join(outputDir, 'navigation.json'),
-    JSON.stringify(navigation, null, 2)
-  );
-  
+
+  await fs.writeFile(path.join(outputDir, "navigation.json"), JSON.stringify(navigation, null, 2));
+
   // Step 2: Crawl each page
-  const pages = navigation.navigations
-    .flatMap(nav => nav.items)
-    .map(item => item.href);
-  
+  const pages = navigation.navigations.flatMap((nav) => nav.items).map((item) => item.href);
+
   for (const pagePath of pages) {
-    const url = pagePath.startsWith('http') 
-      ? pagePath 
-      : `${baseUrl}${pagePath}`;
-    
+    const url = pagePath.startsWith("http") ? pagePath : `${baseUrl}${pagePath}`;
+
     console.log(`Crawling: ${url}`);
-    
+
     try {
       // Extract content with context
       const { stdout: content } = await execAsync(
         `readability --extract-content --with-context "${url}"`
       );
-      
-      const filename = pagePath
-        .replace(/[^a-zA-Z0-9]/g, '-')
-        .replace(/-+/g, '-');
-      
-      await fs.writeFile(
-        path.join(outputDir, `${filename}.json`),
-        content
-      );
-      
+
+      const filename = pagePath.replace(/[^a-zA-Z0-9]/g, "-").replace(/-+/g, "-");
+
+      await fs.writeFile(path.join(outputDir, `${filename}.json`), content);
+
       // Wait between requests
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error(`Failed to crawl ${url}:`, error.message);
     }
   }
-  
-  console.log('Crawling completed!');
+
+  console.log("Crawling completed!");
 }
 
 // Usage
-crawlDocumentation('https://docs.example.com', './output')
-  .catch(console.error);
+crawlDocumentation("https://docs.example.com", "./output").catch(console.error);
 ```
 
 ## ベストプラクティス

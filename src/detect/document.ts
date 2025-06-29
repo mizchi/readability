@@ -13,12 +13,12 @@ export interface DocumentStructure extends PageStructure {
    * サイドバーナビゲーション（存在する場合）
    */
   sidebarNavigation?: NavigationInfo;
-  
+
   /**
    * ページ内の章・セクション構造
    */
   sections?: SectionInfo[];
-  
+
   /**
    * 前後のページへのリンク
    */
@@ -33,22 +33,22 @@ export interface SectionInfo {
    * セクションのID（アンカーリンク用）
    */
   id?: string;
-  
+
   /**
    * セクションのタイトル
    */
   title: string;
-  
+
   /**
    * セクションのレベル（h1=1, h2=2, ...）
    */
   level: number;
-  
+
   /**
    * セクション内のコンテンツ（要約やプレビュー）
    */
   preview?: string;
-  
+
   /**
    * 子セクション
    */
@@ -58,24 +58,25 @@ export interface SectionInfo {
 /**
  * ドキュメントサイト用の構造解析
  */
-export function analyzeDocumentStructure(html: string, options: AnalyzeOptions = {}): DocumentStructure {
+export function analyzeDocumentStructure(
+  html: string,
+  options: AnalyzeOptions = {}
+): DocumentStructure {
   // ドキュメントモードを有効にして基本構造を解析
   const baseStructure = analyzePageStructure(html, {
     ...options,
     documentMode: true,
   });
-  
+
   // サイドバー内のナビゲーションを特定
-  const sidebarNavigation = baseStructure.navigations.find(
-    nav => nav.location === "sidebar"
-  );
-  
+  const sidebarNavigation = baseStructure.navigations.find((nav) => nav.location === "sidebar");
+
   // セクション構造を解析
   const sections = extractSections(html);
-  
+
   // ページネーションを検出
   const pagination = extractPagination(baseStructure);
-  
+
   return {
     ...baseStructure,
     sidebarNavigation,
@@ -90,17 +91,17 @@ export function analyzeDocumentStructure(html: string, options: AnalyzeOptions =
 function extractSections(html: string): SectionInfo[] {
   const doc = parseHTML(html);
   const ariaTree = buildAriaTree(doc, { compress: false });
-  
+
   const sections: SectionInfo[] = [];
   const stack: { section: SectionInfo; level: number }[] = [];
-  
+
   function traverse(node: AriaNode) {
     const element = node.originalElement?.deref();
     if (element && /^h[1-6]$/.test(element.tagName)) {
       const level = parseInt(element.tagName.substring(1));
       const title = node.name || "";
       const id = element.id || element.attributes?.id;
-      
+
       // 新しいセクションを作成
       const newSection: SectionInfo = {
         title,
@@ -108,12 +109,12 @@ function extractSections(html: string): SectionInfo[] {
         ...(id && { id }),
         children: [],
       };
-      
+
       // スタックを適切なレベルまで巻き戻す
       while (stack.length > 0 && stack[stack.length - 1].level >= level) {
         stack.pop();
       }
-      
+
       // 親セクションがある場合は子として追加、なければルートに追加
       if (stack.length > 0) {
         const parent = stack[stack.length - 1].section;
@@ -122,11 +123,11 @@ function extractSections(html: string): SectionInfo[] {
       } else {
         sections.push(newSection);
       }
-      
+
       // スタックに追加
       stack.push({ section: newSection, level });
     }
-    
+
     // 子要素を再帰的に処理
     if (node.children) {
       for (const child of node.children) {
@@ -134,7 +135,7 @@ function extractSections(html: string): SectionInfo[] {
       }
     }
   }
-  
+
   traverse(ariaTree.root);
   return sections;
 }
@@ -143,11 +144,11 @@ function extractSections(html: string): SectionInfo[] {
  * ページネーションリンクを抽出
  */
 function extractPagination(structure: PageStructure): DocumentStructure["pagination"] {
-  const paginationNav = structure.navigations.find(nav => nav.type === "pagination");
+  const paginationNav = structure.navigations.find((nav) => nav.type === "pagination");
   if (!paginationNav) return undefined;
-  
+
   const pagination: DocumentStructure["pagination"] = {};
-  
+
   // 前後のリンクを探す
   for (const item of paginationNav.items) {
     const label = item.label.toLowerCase();
@@ -163,7 +164,7 @@ function extractPagination(structure: PageStructure): DocumentStructure["paginat
       };
     }
   }
-  
+
   return Object.keys(pagination).length > 0 ? pagination : undefined;
 }
 
@@ -175,22 +176,22 @@ export interface DocumentContent {
    * メインコンテンツのテキスト
    */
   content: string;
-  
+
   /**
    * サイドバーナビゲーションのマークダウン表現
    */
   sidebarNav?: string;
-  
+
   /**
    * 目次（TOC）のマークダウン表現
    */
   toc?: string;
-  
+
   /**
    * パンくずリストのテキスト表現
    */
   breadcrumb?: string;
-  
+
   /**
    * セクション構造のマークダウン表現
    */
@@ -205,34 +206,32 @@ export function extractDocumentContent(html: string): DocumentContent {
   const result: DocumentContent = {
     content: "",
   };
-  
+
   // メインコンテンツを抽出
   if (structure.mainContent) {
     result.content = extractTextFromAriaNode(structure.mainContent, true);
   }
-  
+
   // サイドバーナビゲーションを整形
   if (structure.sidebarNavigation) {
     result.sidebarNav = formatNavigationAsMarkdown(structure.sidebarNavigation);
   }
-  
+
   // TOCを整形
   if (structure.toc) {
     result.toc = formatNavigationAsMarkdown(structure.toc);
   }
-  
+
   // パンくずリストを整形
   if (structure.breadcrumb) {
-    result.breadcrumb = structure.breadcrumb.items
-      .map(item => item.label)
-      .join(" > ");
+    result.breadcrumb = structure.breadcrumb.items.map((item) => item.label).join(" > ");
   }
-  
+
   // セクション構造をアウトラインとして整形
   if (structure.sections && structure.sections.length > 0) {
     result.outline = formatSectionsAsMarkdown(structure.sections);
   }
-  
+
   return result;
 }
 
@@ -246,7 +245,7 @@ export function extractDocumentContent(html: string): DocumentContent {
  */
 function formatNavigationAsMarkdown(nav: NavigationInfo, indent: number = 0): string {
   let markdown = "";
-  
+
   for (const item of nav.items) {
     const prefix = "  ".repeat(indent) + "- ";
     markdown += prefix + item.label;
@@ -257,12 +256,12 @@ function formatNavigationAsMarkdown(nav: NavigationInfo, indent: number = 0): st
       markdown += " **[Current]**";
     }
     markdown += "\n";
-    
+
     if (item.children && item.children.length > 0) {
       markdown += formatNavigationItemsAsMarkdown(item.children, indent + 1);
     }
   }
-  
+
   return markdown;
 }
 
@@ -271,7 +270,7 @@ function formatNavigationAsMarkdown(nav: NavigationInfo, indent: number = 0): st
  */
 function formatNavigationItemsAsMarkdown(items: NavigationInfo["items"], indent: number): string {
   let markdown = "";
-  
+
   for (const item of items) {
     const prefix = "  ".repeat(indent) + "- ";
     markdown += prefix + item.label;
@@ -279,12 +278,12 @@ function formatNavigationItemsAsMarkdown(items: NavigationInfo["items"], indent:
       markdown += ` (${item.href})`;
     }
     markdown += "\n";
-    
+
     if (item.children && item.children.length > 0) {
       markdown += formatNavigationItemsAsMarkdown(item.children, indent + 1);
     }
   }
-  
+
   return markdown;
 }
 
@@ -293,7 +292,7 @@ function formatNavigationItemsAsMarkdown(items: NavigationInfo["items"], indent:
  */
 function formatSectionsAsMarkdown(sections: SectionInfo[], baseLevel: number = 0): string {
   let markdown = "";
-  
+
   for (const section of sections) {
     const prefix = "#".repeat(section.level + baseLevel) + " ";
     markdown += prefix + section.title;
@@ -301,15 +300,15 @@ function formatSectionsAsMarkdown(sections: SectionInfo[], baseLevel: number = 0
       markdown += ` {#${section.id}}`;
     }
     markdown += "\n\n";
-    
+
     if (section.preview) {
       markdown += section.preview + "\n\n";
     }
-    
+
     if (section.children && section.children.length > 0) {
       markdown += formatSectionsAsMarkdown(section.children, baseLevel);
     }
   }
-  
+
   return markdown;
 }

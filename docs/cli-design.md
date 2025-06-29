@@ -10,6 +10,7 @@
 ## Command Structure
 
 ### Default Behavior (Unchanged)
+
 ```bash
 readability <url>                # Extract main content as markdown (current behavior)
 readability <url> -f html        # Extract main content as HTML
@@ -18,6 +19,7 @@ readability <url> -f html        # Extract main content as HTML
 ### Progressive Analysis Commands
 
 #### 1. Structure Analysis
+
 ```bash
 # Analyze page structure without content extraction
 readability <url> --analyze-structure
@@ -44,6 +46,7 @@ readability <url> --analyze structure    # Alternative syntax
 ```
 
 #### 2. Navigation Extraction
+
 ```bash
 # Extract all navigations (current --nav-only behavior)
 readability <url> --extract-nav
@@ -57,6 +60,7 @@ readability <url> --extract-nav --location sidebar
 ```
 
 #### 3. Content Extraction with Context
+
 ```bash
 # Extract content with surrounding context
 readability <url> --extract-content --with-context
@@ -66,6 +70,7 @@ readability <url> --extract content --context full
 ```
 
 #### 4. Full Document Analysis
+
 ```bash
 # Complete analysis in one command
 readability <url> --full-analysis
@@ -83,6 +88,7 @@ readability <url> --analyze full
 ### AI-Optimized Formats
 
 #### 1. Summary Format
+
 ```bash
 readability <url> --format ai-summary
 
@@ -102,6 +108,7 @@ readability <url> --format ai-summary
 ```
 
 #### 2. Structured Format
+
 ```bash
 readability <url> --format ai-structured
 
@@ -140,21 +147,25 @@ readability <url> --analyze-structure | \
 ## Implementation Plan
 
 ### Phase 1: Command Parser Refactoring
+
 - Add subcommand support (`--analyze`, `--extract`)
 - Maintain backward compatibility
 - Add command aliases for flexibility
 
 ### Phase 2: Progressive Analysis
+
 - Implement structure analysis without full extraction
 - Add navigation-only extraction modes
 - Enable content extraction with context
 
 ### Phase 3: AI-Optimized Formats
+
 - Add AI-friendly output formats
 - Implement summary generation
 - Add structured hierarchical output
 
 ### Phase 4: Advanced Features
+
 - Add caching for multi-step analysis
 - Implement format conversion between outputs
 - Add filtering and transformation options
@@ -162,6 +173,7 @@ readability <url> --analyze-structure | \
 ## Examples for AI Usage
 
 ### 1. Documentation Site Analysis
+
 ```bash
 # Step 1: Understand the structure
 readability https://docs.example.com --analyze-structure
@@ -174,6 +186,7 @@ readability https://docs.example.com --extract-content --with-context
 ```
 
 ### 2. Article Extraction with Metadata
+
 ```bash
 # Single command for article analysis
 readability https://blog.example.com/post --format ai-structured
@@ -182,6 +195,7 @@ readability https://blog.example.com/post --format ai-structured
 ```
 
 ### 3. Progressive Enhancement
+
 ```bash
 # Start with basic analysis
 ANALYSIS=$(readability <url> --analyze-structure)

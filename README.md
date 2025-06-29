@@ -62,6 +62,7 @@ open coverage/index.html
 ```
 
 Current coverage thresholds:
+
 - Lines: 50%
 - Functions: 60%
 - Branches: 75%

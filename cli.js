@@ -1,5 +1,11 @@
 #!/usr/bin/env node
-import { toHTML, toMarkdown, extract, analyzePageStructure, extractDocumentContent } from "./dist/index.js"; // Adjust path as needed, import PageType, remove toReadableAriaTree
+import {
+  toHTML,
+  toMarkdown,
+  extract,
+  analyzePageStructure,
+  extractDocumentContent,
+} from "./dist/index.js"; // Adjust path as needed, import PageType, remove toReadableAriaTree
 import { parseArgs } from "node:util";
 import path from "node:path";
 import fs from "node:fs";
@@ -194,11 +200,11 @@ async function main() {
       pageType: result.nodeCount > 0 ? "article" : "other", // Simple heuristic
       hasMainContent: result.nodeCount > 0,
       navigations: {
-        global: structure.navigations.some(n => n.type === "global"),
-        breadcrumb: structure.navigations.some(n => n.type === "breadcrumb"),
-        toc: structure.navigations.some(n => n.type === "toc"),
-        sidebar: structure.navigations.some(n => n.location === "sidebar"),
-        pagination: structure.navigations.some(n => n.type === "pagination"),
+        global: structure.navigations.some((n) => n.type === "global"),
+        breadcrumb: structure.navigations.some((n) => n.type === "breadcrumb"),
+        toc: structure.navigations.some((n) => n.type === "toc"),
+        sidebar: structure.navigations.some((n) => n.location === "sidebar"),
+        pagination: structure.navigations.some((n) => n.type === "pagination"),
       },
       contentAreas: {
         header: structure.headers.length > 0,
@@ -210,7 +216,7 @@ async function main() {
         navigationCount: structure.navigations.length,
         headerCount: structure.headers.length,
         contentLength: result.nodeCount,
-      }
+      },
     };
     content = JSON.stringify(analysis, null, 2);
   } else if (parsed.values["extract-nav"] || parsed.values["nav-only"]) {
@@ -270,14 +276,14 @@ async function main() {
         title: result.metadata?.title || "",
         content: toMarkdown(result.root),
         context: {
-          breadcrumb: structure.breadcrumb?.items.map(i => i.label).join(" > ") || null,
+          breadcrumb: structure.breadcrumb?.items.map((i) => i.label).join(" > ") || null,
           section: structure.mainContent ? "main" : "unknown",
           surroundingNavigation: structure.navigations
-            .filter(n => n.location === "inline" || n.type === "toc")
-            .map(n => ({
+            .filter((n) => n.location === "inline" || n.type === "toc")
+            .map((n) => ({
               type: n.type,
               location: n.location,
-              itemCount: n.items.length
+              itemCount: n.items.length,
             })),
         },
         metadata: result.metadata,
@@ -294,13 +300,13 @@ async function main() {
       url: url,
       structure: {
         pageType: result.nodeCount > 0 ? "article" : "other",
-        navigations: structure.navigations.map(n => ({
+        navigations: structure.navigations.map((n) => ({
           type: n.type,
           location: n.location,
           itemCount: n.items.length,
           label: n.label,
         })),
-        headers: structure.headers.map(h => ({
+        headers: structure.headers.map((h) => ({
           type: h.type,
           text: h.contains.siteTitle?.text || "",
         })),
@@ -327,16 +333,18 @@ async function main() {
     const structure = analyzePageStructure(html);
     const summary = {
       url: url,
-      type: structure.navigations.some(n => n.type === "toc" && n.location === "sidebar") 
-        ? "documentation" 
-        : result.nodeCount > 500 ? "article" : "other",
+      type: structure.navigations.some((n) => n.type === "toc" && n.location === "sidebar")
+        ? "documentation"
+        : result.nodeCount > 500
+          ? "article"
+          : "other",
       title: result.metadata?.title || "",
       summary: result.root ? toMarkdown(result.root).substring(0, 200) + "..." : "",
-      mainTopics: structure.sections?.map(s => s.title).slice(0, 5) || [],
+      mainTopics: structure.sections?.map((s) => s.title).slice(0, 5) || [],
       navigationSummary: {
-        breadcrumb: structure.breadcrumb?.items.map(i => i.label).join(" > ") || null,
+        breadcrumb: structure.breadcrumb?.items.map((i) => i.label).join(" > ") || null,
         sections: structure.sections?.length || 0,
-        hasTableOfContents: structure.navigations.some(n => n.type === "toc"),
+        hasTableOfContents: structure.navigations.some((n) => n.type === "toc"),
         hasSidebar: !!structure.sidebar,
       },
       contentStats: {
@@ -354,17 +362,20 @@ async function main() {
         ...result.metadata,
       },
       structure: {
-        header: structure.mainHeader ? {
-          logo: structure.mainHeader.contains.logo ? "present" : "absent",
-          title: structure.mainHeader.contains.siteTitle?.text || null,
-          navigation: structure.mainHeader.contains.navigation ? "present" : "absent",
-        } : null,
+        header: structure.mainHeader
+          ? {
+              logo: structure.mainHeader.contains.logo ? "present" : "absent",
+              title: structure.mainHeader.contains.siteTitle?.text || null,
+              navigation: structure.mainHeader.contains.navigation ? "present" : "absent",
+            }
+          : null,
         navigation: {
-          types: structure.navigations.map(n => n.type),
-          main: structure.mainNavigation?.items.map(i => ({
-            label: i.label,
-            href: i.href,
-          })) || [],
+          types: structure.navigations.map((n) => n.type),
+          main:
+            structure.mainNavigation?.items.map((i) => ({
+              label: i.label,
+              href: i.href,
+            })) || [],
           breadcrumb: structure.breadcrumb?.items || [],
         },
         content: {
@@ -372,43 +383,46 @@ async function main() {
             present: !!result.root,
             markdown: result.root ? toMarkdown(result.root) : "",
           },
-          sections: structure.sections?.map(s => ({
-            id: s.id,
-            title: s.title,
-            level: s.level,
-            children: s.children?.length || 0,
-          })) || [],
+          sections:
+            structure.sections?.map((s) => ({
+              id: s.id,
+              title: s.title,
+              level: s.level,
+              children: s.children?.length || 0,
+            })) || [],
         },
-        sidebar: structure.sidebar ? {
-          present: true,
-          navigation: structure.sidebarNavigation?.items.length || 0,
-        } : null,
+        sidebar: structure.sidebar
+          ? {
+              present: true,
+              navigation: structure.sidebarNavigation?.items.length || 0,
+            }
+          : null,
       },
     };
     content = JSON.stringify(structured, null, 2);
   } else if (parsed.values["doc-mode"] || format === "doc") {
     // ドキュメントモード：本文とナビゲーション構造を統合
     const docContent = extractDocumentContent(html);
-    
+
     // マークダウン形式で出力
     content = "# Document Content\n\n";
-    
+
     if (docContent.breadcrumb) {
       content += `**Breadcrumb:** ${docContent.breadcrumb}\n\n`;
     }
-    
+
     if (docContent.toc) {
       content += "## Table of Contents\n\n" + docContent.toc + "\n";
     }
-    
+
     if (docContent.sidebarNav) {
       content += "## Sidebar Navigation\n\n" + docContent.sidebarNav + "\n";
     }
-    
+
     if (docContent.outline) {
       content += "## Document Outline\n\n" + docContent.outline + "\n";
     }
-    
+
     content += "## Main Content\n\n" + docContent.content;
   } else if (format === "html") {
     content = toHTML(result.root);

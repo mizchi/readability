@@ -185,9 +185,9 @@ describe("Cloudflare Workers Documentation Site", () => {
 
       // Should find multiple navigation areas
       expect(structure.navigations.length).toBeGreaterThan(4);
-      
+
       // Check for specific navigation types
-      const navTypes = structure.navigations.map(nav => nav.type);
+      const navTypes = structure.navigations.map((nav) => nav.type);
       expect(navTypes).toContain("global");
       expect(navTypes).toContain("breadcrumb");
       expect(navTypes).toContain("toc");
@@ -199,9 +199,9 @@ describe("Cloudflare Workers Documentation Site", () => {
 
       expect(structure.sidebarNavigation).toBeDefined();
       const sidebarItems = structure.sidebarNavigation?.items || [];
-      
+
       // Should have main categories - the detection finds individual links
-      const allLabels = sidebarItems.map(item => item.label);
+      const allLabels = sidebarItems.map((item) => item.label);
       expect(allLabels).toContain("Get started guide");
       expect(allLabels).toContain("Request"); // From Runtime APIs
       expect(allLabels).toContain("Install/Update"); // From Wrangler
@@ -225,16 +225,15 @@ describe("Cloudflare Workers Documentation Site", () => {
     it("should extract table of contents from right sidebar", () => {
       const structure = analyzePageStructure(cloudflareDocsHTML);
 
-      const toc = structure.navigations.find(nav => 
-        nav.type === "toc" || 
-        nav.items.every(item => item.href?.startsWith("#"))
+      const toc = structure.navigations.find(
+        (nav) => nav.type === "toc" || nav.items.every((item) => item.href?.startsWith("#"))
       );
-      
+
       expect(toc).toBeDefined();
       expect(toc?.items.length).toBeGreaterThan(0);
-      
+
       // Check for nested TOC structure
-      const mainItem = toc?.items.find(item => item.label.includes("What is"));
+      const mainItem = toc?.items.find((item) => item.label.includes("What is"));
       expect(mainItem?.children).toBeDefined();
       expect(mainItem?.children?.length).toBeGreaterThan(0);
     });
@@ -263,8 +262,8 @@ describe("Cloudflare Workers Documentation Site", () => {
       // Check main content
       expect(content.content).toContain("Cloudflare Workers documentation");
       // The lead text might be extracted differently
-      const hasLeadText = content.content.includes("serverless") || 
-                         content.content.includes("Build and deploy");
+      const hasLeadText =
+        content.content.includes("serverless") || content.content.includes("Build and deploy");
       expect(hasLeadText).toBe(true);
       expect(content.content).toContain("Global network");
     });
@@ -276,24 +275,24 @@ describe("Cloudflare Workers Documentation Site", () => {
       expect(structure.sections?.length).toBeGreaterThan(0);
 
       // Find main heading
-      const mainHeading = structure.sections?.find(s => 
-        s.title === "Cloudflare Workers documentation"
+      const mainHeading = structure.sections?.find(
+        (s) => s.title === "Cloudflare Workers documentation"
       );
       expect(mainHeading).toBeDefined();
 
       // Check for subsections
       const sections = structure.sections || [];
-      const sectionTitles = sections.flatMap(s => [
+      const sectionTitles = sections.flatMap((s) => [
         s.title,
-        ...(s.children?.map(c => c.title) || [])
+        ...(s.children?.map((c) => c.title) || []),
       ]);
-      
+
       expect(sectionTitles).toContain("What is Cloudflare Workers?");
       // Benefits might be at a different level
-      const allTitles = sections.flatMap(s => [
+      const allTitles = sections.flatMap((s) => [
         s.title,
-        ...(s.children?.map(c => c.title) || []),
-        ...(s.children?.flatMap(c => c.children?.map(cc => cc.title) || []) || [])
+        ...(s.children?.map((c) => c.title) || []),
+        ...(s.children?.flatMap((c) => c.children?.map((cc) => cc.title) || []) || []),
       ]);
       expect(allTitles).toContain("Benefits");
       expect(sectionTitles).toContain("Get started");
@@ -304,18 +303,16 @@ describe("Cloudflare Workers Documentation Site", () => {
       const structure = analyzePageStructure(cloudflareDocsHTML);
 
       // Tutorial cards might be detected as a navigation element
-      const tutorialNav = structure.navigations.find(nav => 
-        nav.items.some(item => 
-          item.label.includes("QR code generator") ||
-          item.label.includes("Get started guide")
+      const tutorialNav = structure.navigations.find((nav) =>
+        nav.items.some(
+          (item) =>
+            item.label.includes("QR code generator") || item.label.includes("Get started guide")
         )
       );
 
       if (tutorialNav) {
         expect(tutorialNav.items.length).toBeGreaterThanOrEqual(2);
-        const qrItem = tutorialNav.items.find(item => 
-          item.label.includes("QR code generator")
-        );
+        const qrItem = tutorialNav.items.find((item) => item.label.includes("QR code generator"));
         if (qrItem) {
           expect(qrItem.href).toContain("/tutorials/build-a-qr-code-generator/");
         }
@@ -336,17 +333,17 @@ describe("Cloudflare Workers Documentation Site", () => {
 
   describe("Document Mode Features", () => {
     it("should prioritize documentation navigation in document mode", () => {
-      const structure = analyzePageStructure(cloudflareDocsHTML, { 
+      const structure = analyzePageStructure(cloudflareDocsHTML, {
         documentMode: true,
-        maxNavigations: 20 
+        maxNavigations: 20,
       });
 
       // In document mode, TOC and sidebar navigation should be prioritized
-      const navTypes = structure.navigations.slice(0, 5).map(nav => nav.type);
-      
+      const navTypes = structure.navigations.slice(0, 5).map((nav) => nav.type);
+
       // Should prioritize documentation-specific navigation types
-      const docNavTypes = navTypes.filter(type => 
-        type === "toc" || type === "local" || type === "breadcrumb"
+      const docNavTypes = navTypes.filter(
+        (type) => type === "toc" || type === "local" || type === "breadcrumb"
       );
       expect(docNavTypes.length).toBeGreaterThan(0);
     });
@@ -359,8 +356,8 @@ describe("Cloudflare Workers Documentation Site", () => {
       expect(sidebar).toBeDefined();
 
       // Since items are flattened, check for Fetch API directly
-      const fetchApi = sidebar?.items.find(item => item.label === "Fetch API");
-      
+      const fetchApi = sidebar?.items.find((item) => item.label === "Fetch API");
+
       expect(fetchApi).toBeDefined();
       expect(fetchApi?.href).toContain("/web-standards/fetch/");
     });
@@ -371,12 +368,12 @@ describe("Cloudflare Workers Documentation Site", () => {
       // Check markdown formatting of nested navigation
       if (content.sidebarNav) {
         // Should have proper indentation for nested items
-        const lines = content.sidebarNav.split('\n');
-        
+        const lines = content.sidebarNav.split("\n");
+
         // Check for actual items
-        expect(lines.some(line => /^- Get started guide/.test(line))).toBe(true);
-        expect(lines.some(line => /^- Request/.test(line))).toBe(true);
-        expect(lines.some(line => /^- Fetch API/.test(line))).toBe(true);
+        expect(lines.some((line) => /^- Get started guide/.test(line))).toBe(true);
+        expect(lines.some((line) => /^- Request/.test(line))).toBe(true);
+        expect(lines.some((line) => /^- Fetch API/.test(line))).toBe(true);
       }
     });
   });

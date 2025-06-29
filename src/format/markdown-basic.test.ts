@@ -16,11 +16,11 @@ describe("markdown module - basic functionality", () => {
         children: [
           {
             nodeType: "text",
-            textContent: "Hello, world!"
-          } as VText
-        ]
+            textContent: "Hello, world!",
+          } as VText,
+        ],
       };
-      
+
       expect(toMarkdown(element)).toBe("Hello, world!");
     });
 
@@ -29,24 +29,24 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "h1",
         attributes: {},
-        children: [{ nodeType: "text", textContent: "Title" } as VText]
+        children: [{ nodeType: "text", textContent: "Title" } as VText],
       };
-      
+
       expect(toMarkdown(h1)).toBe("# Title");
     });
 
     it("should convert different heading levels", () => {
       const headings = ["h1", "h2", "h3", "h4", "h5", "h6"];
       const expectedPrefixes = ["#", "##", "###", "####", "#####", "######"];
-      
+
       headings.forEach((tag, index) => {
         const heading: VElement = {
           nodeType: "element",
           tagName: tag,
           attributes: {},
-          children: [{ nodeType: "text", textContent: "Heading" } as VText]
+          children: [{ nodeType: "text", textContent: "Heading" } as VText],
         };
-        
+
         expect(toMarkdown(heading)).toBe(`${expectedPrefixes[index]} Heading`);
       });
     });
@@ -56,9 +56,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "strong",
         attributes: {},
-        children: [{ nodeType: "text", textContent: "bold text" } as VText]
+        children: [{ nodeType: "text", textContent: "bold text" } as VText],
       };
-      
+
       expect(toMarkdown(bold)).toBe("**bold text**");
     });
 
@@ -67,9 +67,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "em",
         attributes: {},
-        children: [{ nodeType: "text", textContent: "italic text" } as VText]
+        children: [{ nodeType: "text", textContent: "italic text" } as VText],
       };
-      
+
       expect(toMarkdown(italic)).toBe("*italic text*");
     });
 
@@ -78,9 +78,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "a",
         attributes: { href: "https://example.com" },
-        children: [{ nodeType: "text", textContent: "Example" } as VText]
+        children: [{ nodeType: "text", textContent: "Example" } as VText],
       };
-      
+
       expect(toMarkdown(link)).toBe("[Example](https://example.com)");
     });
 
@@ -90,11 +90,11 @@ describe("markdown module - basic functionality", () => {
         tagName: "img",
         attributes: {
           src: "image.jpg",
-          alt: "Description"
+          alt: "Description",
         },
-        children: []
+        children: [],
       };
-      
+
       expect(toMarkdown(img)).toBe("![Description](image.jpg)");
     });
 
@@ -103,9 +103,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "code",
         attributes: {},
-        children: [{ nodeType: "text", textContent: "const x = 42;" } as VText]
+        children: [{ nodeType: "text", textContent: "const x = 42;" } as VText],
       };
-      
+
       expect(toMarkdown(code)).toBe("`const x = 42;`");
     });
 
@@ -119,11 +119,16 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "code",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "function hello() {\n  return 'world';\n}" } as VText]
-          } as VElement
-        ]
+            children: [
+              {
+                nodeType: "text",
+                textContent: "function hello() {\n  return 'world';\n}",
+              } as VText,
+            ],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(pre)).toBe("```\nfunction hello() {\n  return 'world';\n}\n```");
     });
 
@@ -137,11 +142,11 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "code",
             attributes: { class: "language-javascript" },
-            children: [{ nodeType: "text", textContent: "console.log('hello');" } as VText]
-          } as VElement
-        ]
+            children: [{ nodeType: "text", textContent: "console.log('hello');" } as VText],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(pre)).toBe("```javascript\nconsole.log('hello');\n```");
     });
 
@@ -155,17 +160,17 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "li",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "Item 1" } as VText]
+            children: [{ nodeType: "text", textContent: "Item 1" } as VText],
           } as VElement,
           {
             nodeType: "element",
             tagName: "li",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "Item 2" } as VText]
-          } as VElement
-        ]
+            children: [{ nodeType: "text", textContent: "Item 2" } as VText],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(ul)).toBe("- Item 1\n- Item 2");
     });
 
@@ -179,17 +184,17 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "li",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "First" } as VText]
+            children: [{ nodeType: "text", textContent: "First" } as VText],
           } as VElement,
           {
             nodeType: "element",
             tagName: "li",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "Second" } as VText]
-          } as VElement
-        ]
+            children: [{ nodeType: "text", textContent: "Second" } as VText],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(ol)).toBe("1. First\n1. Second");
     });
 
@@ -203,11 +208,11 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "p",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "This is a quote" } as VText]
-          } as VElement
-        ]
+            children: [{ nodeType: "text", textContent: "This is a quote" } as VText],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(blockquote)).toBe("> This is a quote");
     });
 
@@ -216,9 +221,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "hr",
         attributes: {},
-        children: []
+        children: [],
       };
-      
+
       expect(toMarkdown(hr)).toBe("---");
     });
 
@@ -227,9 +232,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "br",
         attributes: {},
-        children: []
+        children: [],
       };
-      
+
       // br tags are converted to two spaces followed by newline in markdown
       const result = toMarkdown(br);
       // Check if it contains the line break pattern
@@ -242,10 +247,10 @@ describe("markdown module - basic functionality", () => {
         tagName: "p",
         attributes: {},
         children: [
-          { nodeType: "text", textContent: "Text with *asterisks* and _underscores_" } as VText
-        ]
+          { nodeType: "text", textContent: "Text with *asterisks* and _underscores_" } as VText,
+        ],
       };
-      
+
       expect(toMarkdown(text)).toBe("Text with \\*asterisks\\* and \\_underscores\\_");
     });
 
@@ -260,19 +265,19 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "strong",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "bold" } as VText]
+            children: [{ nodeType: "text", textContent: "bold" } as VText],
           } as VElement,
           { nodeType: "text", textContent: " and " } as VText,
           {
             nodeType: "element",
             tagName: "em",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "italic" } as VText]
+            children: [{ nodeType: "text", textContent: "italic" } as VText],
           } as VElement,
-          { nodeType: "text", textContent: " text." } as VText
-        ]
+          { nodeType: "text", textContent: " text." } as VText,
+        ],
       };
-      
+
       expect(toMarkdown(nested)).toBe("This is **bold** and *italic* text.");
     });
 
@@ -286,23 +291,23 @@ describe("markdown module - basic functionality", () => {
             nodeType: "element",
             tagName: "script",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "console.log('ignored');" } as VText]
+            children: [{ nodeType: "text", textContent: "console.log('ignored');" } as VText],
           } as VElement,
           {
             nodeType: "element",
             tagName: "style",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "body { color: red; }" } as VText]
+            children: [{ nodeType: "text", textContent: "body { color: red; }" } as VText],
           } as VElement,
           {
             nodeType: "element",
             tagName: "p",
             attributes: {},
-            children: [{ nodeType: "text", textContent: "Visible text" } as VText]
-          } as VElement
-        ]
+            children: [{ nodeType: "text", textContent: "Visible text" } as VText],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(scriptStyle)).toBe("Visible text");
     });
 
@@ -311,9 +316,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "p",
         attributes: {},
-        children: []
+        children: [],
       };
-      
+
       expect(toMarkdown(emptyP)).toBe("");
     });
 
@@ -322,9 +327,9 @@ describe("markdown module - basic functionality", () => {
         nodeType: "element",
         tagName: "code",
         attributes: {},
-        children: [{ nodeType: "text", textContent: "Use `code` here" } as VText]
+        children: [{ nodeType: "text", textContent: "Use `code` here" } as VText],
       };
-      
+
       expect(toMarkdown(codeWithBackticks)).toBe("``Use `code` here``");
     });
 
@@ -348,17 +353,17 @@ describe("markdown module - basic functionality", () => {
                     nodeType: "element",
                     tagName: "th",
                     attributes: {},
-                    children: [{ nodeType: "text", textContent: "Header 1" } as VText]
+                    children: [{ nodeType: "text", textContent: "Header 1" } as VText],
                   } as VElement,
                   {
                     nodeType: "element",
                     tagName: "th",
                     attributes: {},
-                    children: [{ nodeType: "text", textContent: "Header 2" } as VText]
-                  } as VElement
-                ]
-              } as VElement
-            ]
+                    children: [{ nodeType: "text", textContent: "Header 2" } as VText],
+                  } as VElement,
+                ],
+              } as VElement,
+            ],
           } as VElement,
           {
             nodeType: "element",
@@ -374,21 +379,21 @@ describe("markdown module - basic functionality", () => {
                     nodeType: "element",
                     tagName: "td",
                     attributes: {},
-                    children: [{ nodeType: "text", textContent: "Cell 1" } as VText]
+                    children: [{ nodeType: "text", textContent: "Cell 1" } as VText],
                   } as VElement,
                   {
                     nodeType: "element",
                     tagName: "td",
                     attributes: {},
-                    children: [{ nodeType: "text", textContent: "Cell 2" } as VText]
-                  } as VElement
-                ]
-              } as VElement
-            ]
-          } as VElement
-        ]
+                    children: [{ nodeType: "text", textContent: "Cell 2" } as VText],
+                  } as VElement,
+                ],
+              } as VElement,
+            ],
+          } as VElement,
+        ],
       };
-      
+
       expect(toMarkdown(table)).toBe("| Header 1 | Header 2 |\n| --- | --- |\n| Cell 1 | Cell 2 |");
     });
   });

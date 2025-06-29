@@ -12,19 +12,19 @@ import type { AriaNode } from "../types";
  */
 export function extractTextFromAriaNode(node: AriaNode, includeNewlines: boolean = false): string {
   let text = "";
-  
+
   if (node.name) {
     text += node.name;
     if (includeNewlines) {
       text += "\n";
     }
   }
-  
+
   if (node.children) {
     for (const child of node.children) {
       text += extractTextFromAriaNode(child, includeNewlines);
     }
   }
-  
+
   return text;
 }

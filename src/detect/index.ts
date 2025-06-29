@@ -42,11 +42,11 @@ export interface AnalyzeOptions {
  * ページ構造を総合的に解析する
  */
 export function analyzePageStructure(html: string, options: AnalyzeOptions = {}): PageStructure {
-  const { 
-    extractContent = false, 
-    maxNavigations = 10, 
+  const {
+    extractContent = false,
+    maxNavigations = 10,
     headerNavigationOnly = false,
-    documentMode = false 
+    documentMode = false,
   } = options;
 
   // HTMLを直接パースしてARIAツリーを構築
@@ -81,7 +81,10 @@ export function analyzePageStructure(html: string, options: AnalyzeOptions = {})
 
   // 最大数で制限
   if (navigations.length > effectiveMaxNavigations) {
-    navigations = prioritizeNavigations(navigations, documentMode).slice(0, effectiveMaxNavigations);
+    navigations = prioritizeNavigations(navigations, documentMode).slice(
+      0,
+      effectiveMaxNavigations
+    );
   }
 
   // 特定の要素を抽出
@@ -111,29 +114,34 @@ export function analyzePageStructure(html: string, options: AnalyzeOptions = {})
 /**
  * ナビゲーションの優先順位付け
  */
-function prioritizeNavigations(navigations: NavigationInfo[], documentMode: boolean = false): NavigationInfo[] {
+function prioritizeNavigations(
+  navigations: NavigationInfo[],
+  documentMode: boolean = false
+): NavigationInfo[] {
   // 優先順位マップ
-  const priorityMap = documentMode ? {
-    // ドキュメントモードではTOCとローカルナビゲーションを優先
-    toc: 10,
-    local: 9,
-    global: 8,
-    breadcrumb: 7,
-    utility: 6,
-    pagination: 5,
-    footer: 4,
-    social: 3,
-  } : {
-    // 通常モード
-    global: 10,
-    breadcrumb: 9,
-    toc: 8,
-    local: 7,
-    utility: 6,
-    pagination: 5,
-    footer: 4,
-    social: 3,
-  };
+  const priorityMap = documentMode
+    ? {
+        // ドキュメントモードではTOCとローカルナビゲーションを優先
+        toc: 10,
+        local: 9,
+        global: 8,
+        breadcrumb: 7,
+        utility: 6,
+        pagination: 5,
+        footer: 4,
+        social: 3,
+      }
+    : {
+        // 通常モード
+        global: 10,
+        breadcrumb: 9,
+        toc: 8,
+        local: 7,
+        utility: 6,
+        pagination: 5,
+        footer: 4,
+        social: 3,
+      };
 
   return navigations.sort((a, b) => {
     const priorityA = priorityMap[a.type] || 0;

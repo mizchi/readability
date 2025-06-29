@@ -35,9 +35,9 @@ describe("analyzeDocumentStructure", () => {
     // The navigation detection also finds individual links as separate navigation items
     expect(result.sidebarNavigation?.items.length).toBeGreaterThanOrEqual(3);
     expect(result.sidebarNavigation?.items[0].label).toBe("Introduction");
-    
+
     // Find the API item which might be at a different index
-    const apiItem = result.sidebarNavigation?.items.find(item => item.label === "API Reference");
+    const apiItem = result.sidebarNavigation?.items.find((item) => item.label === "API Reference");
     expect(apiItem).toBeDefined();
     expect(apiItem?.children).toHaveLength(2);
   });
@@ -131,7 +131,7 @@ describe("analyzeDocumentStructure", () => {
 
     // In document mode, TOC should be prioritized
     expect(result.navigations.length).toBeGreaterThan(0);
-    const tocNav = result.navigations.find(nav => nav.type === "toc");
+    const tocNav = result.navigations.find((nav) => nav.type === "toc");
     expect(tocNav).toBeDefined();
     expect(result.toc).toBe(tocNav);
   });
@@ -397,59 +397,58 @@ npm run dev</code></pre>
 
     // Should find multiple navigation types
     expect(structure.navigations.length).toBeGreaterThan(3);
-    
+
     // Should identify main navigation
     expect(structure.mainNavigation).toBeDefined();
     expect(structure.mainNavigation?.items).toHaveLength(4);
-    
+
     // Should find breadcrumb
     expect(structure.breadcrumb).toBeDefined();
     expect(structure.breadcrumb?.items).toHaveLength(4);
-    
+
     // Should find TOC or at least have navigation items that could be TOC
-    const tocLikeNav = structure.navigations.find(nav => 
-      nav.type === "toc" || 
-      (nav.items.length > 0 && nav.items[0].href?.startsWith("#"))
+    const tocLikeNav = structure.navigations.find(
+      (nav) => nav.type === "toc" || (nav.items.length > 0 && nav.items[0].href?.startsWith("#"))
     );
     expect(tocLikeNav).toBeDefined();
-    
+
     if (structure.toc) {
       expect(structure.toc.items).toHaveLength(4);
     }
-    
+
     // Should find sidebar navigation
     expect(structure.sidebarNavigation).toBeDefined();
     // Sidebar might have more items due to nested navigation detection
     expect(structure.sidebarNavigation?.items.length).toBeGreaterThanOrEqual(3);
-    
+
     // Should detect pagination - check if pagination navigation exists
-    const paginationNav = structure.navigations.find(nav => nav.type === "pagination");
+    const paginationNav = structure.navigations.find((nav) => nav.type === "pagination");
     expect(paginationNav).toBeDefined();
-    
+
     // If pagination is extracted, verify content
     if (structure.pagination) {
       expect(structure.pagination.prev?.label).toContain("Introduction");
       expect(structure.pagination.next?.label).toContain("Tutorial");
     }
-    
+
     // Should extract sections
     expect(structure.sections).toBeDefined();
     // Find the main article heading
-    const mainHeading = structure.sections?.find(section => 
-      section.title.includes("Getting Started") || 
-      section.level === 1
+    const mainHeading = structure.sections?.find(
+      (section) => section.title.includes("Getting Started") || section.level === 1
     );
     expect(mainHeading).toBeDefined();
-    
+
     // Check for expected number of subsections
-    const totalSubsections = structure.sections?.reduce((count, section) => 
-      count + (section.children?.length || 0), 0
+    const totalSubsections = structure.sections?.reduce(
+      (count, section) => count + (section.children?.length || 0),
+      0
     );
     expect(totalSubsections).toBeGreaterThanOrEqual(4);
-    
+
     // Test content extraction
     const content = extractDocumentContent(html);
-    
+
     expect(content.breadcrumb).toMatch(/Home.*Docs.*Guides/);
     expect(content.sidebarNav).toContain("Getting Started");
     if (content.toc) {

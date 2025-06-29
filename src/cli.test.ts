@@ -82,29 +82,29 @@ describe("CLI document mode", () => {
 
   it("should extract document structure with --doc-mode flag", async () => {
     const { stdout } = await execAsync(`node ${cliPath} --doc-mode ${testHtmlPath}`);
-    
+
     // Check for breadcrumb - might not include current page
     expect(stdout).toContain("**Breadcrumb:** Home > Documentation");
-    
+
     // Check for TOC
     expect(stdout).toContain("## Table of Contents");
     expect(stdout).toContain("- Installation (#install)");
     expect(stdout).toContain("- Usage (#usage)");
     expect(stdout).toContain("- Examples (#examples)");
-    
+
     // Check for sidebar navigation
     expect(stdout).toContain("## Sidebar Navigation");
     expect(stdout).toContain("- Introduction (/docs/intro)");
     expect(stdout).toContain("- Getting Started (/docs/getting-started) **[Current]**");
     expect(stdout).toContain("- Advanced (/docs/advanced)");
-    
+
     // Check for document outline
     expect(stdout).toContain("## Document Outline");
     expect(stdout).toContain("# Getting Started");
     expect(stdout).toContain("## Installation {#install}");
     expect(stdout).toContain("## Usage {#usage}");
     expect(stdout).toContain("## Examples {#examples}");
-    
+
     // Check for main content
     expect(stdout).toContain("## Main Content");
     expect(stdout).toContain("Welcome to our documentation!");
@@ -113,7 +113,7 @@ describe("CLI document mode", () => {
 
   it("should work with -f doc format option", async () => {
     const { stdout } = await execAsync(`node ${cliPath} -f doc ${testHtmlPath}`);
-    
+
     // Should produce the same output as --doc-mode
     expect(stdout).toContain("**Breadcrumb:** Home > Documentation");
     expect(stdout).toContain("## Table of Contents");
@@ -123,8 +123,10 @@ describe("CLI document mode", () => {
   });
 
   it("should handle navigation filtering in document mode", async () => {
-    const { stdout } = await execAsync(`node ${cliPath} --doc-mode --nav-location sidebar ${testHtmlPath}`);
-    
+    const { stdout } = await execAsync(
+      `node ${cliPath} --doc-mode --nav-location sidebar ${testHtmlPath}`
+    );
+
     // Should still show sidebar navigation in document mode
     expect(stdout).toContain("## Sidebar Navigation");
     expect(stdout).toContain("- Introduction (/docs/intro)");
@@ -132,13 +134,13 @@ describe("CLI document mode", () => {
 
   it("should output to file with -o option", async () => {
     const outputPath = path.join(process.cwd(), "test-output.md");
-    
+
     await execAsync(`node ${cliPath} --doc-mode -o ${outputPath} ${testHtmlPath}`);
-    
+
     const output = fs.readFileSync(outputPath, "utf-8");
     expect(output).toContain("# Document Content");
     expect(output).toContain("**Breadcrumb:** Home > Documentation");
-    
+
     // Clean up
     fs.unlinkSync(outputPath);
   });
@@ -159,17 +161,17 @@ describe("CLI document mode", () => {
     fs.writeFileSync(simpleHtmlPath, simpleHtml);
 
     const { stdout } = await execAsync(`node ${cliPath} --doc-mode ${simpleHtmlPath}`);
-    
+
     // Should still show main content
     expect(stdout).toContain("## Main Content");
     expect(stdout).toContain("Simple Page");
     expect(stdout).toContain("This is a simple page without navigation");
-    
+
     // Should not show navigation sections
     expect(stdout).not.toContain("## Sidebar Navigation");
     expect(stdout).not.toContain("## Table of Contents");
     expect(stdout).not.toContain("**Breadcrumb:**");
-    
+
     // Clean up
     fs.unlinkSync(simpleHtmlPath);
   });
@@ -232,27 +234,31 @@ describe("CLI navigation options", () => {
   });
 
   it("should filter navigation by type with --nav-type", async () => {
-    const { stdout } = await execAsync(`node ${cliPath} --nav-only --nav-type global ${testHtmlPath}`);
+    const { stdout } = await execAsync(
+      `node ${cliPath} --nav-only --nav-type global ${testHtmlPath}`
+    );
     const result = JSON.parse(stdout);
-    
+
     expect(result.navigations).toHaveLength(1);
     expect(result.navigations[0].type).toBe("global");
     expect(result.navigations[0].items).toHaveLength(3);
   });
 
   it("should filter navigation by location with --nav-location", async () => {
-    const { stdout } = await execAsync(`node ${cliPath} --nav-only --nav-location header ${testHtmlPath}`);
+    const { stdout } = await execAsync(
+      `node ${cliPath} --nav-only --nav-location header ${testHtmlPath}`
+    );
     const result = JSON.parse(stdout);
-    
+
     // Should only show navigation in header
-    const locations = result.navigations.map(nav => nav.location);
-    expect(locations.every(loc => loc === "header")).toBe(true);
+    const locations = result.navigations.map((nav) => nav.location);
+    expect(locations.every((loc) => loc === "header")).toBe(true);
   });
 
   it("should show all navigations with --nav-only", async () => {
     const { stdout } = await execAsync(`node ${cliPath} --nav-only ${testHtmlPath}`);
     const result = JSON.parse(stdout);
-    
+
     expect(result.navigations.length).toBeGreaterThan(2);
     expect(result.summary.total).toBe(result.navigations.length);
     expect(result.summary.byType).toBeDefined();
