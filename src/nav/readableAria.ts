@@ -16,60 +16,69 @@ import { getNodeDepth, countLinks, assignWeightsToTree, filterNodesByWeight } fr
 
 /**
  * ドキュメントからAriaTreeを構築する
+ * @param doc - VDocument
+ * @param options - オプション
+ * @param options.compress - ツリーを圧縮するかどうか（デフォルト: true）
  */
-export function buildAriaTree(doc: VDocument): AriaTree {
+export function buildAriaTree(doc: VDocument, options: { compress?: boolean } = {}): AriaTree {
+  const { compress = true } = options;
+  
   // ドキュメントのbody要素からツリーを構築
   const rootNode = buildBaseAriaNode(doc.body); // Use renamed function
 
-  // ツリーを圧縮
-  let compressedRoot = compressAriaTree(rootNode);
+  // 圧縮するかどうか
+  let resultRoot = rootNode;
+  if (compress) {
+    // ツリーを圧縮
+    resultRoot = compressAriaTree(rootNode);
 
-  // ルートレベルでの入れ子も解消
-  // ルートがtextで、子がある場合、意味のある子を直接ルートにする
-  if (
-    compressedRoot.type === "text" &&
-    compressedRoot.children &&
-    compressedRoot.children.length > 0
-  ) {
-    // 意味のある子ノードを探す（main, article, sectionなど）
-    const significantChild = compressedRoot.children.find((child) =>
-      ["main", "article", "section", "navigation", "banner", "contentinfo"].includes(child.type)
-    );
+    // ルートレベルでの入れ子も解消
+    // ルートがtextで、子がある場合、意味のある子を直接ルートにする
+    if (
+      resultRoot.type === "text" &&
+      resultRoot.children &&
+      resultRoot.children.length > 0
+    ) {
+      // 意味のある子ノードを探す（main, article, sectionなど）
+      const significantChild = resultRoot.children.find((child) =>
+        ["main", "article", "section", "navigation", "banner", "contentinfo"].includes(child.type)
+      );
 
-    // 意味のある子ノードがあれば、それをルートにする
-    if (significantChild) {
-      // 元のルートの名前を子ノードにマージ（必要な場合）
-      if (compressedRoot.name && !significantChild.name) {
-        significantChild.name = compressedRoot.name;
+      // 意味のある子ノードがあれば、それをルートにする
+      if (significantChild) {
+        // 元のルートの名前を子ノードにマージ（必要な場合）
+        if (resultRoot.name && !significantChild.name) {
+          significantChild.name = resultRoot.name;
+        }
+
+        resultRoot = significantChild;
       }
+      // 意味のある子ノードがなく、子が1つだけの場合
+      else if (resultRoot.children.length === 1) {
+        const child = resultRoot.children[0];
 
-      compressedRoot = significantChild;
-    }
-    // 意味のある子ノードがなく、子が1つだけの場合
-    else if (compressedRoot.children.length === 1) {
-      const child = compressedRoot.children[0];
+        // 子の名前をマージ
+        if (child.name) {
+          resultRoot.name = resultRoot.name
+            ? `${resultRoot.name} ${child.name}`
+            : child.name;
+        }
 
-      // 子の名前をマージ
-      if (child.name) {
-        compressedRoot.name = compressedRoot.name
-          ? `${compressedRoot.name} ${child.name}`
-          : child.name;
-      }
-
-      // 子の子をルートに移動
-      if (child.children && child.children.length > 0) {
-        compressedRoot.children = child.children;
-      } else {
-        delete compressedRoot.children;
+        // 子の子をルートに移動
+        if (child.children && child.children.length > 0) {
+          resultRoot.children = child.children;
+        } else {
+          delete resultRoot.children;
+        }
       }
     }
   }
 
   // ノード数をカウント
-  const nodeCount = countNodes(compressedRoot);
+  const nodeCount = countNodes(resultRoot);
 
   return {
-    root: compressedRoot,
+    root: resultRoot,
     nodeCount,
   };
 }

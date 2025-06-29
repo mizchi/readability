@@ -35,6 +35,7 @@ import {
   serialize as internalSerialize,
   deserialize as internalDeserialize,
 } from "./serializer.ts"; // Import serializer functions
+import { analyzePageStructure, type PageStructure, type AnalyzeOptions } from "./detect/index.ts"; // Import page structure analysis
 
 /** Options for the Readable class */
 export interface ReadableOptions extends Omit<InternalReadabilityOptions, "generateAriaTree"> {
@@ -65,6 +66,7 @@ export class Readable implements IReadable {
   public readonly snapshot: InternalExtractedSnapshot;
   public readonly pageType: PageType;
   private readonly options: ReadableOptions;
+  private readonly originalHTML?: string;
   // Store the processed document internally if needed for methods like AriaTree regeneration
   // private readonly processedDoc: InternalVDocument; // Consider if storing the doc is necessary/feasible
 
@@ -75,12 +77,14 @@ export class Readable implements IReadable {
   private constructor(
     snapshot: InternalExtractedSnapshot,
     pageType: PageType,
-    options: ReadableOptions = {}
+    options: ReadableOptions = {},
+    originalHTML?: string
     // processedDoc?: InternalVDocument // Pass the processed doc optionally
   ) {
     this.snapshot = snapshot;
     this.pageType = pageType;
     this.options = options;
+    this.originalHTML = originalHTML;
     // if (processedDoc) this.processedDoc = processedDoc; // Store the doc if provided
 
     // Removed AriaTree regeneration check based on options.generateAriaTree
@@ -164,7 +168,7 @@ export class Readable implements IReadable {
     };
 
     // Pass the processed doc to the constructor if needed later
-    return new Readable(snapshot, determinedPageType, options /*, doc */);
+    return new Readable(snapshot, determinedPageType, options, content /*, doc */);
   }
 
   /**
@@ -250,6 +254,25 @@ export class Readable implements IReadable {
    */
   public getLinkHierarchy(): LinkHierarchyAnalysis {
     return analyzeLinkHierarchy(this.snapshot.links, this.snapshot.metadata);
+  }
+
+  /**
+   * Analyzes the page structure including navigations, headers, and other structural elements.
+   * This method requires the original HTML content.
+   *
+   * @param options Options for the page structure analysis
+   * @returns Page structure information including navigations
+   * @throws Error if the original HTML is not available
+   */
+  public getPageStructure(options?: AnalyzeOptions): PageStructure {
+    if (!this.originalHTML) {
+      throw new Error(
+        "Page structure analysis requires the original HTML content. " +
+        "This method is only available when creating Readable instances with fromHTML()."
+      );
+    }
+    
+    return analyzePageStructure(this.originalHTML, options);
   }
 } // This closes the Readable class properly
 

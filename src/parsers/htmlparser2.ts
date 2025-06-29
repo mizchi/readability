@@ -25,17 +25,50 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
   };
 
   // Setup document structure
-  document.documentElement.children = [document.body];
+  document.documentElement.children = [];
   document.body.parent = new WeakRef(document.documentElement); // Use WeakRef
 
   // Currently processing element
-  let currentElement: VElement = document.body;
+  let currentElement: VElement = document.documentElement;
+  let bodyFound = false;
 
   const parser = new Parser({
     onopentag(name, attributes) {
+      const tagLower = name.toLowerCase();
+      
+      // Handle special cases for html and body tags
+      if (tagLower === "html") {
+        // Update attributes on existing documentElement
+        for (const [key, value] of Object.entries(attributes)) {
+          document.documentElement.attributes[key] = value;
+        }
+        if (attributes.id) document.documentElement.id = attributes.id;
+        if (attributes.class) document.documentElement.className = attributes.class;
+        currentElement = document.documentElement;
+        return;
+      }
+      
+      if (tagLower === "body") {
+        // Update attributes on existing body
+        for (const [key, value] of Object.entries(attributes)) {
+          document.body.attributes[key] = value;
+        }
+        if (attributes.id) document.body.id = attributes.id;
+        if (attributes.class) document.body.className = attributes.class;
+        
+        // If not already in documentElement, add it
+        if (!bodyFound) {
+          document.documentElement.children.push(document.body);
+          bodyFound = true;
+        }
+        
+        currentElement = document.body;
+        return;
+      }
+
       const element: VElement = {
         nodeType: "element",
-        tagName: name.toLowerCase(), // Use lowercase
+        tagName: tagLower,
         attributes: {},
         children: [],
         parent: new WeakRef(currentElement), // Use WeakRef
@@ -67,7 +100,15 @@ export function parseHTML(html: string, baseURI: string = "about:blank"): VDocum
       // Add to parent element
       currentElement.children.push(textNode);
     },
-    onclosetag() {
+    onclosetag(name) {
+      const tagLower = name.toLowerCase();
+      
+      // Don't go above documentElement for html tag
+      if (tagLower === "html") {
+        currentElement = document.documentElement;
+        return;
+      }
+      
       // Return to parent element
       const parentRef = currentElement.parent;
       if (parentRef) {

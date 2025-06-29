@@ -57,3 +57,18 @@ export { classify } from "./classify/classify.ts";
 
 // Export the readable function and related types from the new module
 export { readable, type ReadableOptions } from "./readable.ts";
+
+// Export page structure analysis function and related types
+export { analyzePageStructure } from "./detect/index.ts";
+export type { 
+  PageStructure,
+  AnalyzeOptions,
+  HeaderInfo,
+  NavigationInfo,
+  NavigationItem,
+  NavigationType,
+  NavigationLocation,
+  NavigationStructure,
+  LogoInfo,
+  SiteTitleInfo,
+} from "./detect/index.ts";

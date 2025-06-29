@@ -4,24 +4,9 @@
  * Utility functions for generating ARIA snapshots
  */
 
-import type { VElement, VNode, VText, AriaNodeType } from "../types.ts";
-
-export interface AriaNode {
-  type: AriaNodeType;
-  role: string;
-  originalElement: WeakRef<VElement>;
-  name?: string;
-  level?: number;
-  checked?: boolean;
-  selected?: boolean;
-  expanded?: boolean;
-  disabled?: boolean;
-  required?: boolean;
-  valuemin?: number;
-  valuemax?: number;
-  valuetext?: string;
-  children?: AriaNode[];
-}
+import type { VElement, VNode, VText } from "../types.ts";
+import type { AriaNodeType } from "./types.ts";
+export type { AriaNode } from "./types.ts";
 import { getAttribute, isProbablyVisible, getInnerText } from "../dom.ts";
 
 /**
@@ -43,6 +28,7 @@ export function getAriaRole(element: VElement): string {
     a: element.attributes.href ? "link" : "generic",
     article: "article",
     aside: "complementary",
+    body: "generic",
     button: "button",
     footer: "contentinfo",
     form: "form",
@@ -108,8 +94,8 @@ export function getAccessibleName(element: VElement): string | undefined {
     return title;
   }
 
-  // 見出し要素、リンク、ボタンなどはテキストコンテンツを名前として使用
-  const isNameFromContent = ["a", "button", "h1", "h2", "h3", "h4", "h5", "h6", "label"].includes(
+  // 見出し要素、リンク、ボタン、リストアイテムなどはテキストコンテンツを名前として使用
+  const isNameFromContent = ["a", "button", "h1", "h2", "h3", "h4", "h5", "h6", "label", "li"].includes(
     element.tagName
   );
 
@@ -185,7 +171,7 @@ export function getAriaNodeType(element: VElement): AriaNodeType {
   };
 
   // テキストノードの子を持つ要素で、他のロールがない場合はテキストとして扱う
-  if (role === "generic" && element.children.some((child) => child.nodeType === "text")) {
+  if (role === "generic" && element.children.some((child) => child.type === "text")) {
     return "text";
   }
 
